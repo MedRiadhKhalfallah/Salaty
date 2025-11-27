@@ -1,0 +1,1345 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: transparent;
+  overflow: hidden;
+  user-select: none;
+}
+
+.app-container {
+  width: 320px; /* Reduced from 360px */
+  height: 540px; /* Original height */
+  border-radius: 20px; /* Original radius */
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.15));
+  backdrop-filter: blur(14px); /* Slightly increased for smoother blur */
+  box-shadow: 8px 8px 32px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+  -webkit-app-region: drag; /* Make entire window draggable */
+}
+
+/* Make all interactive elements non-draggable */
+button, input, select, textarea, a, .prayer-item, .settings-panel, .settings-panel * {
+  -webkit-app-region: no-drag;
+  pointer-events: auto;
+}
+
+.drag-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  pointer-events: none; /* Allow clicks to pass through */
+  -webkit-app-region: drag; /* Make the drag area draggable */
+}
+
+/* Ensure settings panel controls are always clickable */
+.settings-panel * {
+  pointer-events: auto;
+}
+
+.window-controls {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  left: 16px;
+  display: flex;
+  -webkit-app-region: no-drag; /* Make controls clickable */
+  pointer-events: auto; /* Ensure controls are clickable */
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 1100;
+  -webkit-app-region: no-drag;
+  align-items: center;
+}
+
+.window-controls .right-controls {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.control-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  -webkit-app-region: no-drag; /* Make buttons clickable */
+  pointer-events: auto; /* Ensure buttons are clickable */
+}
+
+.control-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.control-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.control-btn:active {
+  transform: translateY(0);
+  transition: transform 0.1s ease;
+}
+
+.control-btn:hover::before {
+  opacity: 1;
+}
+
+.control-btn svg {
+  width: 14px;
+  height: 14px;
+  transition: all 0.3s ease;
+  fill: rgba(255, 255, 255, 0.9);
+}
+
+.control-btn:hover svg {
+  transform: scale(1.1);
+}
+
+.minimize-btn:hover {
+  background: rgba(247, 183, 49, 0.2);
+}
+
+.minimize-btn:active {
+  background: rgba(247, 183, 49, 0.3);
+}
+
+.close-btn:hover {
+  background: rgba(255, 59, 48, 0.2);
+}
+
+.close-btn:active {
+  background: rgba(255, 59, 48, 0.3);
+}
+
+/* Ripple effect */
+.control-btn::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform 0.6s, opacity 1s;
+}
+
+.control-btn:active::after {
+  transform: scale(0, 0);
+  opacity: 0.3;
+  transition: 0s;
+}
+
+.header {
+  padding: 48px 20px 16px; /* Reduced padding */
+  text-align: center;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.15), transparent);
+}
+
+.settings-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-app-region: no-drag;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.settings-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px) rotate(45deg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.settings-btn:active {
+  transform: translateY(0) rotate(45deg);
+  transition: transform 0.1s ease;
+}
+
+.settings-btn i {
+  transition: transform 0.3s ease;
+}
+
+.settings-btn:hover i {
+  transform: scale(1.1);
+}
+
+/* Ripple effect for settings button */
+.settings-btn::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform 0.6s, opacity 1s;
+}
+
+.settings-btn:active::after {
+  transform: scale(0, 0);
+  opacity: 0.3;
+  transition: 0s;
+}
+
+.location {
+  font-size: 18px; /* Slightly smaller */
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+}
+
+.date-info {
+  font-size: 13px; /* Adjusted for compactness */
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 400;
+}
+
+.hijri-date {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.current-prayer-card {
+  margin: 10px 16px; /* Reduced margins */
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.current-prayer-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.current-prayer-name {
+  font-size: 14px; /* Smaller font */
+  font-weight: 600;
+  color: var(--accent-color, #fff);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.current-prayer-time {
+  font-size: 22px; /* Adjusted for compactness */
+  font-weight: 700;
+  color: #fff;
+}
+
+.time-remaining {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 4px;
+}
+
+.prayer-cards-container {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+
+.prayer-card {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px 8px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.prayer-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.prayer-card:hover::before {
+  opacity: 1;
+}
+
+.prayer-card.current {
+  background: linear-gradient(135deg, 
+    rgba(var(--accent-rgb, 74, 107, 255), 0.9), 
+    rgba(var(--accent-rgb, 74, 107, 255), 0.7)
+  );
+  color: white;
+  box-shadow: 0 4px 20px rgba(var(--accent-rgb, 74, 107, 255), 0.2);
+}
+
+.prayer-card.next {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.prayer-card.next .prayer-name,
+.prayer-card.next .prayer-time {
+  color: #fff;
+}
+
+.prayer-card.next .countdown {
+  color: var(--accent-color, #4a6bff);
+  font-weight: 600;
+}
+
+.prayer-label {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-bottom: 4px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.prayer-card .prayer-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 6px 0 4px;
+  color: inherit;
+}
+
+.prayer-card .prayer-time {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: inherit;
+  font-feature-settings: 'tnum' on, 'lnum' on;
+  letter-spacing: 0.5px;
+}
+
+.prayer-card .time-remaining {
+  font-size: 12px;
+  opacity: 0.9;
+  font-weight: 500;
+  color: inherit;
+  margin-top: 2px;
+}
+
+.prayer-card .countdown {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+  color: #4a6bff;
+}
+
+.prayer-times {
+  padding: 0 20px;
+  max-height: 280px; /* Reduced to fit smaller window */
+  overflow-y: auto;
+}
+
+.prayer-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px; /* Reduced padding */
+  margin: 4px 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.prayer-item.current-prayer {
+  background: linear-gradient(135deg, 
+    rgba(var(--accent-rgb, 74, 107, 255), 0.15), 
+    rgba(var(--accent-rgb, 74, 107, 255), 0.05)
+  );
+  border: 1px solid rgba(var(--accent-rgb, 74, 107, 255), 0.3);
+  box-shadow: 0 0 15px rgba(var(--accent-rgb, 74, 107, 255), 0.2);
+}
+
+.prayer-item.current-prayer::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: var(--accent-color, #4a6bff);
+}
+
+.current-indicator {
+  display: inline-block;
+  background: var(--accent-color, #4a6bff);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 8px;
+  vertical-align: middle;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+.prayer-item:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.prayer-item i {
+  width: 28px; /* Smaller icon container */
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  margin-right: 10px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.prayer-item .prayer-name {
+  flex-grow: 1;
+  font-size: 14px; /* Smaller font */
+  font-weight: 500;
+  color: #fff;
+}
+
+.prayer-item .prayer-time {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  margin-right: 4px;
+}
+
+.prayer-item.current {
+  background: var(--accent-color, rgba(255, 255, 255, 0.25));
+  border-left: 3px solid #fff;
+  transform: scale(1.01);
+}
+
+.next-prayer {
+  margin: 12px 20px 16px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  text-align: center;
+  font-size: 13px;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.next-prayer .highlight {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--accent-color, #fff);
+}
+
+.settings-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(30, 30, 30, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 24px 20px 20px;
+  transform: translateY(100%);
+  transition: transform 0.3s ease-in-out;
+  z-index: 9999;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  -webkit-app-region: no-drag; /* Make settings panel non-draggable */
+  pointer-events: auto; /* Ensure settings panel is clickable */
+}
+
+.settings-panel.active {
+  transform: translateY(0);
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  padding-top: 8px;
+}
+
+.settings-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.back-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 16px;
+  margin-right: 16px;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(-2px);
+}
+
+.back-btn:active {
+  transform: translateX(0);
+}
+
+.setting-group {
+  margin-bottom: 10px;
+}
+
+.location-group {
+  display: flex;
+  gap: 10px;
+}
+
+.location-group .setting-input {
+  flex: 1;
+}
+
+.setting-label {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.setting-input {
+  width: 100%;
+  padding: 8px; /* Reduced padding */
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.setting-input:focus {
+  outline: none;
+  border-color: var(--accent-color, #fff);
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.theme-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.theme-option {
+  padding: 6px; /* Smaller padding */
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  color: white;
+  text-align: center;
+  border: 2px solid transparent;
+  opacity: 0.85;
+}
+
+.theme-option.selected {
+  opacity: 1;
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.theme-option:hover {
+  transform: scale(1.05);
+  opacity: 1;
+}
+
+.save-btn {
+  width: 100%;
+  padding: 10px;
+  background: var(--accent-gradient, linear-gradient(90deg, #4a90e2, #5da7ff));
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 12px 0;
+  transition: all 0.3s ease;
+}
+
+.save-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.save-btn:active {
+  transform: translateY(0);
+}
+
+.version-info {
+  margin-top: auto;
+  text-align: center;
+  padding: 16px 0 8px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 12px;
+}
+
+.version {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.update-btn {
+  background: none;
+  border: none;
+  color: #9b59b6;
+  cursor: pointer;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.update-btn:hover {
+  background: rgba(155, 89, 182, 0.15);
+}
+
+.footer-text {
+  font-size: 11px;
+  margin-top: 6px;
+  opacity: 0.85;
+}
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 2000;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 3px 16px rgba(0, 0, 0, 0.2);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast i {
+  font-size: 14px;
+}
+
+/* Theme Styles */
+.theme-navy {
+  background: linear-gradient(145deg, #0a1128, #1a237e);
+  --accent-color: #4a90e2;
+  --accent-rgb: 74, 144, 226;
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --bg-primary: #0a1128;
+  --bg-secondary: #1a237e;
+  --bg-surface: rgba(26, 35, 126, 0.6);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-green {
+  background: linear-gradient(145deg, #1b5e20, #2e7d32);
+  --accent-color: #4caf50;
+  --accent-rgb: 76, 175, 80;
+  --text-primary: #ffffff;
+  --text-secondary: #e0f7e0;
+  --bg-primary: #1b5e20;
+  --bg-secondary: #2e7d32;
+  --bg-surface: rgba(27, 94, 32, 0.6);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-brown {
+  background: linear-gradient(145deg, #4e342e, #6d4c41);
+  --accent-color: #8d6e63;
+  --accent-rgb: 141, 110, 99;
+  --text-primary: #ffffff;
+  --text-secondary: #f5e6d3;
+  --bg-primary: #4e342e;
+  --bg-secondary: #6d4c41;
+  --bg-surface: rgba(78, 52, 46, 0.6);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-gold {
+  background: linear-gradient(145deg, #6b5b1e, #b5982c);
+  --accent-color: #d4af37;
+  --accent-rgb: 212, 175, 55;
+  --text-primary: #2c2100;
+  --text-secondary: #4a3d00;
+  --bg-primary: #8e6e19;
+  --bg-secondary: #d4af37;
+  --bg-surface: rgba(212, 175, 55, 0.7);
+  --border-color: rgba(0, 0, 0, 0.15);
+}
+
+.theme-pink {
+  background: linear-gradient(145deg, #7a1a4a, #b51a5c);
+  --accent-color: #e91e63;
+  --accent-rgb: 233, 30, 99;
+  --text-primary: #ffffff;
+  --text-secondary: #ffd1e0;
+  --bg-primary: #9e1a5c;
+  --bg-secondary: #e91e63;
+  --bg-surface: rgba(158, 26, 92, 0.65);
+  --border-color: rgba(255, 255, 255, 0.15);
+}
+
+.theme-purple {
+  background: linear-gradient(145deg, #311b92, #4527a0);
+  --accent-color: #7e57c2;
+  --accent-rgb: 126, 87, 194;
+  --text-primary: #ffffff;
+  --text-secondary: #e1bee7;
+  --bg-primary: #311b92;
+  --bg-secondary: #4527a0;
+  --bg-surface: rgba(69, 39, 160, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-emerald {
+  background: linear-gradient(145deg, #006064, #00838f);
+  --accent-color: #26a69a;
+  --accent-rgb: 38, 166, 154;
+  --text-primary: #ffffff;
+  --text-secondary: #b2ebf2;
+  --bg-primary: #006064;
+  --bg-secondary: #00838f;
+  --bg-surface: rgba(0, 131, 143, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-sunset {
+  background: linear-gradient(145deg, #e65100, #ef6c00);
+  --accent-color: #ff9800;
+  --accent-rgb: 255, 152, 0;
+  --text-primary: #fff3e0;
+  --text-secondary: #ffe0b2;
+  --bg-primary: #e65100;
+  --bg-secondary: #ef6c00;
+  --bg-surface: rgba(239, 108, 0, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-ocean {
+  background: linear-gradient(145deg, #01579b, #0277bd);
+  --accent-color: #29b6f6;
+  --accent-rgb: 41, 182, 246;
+  --text-primary: #e1f5fe;
+  --text-secondary: #b3e5fc;
+  --bg-primary: #01579b;
+  --bg-secondary: #0277bd;
+  --bg-surface: rgba(2, 119, 189, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-royal {
+  background: linear-gradient(145deg, #0d47a1, #1565c0);
+  --accent-color: #ffd700;
+  --accent-rgb: 255, 215, 0;
+  --text-primary: #ffffff;
+  --text-secondary: #e3f2fd;
+  --bg-primary: #0d47a1;
+  --bg-secondary: #1565c0;
+  --bg-surface: rgba(21, 101, 192, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-indigo {
+  background: linear-gradient(145deg, #1a237e, #283593);
+  --accent-color: #5c6bc0;
+  --accent-rgb: 92, 107, 192;
+  --text-primary: #ffffff;
+  --text-secondary: #e8eaf6;
+  --bg-primary: #1a237e;
+  --bg-secondary: #283593;
+  --bg-surface: rgba(40, 53, 147, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-classic {
+  background: linear-gradient(145deg, #212121, #424242);
+  --accent-color: #9e9e9e;
+  --accent-rgb: 158, 158, 158;
+  --text-primary: #ffffff;
+  --text-secondary: #f5f5f5;
+  --bg-primary: #212121;
+  --bg-secondary: #424242;
+  --bg-surface: rgba(66, 66, 66, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Settings Panel */
+.settings-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-surface);
+  backdrop-filter: blur(20px);
+  padding: 20px;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 1500; /* Higher z-index to ensure it's above other elements */
+  pointer-events: auto; /* Ensure the panel can receive pointer events */
+  opacity: 0;
+  visibility: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-panel.active {
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.settings-panel.active {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.settings-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 auto 0 12px;
+}
+
+.back-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: visible;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 2000; /* Higher z-index to ensure it's above other elements */
+  margin-right: 12px;
+  -webkit-app-region: no-drag;
+  pointer-events: auto !important; /* Force pointer events to work */
+}
+
+.back-btn i {
+  transition: transform 0.3s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-btn:hover i {
+  transform: translateX(-2px);
+}
+
+.back-btn:active {
+  transform: translateY(0);
+  transition: transform 0.1s ease;
+}
+
+/* Ripple effect for back button */
+.back-btn::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform 0.6s, opacity 1s;
+}
+
+.back-btn:active::after {
+  transform: scale(0, 0);
+  opacity: 0.3;
+  transition: 0s;
+}
+
+.settings-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-app-region: no-drag;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  z-index: 1001;
+  opacity: 1;
+}
+
+.settings-btn i {
+  transition: transform 0.3s ease;
+}
+
+.settings-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px) rotate(45deg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.settings-btn:hover i {
+  transform: scale(1.1);
+}
+
+.settings-btn:active {
+  transform: translateY(0) rotate(45deg);
+  transition: transform 0.1s ease;
+}
+
+/* Ripple effect for settings button */
+.settings-btn::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform 0.6s, opacity 1s;
+}
+
+.settings-btn:active::after {
+  transform: scale(0, 0);
+  opacity: 0.3;
+  transition: 0s;
+}
+
+/* Hide settings button when settings panel is active */
+.settings-panel.active ~ .header .settings-btn,
+body.settings-open .settings-btn {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-10px);
+}
+
+.setting-group {
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.location-group {
+  padding: 12px 16px;
+}
+
+.location-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.location-input {
+  flex: 1;
+  min-width: 0; /* Prevents flex items from overflowing */
+}
+
+.setting-group:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.setting-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.setting-input {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  font-size: 12px;
+  transition: all 0.2s ease;
+  margin-bottom: 2px;
+  height: 32px;
+}
+
+.setting-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.3);
+}
+
+.input-hint {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
+.theme-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* Adjust theme option size to fit 4 in a row */
+.theme-option {
+  height: 28px; /* Slightly reduced height to fit better */
+  font-size: 9px; /* Slightly smaller font */
+  padding: 0 1px; /* Reduced padding */
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  height: 32px; /* Slightly reduced height */
+  font-size: 10px; /* Slightly smaller font */
+  padding: 0 2px; /* Reduced padding */
+  text-align: center;
+  line-height: 1.1;
+}
+
+.theme-option::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.theme-option:hover::before {
+  opacity: 0.8;
+}
+
+.theme-option.selected {
+  border-color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.theme-navy-option { background: linear-gradient(145deg, #0a1128, #1a237e); }
+.theme-green-option { background: linear-gradient(145deg, #1b5e20, #2e7d32); }
+.theme-brown-option { background: linear-gradient(145deg, #4e342e, #6d4c41); }
+.theme-gold-option { background: linear-gradient(145deg, #6b5b1e, #b5982c); }
+.theme-pink-option { background: linear-gradient(145deg, #7a1a4a, #b51a5c); }
+
+.theme-purple-option { background: linear-gradient(145deg, #311b92, #4527a0); }
+.theme-emerald-option { background: linear-gradient(145deg, #006064, #00838f); }
+
+.theme-ocean-option { background: linear-gradient(145deg, #01579b, #0277bd); }
+.theme-royal-option { background: linear-gradient(145deg, #0d47a1, #1565c0); }
+.theme-indigo-option { background: linear-gradient(145deg, #1a237e, #283593); }
+
+.theme-classic-option { background: linear-gradient(145deg, #212121, #424242); }
+
+.theme-option.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 10px;
+  height: 10px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7px;
+  color: #333;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.save-btn {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 16px;
+  height: 36px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.save-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.version-info {
+  margin-top: auto;
+  text-align: center;
+  padding-top: 24px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.version {
+  margin-bottom: 4px;
+}
+
+.footer-text {
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* Error Message Styles */
+.error-message {
+  text-align: center;
+  padding: 20px;
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 10px;
+  margin: 10px;
+  border: 1px solid rgba(255, 107, 107, 0.2);
+}
+
+.error-message i {
+  font-size: 24px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.error-message div {
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.retry-button {
+  background: var(--accent-color, #4a6bff);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.retry-button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.retry-button:active {
+  transform: translateY(0);
+}
+
+.retry-button i {
+  font-size: 12px;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.prayer-item, .current-prayer-card, .next-prayer {
+  animation: fadeIn 0.4s ease-out;
+}
