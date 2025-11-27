@@ -28,11 +28,9 @@ A beautiful, lightweight, always-on-top **Electron.js** desktop app that shows a
 - 🌐 Offline capable after first load
 - 💻 Cross-platform: Windows • macOS • Linux
 
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/95c8f7d0-6fa5-4d66-a857-527f573550d1" width="32%"/> 
-  <img src="https://github.com/user-attachments/assets/677e38cc-5cee-4f8f-886b-9f089e64ae0d" width="32%"/> 
-  <img src="https://github.com/user-attachments/assets/b3fd74b9-3edf-4326-969b-7eeac5e6009d" width="32%"/>
-</div>
+| Home (Navy Theme)                          | Settings                                   | Royal Theme                                |
+|--------------------------------------------|--------------------------------------------|--------------------------------------------|
+| <img src="https://github.com/user-attachments/assets/95c8f7d0-6fa5-4d66-a857-527f573550d1" width="300"/> | <img src="https://github.com/user-attachments/assets/677e38cc-5cee-4f8f-886b-9f089e64ae0d" width="300"/> | <img src="https://github.com/user-attachments/assets/b3fd74b9-3edf-4326-969b-7eeac5e6009d" width="300"/> |
 
 ---
 
