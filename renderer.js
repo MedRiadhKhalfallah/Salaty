@@ -1,14 +1,110 @@
 const { ipcRenderer } = require('electron');
 
-let currentSettings = { theme: 'navy', city: '', country: '' };
+let currentSettings = { theme: 'navy', city: '', country: '', language: 'en' };
 let prayerData = null;
 
-const prayerNames = {
-  'Fajr': 'Fajr',
-  'Dhuhr': 'Dhuhr',
-  'Asr': 'Asr',
-  'Maghrib': 'Maghrib',
-  'Isha': 'Isha'
+// Translation object
+const translations = {
+  en: {
+    prayerNames: {
+      'Fajr': 'Fajr',
+      'Dhuhr': 'Dhuhr',
+      'Asr': 'Asr',
+      'Maghrib': 'Maghrib',
+      'Isha': 'Isha'
+    },
+    ui: {
+      loading: 'Loading...',
+      loadingPrayerTimes: 'Loading prayer times...',
+      currentPrayer: 'Current Prayer',
+      nextPrayer: 'Next Prayer',
+      endTime: 'End time',
+      now: 'Now',
+      settings: 'Settings',
+      city: 'City',
+      country: 'Country',
+      theme: 'Theme',
+      language: 'Language',
+      save: 'Save',
+      backToMain: 'Back to Main',
+      cityPlaceholder: 'e.g., Tunis',
+      countryPlaceholder: 'e.g., Tunisia',
+      cityHint: 'Your city',
+      countryHint: 'Your country',
+      madeWith: 'Made with ❤️ for the Muslim Ummah',
+      errorLoading: 'Error loading prayer times',
+      networkError: 'Network error. Please check your connection.',
+      retry: 'Retry',
+      settingsSaved: 'Settings saved successfully',
+      errorSaving: 'Error saving settings',
+      enterBothCityCountry: 'Please enter both city and country',
+      locationNotSet: 'Location not set',
+      ah: 'AH'
+    },
+    themes: {
+      navy: 'Navy',
+      green: 'Green',
+      brown: 'Brown',
+      gold: 'Gold',
+      pink: 'Pink',
+      purple: 'Purple',
+      emerald: 'Emerald',
+      ocean: 'Ocean',
+      royal: 'Royal',
+      indigo: 'Indigo',
+      classic: 'Classic'
+    }
+  },
+  ar: {
+    prayerNames: {
+      'Fajr': 'الفجر',
+      'Dhuhr': 'الظهر',
+      'Asr': 'العصر',
+      'Maghrib': 'المغرب',
+      'Isha': 'العشاء'
+    },
+    ui: {
+      loading: 'جاري التحميل...',
+      loadingPrayerTimes: 'جاري تحميل أوقات الصلاة...',
+      currentPrayer: 'الصلاة الحالية',
+      nextPrayer: 'الصلاة القادمة',
+      endTime: 'وقت الانتهاء',
+      now: 'الآن',
+      settings: 'الإعدادات',
+      city: 'المدينة',
+      country: 'البلد',
+      theme: 'المظهر',
+      language: 'اللغة',
+      save: 'حفظ',
+      backToMain: 'العودة للرئيسية',
+      cityPlaceholder: 'مثال: تونس',
+      countryPlaceholder: 'مثال: تونس',
+      cityHint: 'مدينتك',
+      countryHint: 'بلدك',
+      madeWith: 'صُنع بـ ❤️ للأمة الإسلامية',
+      errorLoading: 'خطأ في تحميل أوقات الصلاة',
+      networkError: 'خطأ في الاتصال. يرجى التحقق من الإنترنت.',
+      retry: 'إعادة المحاولة',
+      settingsSaved: 'تم حفظ الإعدادات بنجاح',
+      errorSaving: 'خطأ في حفظ الإعدادات',
+      enterBothCityCountry: 'يرجى إدخال المدينة والبلد',
+      locationNotSet: 'الموقع غير محدد',
+      ah: 'هـ'
+    },
+    themes: {
+      navy: 'أزرق داكن',
+      green: 'أخضر',
+      brown: 'بني',
+      gold: 'ذهبي',
+      pink: 'وردي',
+      purple: 'بنفسجي',
+      emerald: 'زمردي',
+      ocean: 'محيطي',
+      royal: 'ملكي',
+      indigo: 'نيلي',
+      classic: 'كلاسيكي'
+    }
+  }
 };
 
 const prayerIcons = {
@@ -19,9 +115,38 @@ const prayerIcons = {
   'Isha': 'moon'
 };
 
+// Get current language
+function getCurrentLanguage() {
+  return currentSettings.language || 'en';
+}
+
+// Get translated text
+function t(key, section = 'ui') {
+  const lang = getCurrentLanguage();
+  const parts = key.split('.');
+  let value = translations[lang][section];
+  
+  for (const part of parts) {
+    value = value?.[part];
+  }
+  
+  return value || key;
+}
+
+// Apply RTL/LTR direction
+function applyLanguageDirection() {
+  const lang = getCurrentLanguage();
+  const isRTL = lang === 'ar';
+  
+  document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+  document.documentElement.lang = lang;
+  
+  // Add or remove RTL class from body
+  document.body.classList.toggle('rtl', isRTL);
+}
+
 async function initApp() {
   try {
-    // Initialize with default settings first
     selectedTheme = 'navy';
     pendingTheme = 'navy';
     applyTheme('navy');
@@ -35,6 +160,8 @@ async function initApp() {
           pendingTheme = currentSettings.theme;
           applyTheme(currentSettings.theme);
         }
+        // Apply language direction
+        applyLanguageDirection();
       }
     } catch (error) {
       console.warn('Could not load settings, using defaults:', error);
@@ -42,37 +169,34 @@ async function initApp() {
     
     updateSettingsInputs();
     initThemeUI();
+    updateLanguageUI();
     
-    // Initial load
     await loadPrayerTimes();
     
-    // Set up intervals
     setInterval(updateCurrentAndNextPrayer, 1000);
-    setInterval(loadPrayerTimes, 3600000); // Refresh prayer times every hour
+    setInterval(loadPrayerTimes, 3600000);
     
-    // Initial update
     updateCurrentAndNextPrayer();
   } catch (error) {
     console.error('Error initializing app:', error);
-    showToast('Error initializing app', 'error');
+    showToast(t('errorLoading'), 'error');
     const container = document.getElementById('prayerCards') || document.getElementById('prayerTimes');
     if (container) {
-      container.innerHTML = '<div class="loading">Error loading prayer times</div>';
+      container.innerHTML = `<div class="loading">${t('errorLoading')}</div>`;
     }
   }
 }
 
 async function loadPrayerTimes() {
-  const prayerTimesContainer = document.getElementById('prayerTimes');
+  const prayerTimesContainer = document.getElementById('prayerList');
   
   try {
     if (!currentSettings.city || !currentSettings.country) {
-      throw new Error('Location not set');
+      throw new Error(t('locationNotSet'));
     }
 
-    // Show loading state
     if (prayerTimesContainer) {
-      prayerTimesContainer.innerHTML = '<div class="loading">Loading prayer times...</div>';
+      prayerTimesContainer.innerHTML = `<div class="loading">${t('loadingPrayerTimes')}</div>`;
     }
 
     const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(currentSettings.city)}&country=${encodeURIComponent(currentSettings.country)}`;
@@ -95,10 +219,10 @@ async function loadPrayerTimes() {
   } catch (error) {
     console.error('Error loading prayer times:', error);
     const errorMessage = error.message.includes('Failed to fetch') 
-      ? 'Network error. Please check your connection.'
-      : `Error: ${error.message}`;
+      ? t('networkError')
+      : `${t('errorLoading')}: ${error.message}`;
       
-    showToast('Failed to load prayer times', 'error');
+    showToast(t('errorLoading'), 'error');
     
     if (prayerTimesContainer) {
       prayerTimesContainer.innerHTML = `
@@ -106,12 +230,11 @@ async function loadPrayerTimes() {
           <i class="fas fa-exclamation-triangle"></i>
           <div>${errorMessage}</div>
           <button id="retryButton" class="retry-button">
-            <i class="fas fa-sync-alt"></i> Retry
+            <i class="fas fa-sync-alt"></i> ${t('retry')}
           </button>
         </div>
       `;
       
-      // Add retry button event listener
       const retryButton = document.getElementById('retryButton');
       if (retryButton) {
         retryButton.addEventListener('click', loadPrayerTimes);
@@ -125,20 +248,40 @@ async function loadPrayerTimes() {
 function updateUI() {
   if (!prayerData) return;
 
-  document.getElementById('location').textContent = `${currentSettings.city}, ${currentSettings.country}`;
-  document.getElementById('gregorianDate').textContent = prayerData.date.readable;
-  document.getElementById('hijriDate').textContent = `${prayerData.date.hijri.day} ${prayerData.date.hijri.month.en} ${prayerData.date.hijri.year} AH`;
+  const lang = getCurrentLanguage();
+  
+  const locationEl = document.getElementById('location');
+  const gregorianDateEl = document.getElementById('gregorianDate');
+  const hijriDateEl = document.getElementById('hijriDate');
+  const prayerListEl = document.getElementById('prayerList');
+  
+  if (locationEl) {
+    locationEl.textContent = `${currentSettings.city}, ${currentSettings.country}`;
+  }
+  if (gregorianDateEl) {
+    // Format date properly for RTL
+    if (lang === 'ar') {
+      // Keep the date in LTR format even in Arabic mode
+      gregorianDateEl.style.direction = 'ltr';
+      gregorianDateEl.style.textAlign = 'center';
+    } else {
+      gregorianDateEl.style.direction = 'ltr';
+      gregorianDateEl.style.textAlign = 'center';
+    }
+    gregorianDateEl.textContent = prayerData.date.readable;
+  }
+  if (hijriDateEl) {
+    const hijriMonth = lang === 'ar' ? prayerData.date.hijri.month.ar : prayerData.date.hijri.month.en;
+    hijriDateEl.textContent = `${prayerData.date.hijri.day} ${hijriMonth} ${prayerData.date.hijri.year} ${t('ah')}`;
+  }
 
-  // Get current prayer key from the currentActivePrayer variable
   const now = new Date();
   const currentSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
   let currentPrayerKey = '';
   
-  // Find the current prayer by checking which prayer time we're currently between
   const prayerTimes = [];
   
-  // First, collect all prayer times
-  for (const [key] of Object.entries(prayerNames)) {
+  for (const key of Object.keys(translations[lang].prayerNames)) {
     const time = prayerData.timings[key];
     if (!time) continue;
     
@@ -151,10 +294,8 @@ function updateUI() {
     });
   }
   
-  // Sort by time
   prayerTimes.sort((a, b) => a.seconds - b.seconds);
   
-  // Find the last prayer that has passed
   for (let i = 0; i < prayerTimes.length; i++) {
     if (prayerTimes[i].seconds <= currentSeconds) {
       currentPrayerKey = prayerTimes[i].key;
@@ -163,12 +304,12 @@ function updateUI() {
     }
   }
   
-  // If no prayer has passed yet, use the last prayer from previous day
   if (!currentPrayerKey && prayerTimes.length > 0) {
     currentPrayerKey = prayerTimes[prayerTimes.length - 1].key;
   }
 
-  const prayerTimesHTML = Object.entries(prayerNames).map(([key, name]) => {
+  const prayerTimesHTML = Object.keys(translations[lang].prayerNames).map((key) => {
+    const name = t(key, 'prayerNames');
     const time = prayerData.timings[key];
     const icon = prayerIcons[key] || 'clock';
     const isCurrent = key === currentPrayerKey;
@@ -176,16 +317,17 @@ function updateUI() {
       <div class="prayer-item ${isCurrent ? 'current-prayer' : ''}" data-prayer="${key}">
         <i class="fas fa-${icon}"></i>
         <span class="prayer-name">${name}</span>
-        <span class="prayer-time">${time} ${isCurrent ? '<span class="current-indicator">Now</span>' : ''}</span>
+        <span class="prayer-time">${time} ${isCurrent ? `<span class="current-indicator">${t('now')}</span>` : ''}</span>
       </div>
     `;
   }).join('');
 
-  document.getElementById('prayerList').innerHTML = prayerTimesHTML;
-  // Update countdown for next prayer
+  if (prayerListEl) {
+    prayerListEl.innerHTML = prayerTimesHTML;
+  }
+  
   const countdownElement = document.getElementById('countdown');
-  if (countdownElement) {
-    // Ensure timeRemaining is positive
+  if (countdownElement && typeof timeRemaining !== 'undefined') {
     const remaining = timeRemaining > 0 ? timeRemaining : 0;
     countdownElement.textContent = formatTime(remaining);
   }
@@ -198,29 +340,31 @@ function formatTime(seconds) {
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-// Track the current prayer to detect changes
 let currentActivePrayer = null;
+let timeRemaining = 0;
 
 function updateCurrentAndNextPrayer() {
   try {
     if (!prayerData || !prayerData.timings) return;
 
+    const lang = getCurrentLanguage();
     const now = new Date();
     const currentSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
     let currentPrayer = null;
     let nextPrayer = null;
-    let timeRemaining = 0;
+    timeRemaining = 0;
 
-    const prayers = Object.entries(prayerNames)
-      .filter(([key]) => prayerData.timings[key]) // Filter out undefined timings
-      .map(([key, name]) => {
+    const prayers = Object.keys(translations[lang].prayerNames)
+      .filter((key) => prayerData.timings[key])
+      .map((key) => {
+        const name = t(key, 'prayerNames');
         const time = prayerData.timings[key];
         if (!time) return null;
         
         const [hours, minutes] = time.split(':').map(Number);
         let prayerSeconds = hours * 3600 + minutes * 60;
         if (prayerSeconds < currentSeconds) {
-          prayerSeconds += 86400; // Add 24 hours if prayer is for next day
+          prayerSeconds += 86400;
         }
         
         return {
@@ -231,38 +375,34 @@ function updateCurrentAndNextPrayer() {
           timeUntil: prayerSeconds - currentSeconds
         };
       })
-      .filter(Boolean) // Remove any null entries
+      .filter(Boolean)
       .sort((a, b) => a.seconds - b.seconds);
 
     if (prayers.length === 0) return;
 
-    // Find current and next prayer
     const currentPrayerIndex = prayers.findIndex(p => p.seconds > currentSeconds) - 1;
     currentPrayer = currentPrayerIndex >= 0 ? prayers[currentPrayerIndex] : prayers[prayers.length - 1];
     nextPrayer = prayers[(currentPrayerIndex + 1) % prayers.length] || prayers[0];
     
     if (!nextPrayer) return;
     
-    // Calculate time remaining until next prayer
     timeRemaining = nextPrayer.seconds - currentSeconds;
     if (timeRemaining < 0) timeRemaining = 0;
     
-    // Check if current prayer has changed
     const prayerChanged = currentActivePrayer !== currentPrayer.key;
     currentActivePrayer = currentPrayer.key;
     
-    // Update prayer cards
     const prayerCardsContainer = document.getElementById('prayerCards');
     if (prayerCardsContainer) {
       prayerCardsContainer.innerHTML = `
         <div class="prayer-card current">
-          <div class="prayer-label">Current Prayer</div>
+          <div class="prayer-label">${t('currentPrayer')}</div>
           <div class="prayer-name">${currentPrayer?.name || '--'}</div>
           <div class="prayer-time">${currentPrayer?.time || '--:--'}</div>
-          <div class="time-remaining">End time - ${nextPrayer?.time || '--:--'}</div>
+          <div class="time-remaining">${t('endTime')} - ${nextPrayer?.time || '--:--'}</div>
         </div>
         <div class="prayer-card next">
-          <div class="prayer-label">Next Prayer</div>
+          <div class="prayer-label">${t('nextPrayer')}</div>
           <div class="prayer-name">${nextPrayer?.name || '--'}</div>
           <div class="prayer-time">${nextPrayer?.time || '--:--'}</div>
           <div class="countdown" id="countdown">${formatTime(timeRemaining)}</div>
@@ -270,7 +410,6 @@ function updateCurrentAndNextPrayer() {
       `;
     }
     
-    // If prayer changed, update the UI to highlight the current prayer
     if (prayerChanged) {
       updateUI();
     }
@@ -289,19 +428,56 @@ function initThemeUI() {
   updateSaveButtonTheme(selectedTheme);
 }
 
+function updateLanguageUI() {
+  const lang = getCurrentLanguage();
+  
+  // Update settings panel text
+  const settingsTitle = document.getElementById('settingsTitle');
+  const cityLabel = document.getElementById('cityLabel');
+  const countryLabel = document.getElementById('countryLabel');
+  const themeLabel = document.getElementById('themeLabel');
+  const languageLabel = document.getElementById('languageLabel');
+  const cityInput = document.getElementById('cityInput');
+  const countryInput = document.getElementById('countryInput');
+  const cityHint = document.getElementById('cityHint');
+  const countryHint = document.getElementById('countryHint');
+  const saveBtn = document.getElementById('saveBtn');
+  const footerText = document.getElementById('footerText');
+  
+  if (settingsTitle) settingsTitle.textContent = t('settings');
+  if (cityLabel) cityLabel.textContent = t('city');
+  if (countryLabel) countryLabel.textContent = t('country');
+  if (themeLabel) themeLabel.textContent = t('theme');
+  if (languageLabel) languageLabel.textContent = t('language');
+  if (cityInput) cityInput.placeholder = t('cityPlaceholder');
+  if (countryInput) countryInput.placeholder = t('countryPlaceholder');
+  if (cityHint) cityHint.textContent = t('cityHint');
+  if (countryHint) countryHint.textContent = t('countryHint');
+  if (saveBtn) saveBtn.textContent = t('save');
+  if (footerText) footerText.innerHTML = t('madeWith');
+  
+  // Update theme option labels
+  document.querySelectorAll('.theme-option').forEach(opt => {
+    const theme = opt.dataset.theme;
+    opt.textContent = t(theme, 'themes');
+  });
+  
+  // Update language selector
+  document.querySelectorAll('.language-option').forEach(opt => {
+    opt.classList.toggle('selected', opt.dataset.lang === lang);
+  });
+}
+
 function applyTheme(theme) {
   const app = document.getElementById('app');
-  // Remove all theme classes
   const themeClasses = [
     'theme-dark', 'theme-blue', 'theme-green', 'theme-brown', 
     'theme-gold', 'theme-pink', 'theme-purple', 'theme-emerald',
-    'theme-ocean', 'theme-royal', 'theme-indigo', 'theme-classic'
+    'theme-ocean', 'theme-royal', 'theme-indigo', 'theme-classic', 'theme-navy'
   ];
   app.classList.remove(...themeClasses);
-  // Add the new theme class
   app.classList.add(`theme-${theme}`);
   
-  // Update the save button theme as well
   updateSaveButtonTheme(theme);
 }
 
@@ -330,86 +506,91 @@ document.addEventListener('click', (e) => {
     
     updateSaveButtonTheme(newTheme);
   }
+  
+  if (e.target.classList.contains('language-option') || e.target.closest('.language-option')) {
+    const langOption = e.target.classList.contains('language-option') ? e.target : e.target.closest('.language-option');
+    const newLang = langOption.dataset.lang;
+    currentSettings.language = newLang;
+    
+    applyLanguageDirection();
+    updateLanguageUI();
+    updateUI();
+    updateCurrentAndNextPrayer();
+    
+    document.querySelectorAll('.language-option').forEach(opt => {
+      opt.classList.toggle('selected', opt.dataset.lang === newLang);
+    });
+  }
 });
 
 function toggleSettings() {
   const settingsPanel = document.getElementById('settingsPanel');
   const isActive = settingsPanel.classList.contains('active');
   
-  // Toggle body class for settings open state
   if (isActive) {
     document.body.classList.remove('settings-open');
-    // Closing the panel
     settingsPanel.classList.remove('active');
-    // Wait for the animation to complete before hiding
     setTimeout(() => {
       if (!settingsPanel.classList.contains('active')) {
         settingsPanel.style.display = 'none';
       }
     }, 300);
   } else {
-    // Opening the panel
     document.body.classList.add('settings-open');
     settingsPanel.style.display = 'flex';
-    // Force reflow to ensure the element is rendered before adding the active class
     void settingsPanel.offsetWidth;
     settingsPanel.classList.add('active');
     
-    // Load current settings into the form
     updateSettingsInputs();
-    
-    // Ensure the panel is scrolled to the top when opened
     settingsPanel.scrollTop = 0;
   }
   
-  // Prevent event bubbling
   if (event) event.stopPropagation();
-  // Prevent scrolling when settings are open
   document.body.style.overflow = settingsPanel.classList.contains('active') ? 'hidden' : '';
 }
 
 function updateSettingsInputs() {
-  document.getElementById('cityInput').value = currentSettings.city || '';
-  document.getElementById('countryInput').value = currentSettings.country || '';
+  const cityInput = document.getElementById('cityInput');
+  const countryInput = document.getElementById('countryInput');
+  
+  if (cityInput) cityInput.value = currentSettings.city || '';
+  if (countryInput) countryInput.value = currentSettings.country || '';
 }
 
 async function saveSettings() {
-  const city = document.getElementById('cityInput').value.trim();
-  const country = document.getElementById('countryInput').value.trim();
+  const cityInput = document.getElementById('cityInput');
+  const countryInput = document.getElementById('countryInput');
+  
+  const city = cityInput ? cityInput.value.trim() : '';
+  const country = countryInput ? countryInput.value.trim() : '';
   
   if (!city || !country) {
-    showToast('Please enter both city and country', 'error');
+    showToast(t('enterBothCityCountry'), 'error');
     return;
   }
 
   try {
-    // Update the theme first
     selectedTheme = pendingTheme;
     applyTheme(selectedTheme);
     
-    // Update current settings
     currentSettings.city = city;
     currentSettings.country = country;
     currentSettings.theme = selectedTheme;
     
-    // Save settings to persistent storage
     await ipcRenderer.invoke('save-settings', currentSettings);
     
-    // Show loading state
-    const prayerTimesContainer = document.getElementById('prayerTimes');
-    if (prayerTimesContainer) {
-      prayerTimesContainer.innerHTML = '<div class="loading">Loading prayer times...</div>';
+    const prayerListEl = document.getElementById('prayerList');
+    if (prayerListEl) {
+      prayerListEl.innerHTML = `<div class="loading">${t('loadingPrayerTimes')}</div>`;
     }
     
-    // Load new prayer times
     await loadPrayerTimes();
     
-    // Close settings panel after successful update
     toggleSettings();
-    showToast('Settings saved successfully', 'success');
+    showToast(t('settingsSaved'), 'success');
   } catch (error) {
     console.error('Error saving settings:', error);
-    showToast('Error saving settings', 'error');
+    showToast(t('errorSaving'), 'error');
   }
 }
 
@@ -425,11 +606,9 @@ function showToast(message, type = 'info') {
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   
-  // Get the computed style from the app container to access CSS variables
   const app = document.getElementById('app');
   const styles = window.getComputedStyle(app);
   
-  // Set the toast background to use the theme's accent color with some transparency
   const bgColor = styles.getPropertyValue('--accent-color') || 'rgba(76, 175, 80, 0.9)';
   toast.style.background = bgColor;
   
@@ -437,7 +616,6 @@ function showToast(message, type = 'info') {
   if (type === 'success') icon = 'check-circle';
   if (type === 'error') {
     icon = 'exclamation-circle';
-    // Override for error to keep it red
     toast.style.background = 'rgba(244, 67, 54, 0.9)';
   }
   
@@ -456,18 +634,14 @@ function showToast(message, type = 'info') {
   }, 2500);
 }
 
-
-// Add click event listener for settings button
 document.addEventListener('DOMContentLoaded', () => {
   initApp();
   
-  // Add click event listener for settings button
   const settingsBtn = document.getElementById('mainSettingsBtn');
   if (settingsBtn) {
     settingsBtn.addEventListener('click', toggleSettings);
   }
   
-  // Add transition for smooth appearance
   const style = document.createElement('style');
   style.textContent = `
     .settings-btn {

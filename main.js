@@ -7,7 +7,8 @@ let mainWindow;
 let settingsData = {
   city: 'Tunis',
   country: 'Tunisia',
-  theme: 'default',
+  theme: 'navy',
+  language: 'en',
   position: { x: 100, y: 100 }
 };
 
@@ -38,8 +39,8 @@ function createWindow() {
   loadSettings();
 
   mainWindow = new BrowserWindow({
-    width: 320, // Updated to smaller size
-    height: 560, // Updated to smaller size
+    width: 320,
+    height: 560,
     frame: false,
     transparent: true,
     resizable: false,

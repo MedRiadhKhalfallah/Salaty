@@ -1,0 +1,243 @@
+/* RTL Support Styles */
+
+/* RTL Text Direction for Text Elements */
+[dir="rtl"] .location,
+[dir="rtl"] .hijri-date {
+  direction: rtl;
+  text-align: center;
+}
+
+/* Keep Gregorian date in LTR format */
+[dir="rtl"] .date-info {
+  direction: ltr !important;
+  text-align: center;
+}
+
+[dir="rtl"] .prayer-label,
+[dir="rtl"] .prayer-name,
+[dir="rtl"] .time-remaining,
+[dir="rtl"] .countdown,
+[dir="rtl"] .setting-label,
+[dir="rtl"] .input-hint,
+[dir="rtl"] .settings-title,
+[dir="rtl"] .footer-text,
+[dir="rtl"] .current-indicator,
+[dir="rtl"] .loading,
+[dir="rtl"] .error-message,
+[dir="rtl"] .toast span {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Keep numbers LTR in RTL mode */
+[dir="rtl"] .prayer-time,
+[dir="rtl"] .countdown {
+  direction: ltr;
+  unicode-bidi: embed;
+}
+
+/* Prayer Item RTL Adjustments */
+[dir="rtl"] .prayer-item {
+  direction: rtl;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+[dir="rtl"] .prayer-item i {
+  margin-right: 0;
+  margin-left: 0;
+  order: 1;
+  flex-shrink: 0;
+}
+
+[dir="rtl"] .prayer-item .prayer-name {
+  text-align: right;
+  order: 2;
+  flex-grow: 1;
+  margin-right: 10px;
+  direction: rtl;
+}
+
+[dir="rtl"] .prayer-item .prayer-time {
+  text-align: left;
+  order: 3;
+  direction: ltr;
+  flex-shrink: 0;
+}
+
+/* Current Prayer Indicator RTL */
+[dir="rtl"] .prayer-item.current-prayer::before {
+  left: auto;
+  right: 0;
+}
+
+[dir="rtl"] .current-indicator {
+  margin-left: 0;
+  margin-right: 8px;
+  direction: rtl;
+}
+
+/* Settings Panel RTL */
+[dir="rtl"] .settings-header {
+  direction: rtl;
+}
+
+[dir="rtl"] .back-btn {
+  margin-right: 0;
+  margin-left: 12px;
+}
+
+[dir="rtl"] .back-btn i {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .back-btn:hover i {
+  transform: scaleX(-1) translateX(2px);
+}
+
+[dir="rtl"] .settings-title {
+  margin: 0 12px 0 auto;
+}
+
+/* Input Fields RTL */
+[dir="rtl"] .setting-input {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Language Options */
+.language-options {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.language-option {
+  flex: 1;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.language-option:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.language-option.selected {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.3);
+}
+
+.language-option .lang-name {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.language-option.selected .lang-name {
+  color: white;
+}
+
+.language-option .lang-native {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.language-option.selected .lang-native {
+  color: white;
+}
+
+/* Toast RTL Support */
+[dir="rtl"] .toast {
+  direction: rtl;
+}
+
+[dir="rtl"] .toast i {
+  margin-right: 0;
+  margin-left: 6px;
+}
+
+/* Prayer Cards RTL Text */
+[dir="rtl"] .prayer-card {
+  direction: rtl;
+}
+
+[dir="rtl"] .prayer-card .prayer-label,
+[dir="rtl"] .prayer-card .prayer-name {
+  text-align: center;
+  direction: rtl;
+}
+
+[dir="rtl"] .prayer-card .prayer-time {
+  direction: ltr;
+  text-align: center;
+}
+
+[dir="rtl"] .prayer-card .time-remaining {
+  direction: rtl;
+  text-align: center;
+}
+
+[dir="rtl"] .prayer-card .countdown {
+  direction: ltr;
+  text-align: center;
+}
+
+/* Ensure time displays remain LTR for readability */
+[dir="rtl"] .time-remaining {
+  direction: rtl;
+}
+
+/* Fix for buttons in RTL */
+[dir="rtl"] .save-btn,
+[dir="rtl"] .retry-button {
+  direction: rtl;
+}
+
+[dir="rtl"] .retry-button i {
+  margin-right: 0;
+  margin-left: 6px;
+}
+
+/* Error message RTL */
+[dir="rtl"] .error-message {
+  direction: rtl;
+  text-align: center;
+}
+
+[dir="rtl"] .error-message div {
+  direction: rtl;
+}
+
+/* Window controls remain LTR */
+[dir="rtl"] .window-controls {
+  direction: ltr;
+}
+
+/* Theme options text RTL */
+[dir="rtl"] .theme-option {
+  direction: rtl;
+}
+
+/* Location row RTL */
+[dir="rtl"] .location-row {
+  direction: rtl;
+}
+
+/* Scrollbar RTL */
+[dir="rtl"] ::-webkit-scrollbar {
+  left: 0;
+  right: auto;
+}

@@ -2,8 +2,9 @@
   "city": "Tunis",
   "country": "Tunisia",
   "theme": "navy",
+  "language": "en",
   "position": {
-    "x": 1208,
-    "y": 272
+    "x": 1216,
+    "y": 248
   }
 }

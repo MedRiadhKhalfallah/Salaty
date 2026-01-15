@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="styles/components.css">
   <link rel="stylesheet" href="styles/settings.css">
   <link rel="stylesheet" href="styles/utilities.css">
+  <link rel="stylesheet" href="styles/rtl.css">
 </head>
 <body>
   <div class="app-container theme-dark" id="app">
@@ -39,12 +40,11 @@
     </div>
 
     <div class="prayer-cards-container" id="prayerCards">
-      <!-- Current and next prayer cards will be inserted here by JavaScript -->
       <div class="loading">Loading prayer times...</div>
     </div>
 
-    <div class="prayer-times" id="prayerList">
-      <!-- Prayer times list will be inserted here by JavaScript -->
+    <div class="prayer-times" id="prayerTimes">
+      <div id="prayerList"></div>
     </div>
 
     <div class="settings-panel" id="settingsPanel">
@@ -52,26 +52,26 @@
         <button class="back-btn" onclick="toggleSettings()" aria-label="Back to Main">
           <i class="fas fa-arrow-left"></i>
         </button>
-        <h2 class="settings-title">Settings</h2>
+        <h2 class="settings-title" id="settingsTitle">Settings</h2>
       </div>
 
       <div class="setting-group location-group">
         <div class="location-row">
           <div class="location-input">
-            <label class="setting-label" for="cityInput">City</label>
+            <label class="setting-label" for="cityInput" id="cityLabel">City</label>
             <input type="text" class="setting-input" id="cityInput" placeholder="e.g., Tunis" aria-describedby="cityInput-hint">
-            <span id="cityInput-hint" class="input-hint">Your city</span>
+            <span id="cityHint" class="input-hint">Your city</span>
           </div>
           <div class="location-input">
-            <label class="setting-label" for="countryInput">Country</label>
+            <label class="setting-label" for="countryInput" id="countryLabel">Country</label>
             <input type="text" class="setting-input" id="countryInput" placeholder="e.g., Tunisia" aria-describedby="countryInput-hint">
-            <span id="countryInput-hint" class="input-hint">Your country</span>
+            <span id="countryHint" class="input-hint">Your country</span>
           </div>
         </div>
       </div>
 
       <div class="setting-group">
-        <label class="setting-label">Theme</label>
+        <label class="setting-label" id="themeLabel">Theme</label>
         <div class="theme-options">
           <div class="theme-option theme-navy-option selected" data-theme="navy" role="button" aria-label="Navy Theme">Navy</div>
           <div class="theme-option theme-green-option" data-theme="green" role="button" aria-label="Green Theme">Green</div>
@@ -87,10 +87,24 @@
         </div>
       </div>
 
-      <button class="save-btn" onclick="saveSettings()">Save</button>
+      <div class="setting-group">
+        <label class="setting-label" id="languageLabel">Language</label>
+        <div class="language-options">
+          <div class="language-option" data-lang="en" role="button">
+            <span class="lang-name">English</span>
+            <span class="lang-native">English</span>
+          </div>
+          <div class="language-option" data-lang="ar" role="button">
+            <span class="lang-name">Arabic</span>
+            <span class="lang-native">العربية</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="save-btn" id="saveBtn" onclick="saveSettings()">Save</button>
       
       <div class="version-info">
-        <div class="footer-text">
+        <div class="footer-text" id="footerText">
           Made with ❤️ for the Muslim Ummah
         </div>
       </div>
