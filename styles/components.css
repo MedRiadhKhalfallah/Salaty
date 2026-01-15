@@ -1,0 +1,303 @@
+/* Control Buttons */
+.control-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.control-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.control-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.control-btn:active {
+  transform: translateY(0);
+  transition: transform 0.1s ease;
+}
+
+.control-btn svg {
+  width: 14px;
+  height: 14px;
+  transition: all 0.3s ease;
+  fill: rgba(255, 255, 255, 0.9);
+}
+
+.control-btn:hover svg {
+  transform: scale(1.1);
+}
+
+/* Specific Control Buttons */
+.minimize-btn:hover {
+  background: rgba(247, 183, 49, 0.2);
+}
+
+.minimize-btn:active {
+  background: rgba(247, 183, 49, 0.3);
+}
+
+.close-btn:hover {
+  background: rgba(255, 59, 48, 0.2);
+}
+
+.close-btn:active {
+  background: rgba(255, 59, 48, 0.3);
+}
+
+/* Settings Button */
+.settings-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.settings-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px) rotate(45deg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.settings-btn:active {
+  transform: translateY(0) rotate(45deg);
+  transition: transform 0.1s ease;
+}
+
+.settings-btn i {
+  transition: transform 0.3s ease;
+}
+
+.settings-btn:hover i {
+  transform: scale(1.1);
+}
+
+/* Prayer Cards */
+.prayer-card {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px 8px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.prayer-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.prayer-card:hover::before {
+  opacity: 1;
+}
+
+.prayer-card.current {
+  background: linear-gradient(135deg, 
+    rgba(var(--accent-rgb, 74, 107, 255), 0.9), 
+    rgba(var(--accent-rgb, 74, 107, 255), 0.7)
+  );
+  color: white;
+  box-shadow: 0 4px 20px rgba(var(--accent-rgb, 74, 107, 255), 0.2);
+}
+
+.prayer-card.next {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.prayer-card.next .prayer-name,
+.prayer-card.next .prayer-time {
+  color: #fff;
+}
+
+.prayer-card.next .countdown {
+  color: var(--accent-color, #4a6bff);
+  font-weight: 600;
+}
+
+/* Prayer Card Content */
+.prayer-label {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-bottom: 4px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.prayer-card .prayer-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 6px 0 4px;
+  color: inherit;
+}
+
+.prayer-card .prayer-time {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: inherit;
+  font-feature-settings: 'tnum' on, 'lnum' on;
+  letter-spacing: 0.5px;
+}
+
+.prayer-card .time-remaining {
+  font-size: 12px;
+  opacity: 0.9;
+  font-weight: 500;
+  color: inherit;
+  margin-top: 2px;
+}
+
+.prayer-card .countdown {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+  color: #4a6bff;
+}
+
+/* Prayer Items */
+.prayer-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  margin: 4px 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.prayer-item.current-prayer {
+  background: linear-gradient(135deg, 
+    rgba(var(--accent-rgb, 74, 107, 255), 0.15), 
+    rgba(var(--accent-rgb, 74, 107, 255), 0.05)
+  );
+  border: 1px solid rgba(var(--accent-rgb, 74, 107, 255), 0.3);
+  box-shadow: 0 0 15px rgba(var(--accent-rgb, 74, 107, 255), 0.2);
+}
+
+.prayer-item.current-prayer::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: var(--accent-color, #4a6bff);
+}
+
+.prayer-item:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.prayer-item i {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  margin-right: 10px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.prayer-item .prayer-name {
+  flex-grow: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.prayer-item .prayer-time {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  margin-right: 4px;
+}
+
+/* Current Indicator */
+.current-indicator {
+  display: inline-block;
+  background: var(--accent-color, #4a6bff);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 8px;
+  vertical-align: middle;
+  animation: pulse 2s infinite;
+}
+
+/* Next Prayer */
+.next-prayer {
+  margin: 12px 20px 16px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  text-align: center;
+  font-size: 13px;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.next-prayer .highlight {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--accent-color, #fff);
+}
