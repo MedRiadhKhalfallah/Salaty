@@ -125,11 +125,11 @@ function t(key, section = 'ui') {
   const lang = getCurrentLanguage();
   const parts = key.split('.');
   let value = translations[lang][section];
-  
+
   for (const part of parts) {
     value = value?.[part];
   }
-  
+
   return value || key;
 }
 
@@ -137,10 +137,10 @@ function t(key, section = 'ui') {
 function applyLanguageDirection() {
   const lang = getCurrentLanguage();
   const isRTL = lang === 'ar';
-  
+
   document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
   document.documentElement.lang = lang;
-  
+
   // Add or remove RTL class from body
   document.body.classList.toggle('rtl', isRTL);
 }
@@ -150,7 +150,7 @@ async function initApp() {
     selectedTheme = 'navy';
     pendingTheme = 'navy';
     applyTheme('navy');
-    
+
     try {
       const settings = await ipcRenderer.invoke('get-settings');
       if (settings) {
@@ -166,16 +166,16 @@ async function initApp() {
     } catch (error) {
       console.warn('Could not load settings, using defaults:', error);
     }
-    
+
     updateSettingsInputs();
     initThemeUI();
     updateLanguageUI();
-    
+
     await loadPrayerTimes();
-    
+
     setInterval(updateCurrentAndNextPrayer, 1000);
     setInterval(loadPrayerTimes, 3600000);
-    
+
     updateCurrentAndNextPrayer();
   } catch (error) {
     console.error('Error initializing app:', error);
@@ -189,7 +189,7 @@ async function initApp() {
 
 async function loadPrayerTimes() {
   const prayerTimesContainer = document.getElementById('prayerList');
-  
+
   try {
     if (!currentSettings.city || !currentSettings.country) {
       throw new Error(t('locationNotSet'));
@@ -201,13 +201,13 @@ async function loadPrayerTimes() {
 
     const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(currentSettings.city)}&country=${encodeURIComponent(currentSettings.country)}`;
     const response = await fetch(url);
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
+
     if (data && data.code === 200) {
       prayerData = data.data;
       updateUI();
@@ -218,12 +218,12 @@ async function loadPrayerTimes() {
     }
   } catch (error) {
     console.error('Error loading prayer times:', error);
-    const errorMessage = error.message.includes('Failed to fetch') 
+    const errorMessage = error.message.includes('Failed to fetch')
       ? t('networkError')
       : `${t('errorLoading')}: ${error.message}`;
-      
+
     showToast(t('errorLoading'), 'error');
-    
+
     if (prayerTimesContainer) {
       prayerTimesContainer.innerHTML = `
         <div class="error-message">
@@ -234,13 +234,13 @@ async function loadPrayerTimes() {
           </button>
         </div>
       `;
-      
+
       const retryButton = document.getElementById('retryButton');
       if (retryButton) {
         retryButton.addEventListener('click', loadPrayerTimes);
       }
     }
-    
+
     return false;
   }
 }
@@ -249,12 +249,12 @@ function updateUI() {
   if (!prayerData) return;
 
   const lang = getCurrentLanguage();
-  
+
   const locationEl = document.getElementById('location');
   const gregorianDateEl = document.getElementById('gregorianDate');
   const hijriDateEl = document.getElementById('hijriDate');
   const prayerListEl = document.getElementById('prayerList');
-  
+
   if (locationEl) {
     locationEl.textContent = `${currentSettings.city}, ${currentSettings.country}`;
   }
@@ -278,24 +278,24 @@ function updateUI() {
   const now = new Date();
   const currentSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
   let currentPrayerKey = '';
-  
+
   const prayerTimes = [];
-  
+
   for (const key of Object.keys(translations[lang].prayerNames)) {
     const time = prayerData.timings[key];
     if (!time) continue;
-    
+
     const [hours, minutes] = time.split(':').map(Number);
     let prayerSeconds = hours * 3600 + minutes * 60;
-    
+
     prayerTimes.push({
       key: key,
       seconds: prayerSeconds
     });
   }
-  
+
   prayerTimes.sort((a, b) => a.seconds - b.seconds);
-  
+
   for (let i = 0; i < prayerTimes.length; i++) {
     if (prayerTimes[i].seconds <= currentSeconds) {
       currentPrayerKey = prayerTimes[i].key;
@@ -303,7 +303,7 @@ function updateUI() {
       break;
     }
   }
-  
+
   if (!currentPrayerKey && prayerTimes.length > 0) {
     currentPrayerKey = prayerTimes[prayerTimes.length - 1].key;
   }
@@ -325,7 +325,7 @@ function updateUI() {
   if (prayerListEl) {
     prayerListEl.innerHTML = prayerTimesHTML;
   }
-  
+
   const countdownElement = document.getElementById('countdown');
   if (countdownElement && typeof timeRemaining !== 'undefined') {
     const remaining = timeRemaining > 0 ? timeRemaining : 0;
@@ -360,13 +360,13 @@ function updateCurrentAndNextPrayer() {
         const name = t(key, 'prayerNames');
         const time = prayerData.timings[key];
         if (!time) return null;
-        
+
         const [hours, minutes] = time.split(':').map(Number);
         let prayerSeconds = hours * 3600 + minutes * 60;
         if (prayerSeconds < currentSeconds) {
           prayerSeconds += 86400;
         }
-        
+
         return {
           key: key,
           name: name,
@@ -383,15 +383,15 @@ function updateCurrentAndNextPrayer() {
     const currentPrayerIndex = prayers.findIndex(p => p.seconds > currentSeconds) - 1;
     currentPrayer = currentPrayerIndex >= 0 ? prayers[currentPrayerIndex] : prayers[prayers.length - 1];
     nextPrayer = prayers[(currentPrayerIndex + 1) % prayers.length] || prayers[0];
-    
+
     if (!nextPrayer) return;
-    
+
     timeRemaining = nextPrayer.seconds - currentSeconds;
     if (timeRemaining < 0) timeRemaining = 0;
-    
+
     const prayerChanged = currentActivePrayer !== currentPrayer.key;
     currentActivePrayer = currentPrayer.key;
-    
+
     const prayerCardsContainer = document.getElementById('prayerCards');
     if (prayerCardsContainer) {
       prayerCardsContainer.innerHTML = `
@@ -409,7 +409,7 @@ function updateCurrentAndNextPrayer() {
         </div>
       `;
     }
-    
+
     if (prayerChanged) {
       updateUI();
     }
@@ -430,7 +430,7 @@ function initThemeUI() {
 
 function updateLanguageUI() {
   const lang = getCurrentLanguage();
-  
+
   // Update settings panel text
   const settingsTitle = document.getElementById('settingsTitle');
   const cityLabel = document.getElementById('cityLabel');
@@ -443,7 +443,7 @@ function updateLanguageUI() {
   const countryHint = document.getElementById('countryHint');
   const saveBtn = document.getElementById('saveBtn');
   const footerText = document.getElementById('footerText');
-  
+
   if (settingsTitle) settingsTitle.textContent = t('settings');
   if (cityLabel) cityLabel.textContent = t('city');
   if (countryLabel) countryLabel.textContent = t('country');
@@ -455,13 +455,13 @@ function updateLanguageUI() {
   if (countryHint) countryHint.textContent = t('countryHint');
   if (saveBtn) saveBtn.textContent = t('save');
   if (footerText) footerText.innerHTML = t('madeWith');
-  
+
   // Update theme option labels
   document.querySelectorAll('.theme-option').forEach(opt => {
     const theme = opt.dataset.theme;
     opt.textContent = t(theme, 'themes');
   });
-  
+
   // Update language selector
   document.querySelectorAll('.language-option').forEach(opt => {
     opt.classList.toggle('selected', opt.dataset.lang === lang);
@@ -471,13 +471,13 @@ function updateLanguageUI() {
 function applyTheme(theme) {
   const app = document.getElementById('app');
   const themeClasses = [
-    'theme-dark', 'theme-blue', 'theme-green', 'theme-brown', 
+    'theme-dark', 'theme-blue', 'theme-green', 'theme-brown',
     'theme-gold', 'theme-pink', 'theme-purple', 'theme-emerald',
     'theme-ocean', 'theme-royal', 'theme-indigo', 'theme-classic', 'theme-navy'
   ];
   app.classList.remove(...themeClasses);
   app.classList.add(`theme-${theme}`);
-  
+
   updateSaveButtonTheme(theme);
 }
 
@@ -499,24 +499,24 @@ document.addEventListener('click', (e) => {
   if (e.target.classList.contains('theme-option')) {
     const newTheme = e.target.dataset.theme;
     pendingTheme = newTheme;
-    
+
     document.querySelectorAll('.theme-option').forEach(opt => {
       opt.classList.toggle('selected', opt.dataset.theme === newTheme);
     });
-    
+
     updateSaveButtonTheme(newTheme);
   }
-  
+
   if (e.target.classList.contains('language-option') || e.target.closest('.language-option')) {
     const langOption = e.target.classList.contains('language-option') ? e.target : e.target.closest('.language-option');
     const newLang = langOption.dataset.lang;
     currentSettings.language = newLang;
-    
+
     applyLanguageDirection();
     updateLanguageUI();
     updateUI();
     updateCurrentAndNextPrayer();
-    
+
     document.querySelectorAll('.language-option').forEach(opt => {
       opt.classList.toggle('selected', opt.dataset.lang === newLang);
     });
@@ -526,7 +526,7 @@ document.addEventListener('click', (e) => {
 function toggleSettings() {
   const settingsPanel = document.getElementById('settingsPanel');
   const isActive = settingsPanel.classList.contains('active');
-  
+
   if (isActive) {
     document.body.classList.remove('settings-open');
     settingsPanel.classList.remove('active');
@@ -540,11 +540,11 @@ function toggleSettings() {
     settingsPanel.style.display = 'flex';
     void settingsPanel.offsetWidth;
     settingsPanel.classList.add('active');
-    
+
     updateSettingsInputs();
     settingsPanel.scrollTop = 0;
   }
-  
+
   if (event) event.stopPropagation();
   document.body.style.overflow = settingsPanel.classList.contains('active') ? 'hidden' : '';
 }
@@ -552,7 +552,7 @@ function toggleSettings() {
 function updateSettingsInputs() {
   const cityInput = document.getElementById('cityInput');
   const countryInput = document.getElementById('countryInput');
-  
+
   if (cityInput) cityInput.value = currentSettings.city || '';
   if (countryInput) countryInput.value = currentSettings.country || '';
 }
@@ -560,10 +560,10 @@ function updateSettingsInputs() {
 async function saveSettings() {
   const cityInput = document.getElementById('cityInput');
   const countryInput = document.getElementById('countryInput');
-  
+
   const city = cityInput ? cityInput.value.trim() : '';
   const country = countryInput ? countryInput.value.trim() : '';
-  
+
   if (!city || !country) {
     showToast(t('enterBothCityCountry'), 'error');
     return;
@@ -572,20 +572,20 @@ async function saveSettings() {
   try {
     selectedTheme = pendingTheme;
     applyTheme(selectedTheme);
-    
+
     currentSettings.city = city;
     currentSettings.country = country;
     currentSettings.theme = selectedTheme;
-    
+
     await ipcRenderer.invoke('save-settings', currentSettings);
-    
+
     const prayerListEl = document.getElementById('prayerList');
     if (prayerListEl) {
       prayerListEl.innerHTML = `<div class="loading">${t('loadingPrayerTimes')}</div>`;
     }
-    
+
     await loadPrayerTimes();
-    
+
     toggleSettings();
     showToast(t('settingsSaved'), 'success');
   } catch (error) {
@@ -605,29 +605,29 @@ function closeWindow() {
 function showToast(message, type = 'info') {
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
-  
+
   const app = document.getElementById('app');
   const styles = window.getComputedStyle(app);
-  
+
   const bgColor = styles.getPropertyValue('--accent-color') || 'rgba(76, 175, 80, 0.9)';
   toast.style.background = bgColor;
-  
+
   let icon = 'info-circle';
   if (type === 'success') icon = 'check-circle';
   if (type === 'error') {
     icon = 'exclamation-circle';
     toast.style.background = 'rgba(244, 67, 54, 0.9)';
   }
-  
+
   toast.innerHTML = `
     <i class="fas fa-${icon}"></i>
     <span>${message}</span>
   `;
-  
+
   document.body.appendChild(toast);
-  
+
   setTimeout(() => toast.classList.add('show'), 10);
-  
+
   setTimeout(() => {
     toast.classList.remove('show');
     setTimeout(() => toast.remove(), 300);
@@ -636,12 +636,12 @@ function showToast(message, type = 'info') {
 
 document.addEventListener('DOMContentLoaded', () => {
   initApp();
-  
+
   const settingsBtn = document.getElementById('mainSettingsBtn');
   if (settingsBtn) {
     settingsBtn.addEventListener('click', toggleSettings);
   }
-  
+
   const style = document.createElement('style');
   style.textContent = `
     .settings-btn {
@@ -649,4 +649,78 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   `;
   document.head.appendChild(style);
+
+  const TomSelect = require('tom-select').default;
+
+  const commonConfig = {
+    valueField: 'name',
+    labelField: 'name',
+    searchField: 'name',
+    maxOptions: 500,
+  };
+
+  // Initialisation Country
+  const countrySelect = new TomSelect('#countryInput', {
+    ...commonConfig,
+    placeholder: 'Select a country',
+    preload: true,
+    load: async (query, callback) => {
+      try {
+        const res = await fetch('https://countriesnow.space/api/v0.1/countries/positions');
+        const json = await res.json();
+        callback(json.data);
+
+        // Valeur par défaut initiale
+        if (!countrySelect.getValue()) {
+          countrySelect.setValue('Tunisia');
+        }
+      } catch (e) {
+        callback();
+      }
+    }
+  });
+
+  // Initialisation City (commence en mode grisé/désactivé)
+  const citySelect = new TomSelect('#cityInput', {
+    ...commonConfig,
+    placeholder: 'Select a city',
+  });
+  citySelect.disable(); // Grisé par défaut au chargement
+
+  // Fonction de chargement des villes
+  async function loadCities(countryName, defaultCity = null) {
+    try {
+      const res = await fetch('https://countriesnow.space/api/v0.1/countries/cities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country: countryName })
+      });
+      const json = await res.json();
+
+      if (json.data) {
+        citySelect.addOptions(json.data.map(city => ({ name: city })));
+        citySelect.enable(); // Activer le champ une fois les données reçues
+
+        if (defaultCity) {
+          citySelect.setValue(defaultCity);
+        }
+      }
+    } catch (e) {
+      console.error('Erreur:', e);
+    }
+  }
+
+  // Logique de changement de pays
+  countrySelect.on('change', (value) => {
+    // Action systématique : on vide et on grise la ville dès que le pays change
+    citySelect.clear();
+    citySelect.clearOptions();
+    citySelect.disable();
+
+    if (value) {
+      // Si un pays est sélectionné, on lance le chargement
+      const defaultCity = (value === 'Tunisia') ? 'Tunis' : null;
+      loadCities(value, defaultCity);
+    }
+  });
 });
