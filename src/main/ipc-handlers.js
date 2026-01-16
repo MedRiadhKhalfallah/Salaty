@@ -31,6 +31,17 @@ function saveSettings() {
   }
 }
 
+// Get settings data
+function getSettingsData() {
+  return settingsData;
+}
+
+// Save position specifically
+function savePosition(x, y) {
+  settingsData.position = { x, y };
+  saveSettings();
+}
+
 function setupHandlers(mainWindow) {
   // IPC handlers
   ipcMain.handle('get-settings', () => {
@@ -91,5 +102,7 @@ module.exports = {
   settingsData,
   loadSettings,
   saveSettings,
+  getSettingsData,
+  savePosition,
   setupHandlers
 };

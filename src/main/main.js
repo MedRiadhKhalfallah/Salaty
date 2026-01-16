@@ -7,6 +7,9 @@ let mainWindow;
 function createWindow() {
   // Load settings
   ipcHandlers.loadSettings();
+  
+  // Get settings after loading
+  const settings = ipcHandlers.getSettingsData();
 
   mainWindow = new BrowserWindow({
     width: 320,
@@ -15,8 +18,8 @@ function createWindow() {
     transparent: true,
     resizable: true,
     alwaysOnTop: true,
-    x: ipcHandlers.settingsData.position.x,
-    y: ipcHandlers.settingsData.position.y,
+    x: settings.position.x,
+    y: settings.position.y,
     icon: path.join(__dirname, '../assets/icons/app_icon.ico'),
     webPreferences: {
       nodeIntegration: true,
@@ -45,8 +48,8 @@ function createWindow() {
 
   mainWindow.on('moved', () => {
     const position = mainWindow.getPosition();
-    ipcHandlers.settingsData.position = { x: position[0], y: position[1] };
-    ipcHandlers.saveSettings();
+    // Use the savePosition
+    ipcHandlers.savePosition(position[0], position[1]);
   });
 
   mainWindow.on('close', (event) => {
