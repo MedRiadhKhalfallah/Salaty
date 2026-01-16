@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "dev": "electron . --enable-logging",
     "build": "electron-builder",
     "dist": "electron-builder --publish=never"
   },
@@ -35,5 +36,8 @@
       "target": "AppImage",
       "icon": "icon.png"
     }
+  },
+  "dependencies": {
+    "tom-select": "^2.4.3"
   }
 }
