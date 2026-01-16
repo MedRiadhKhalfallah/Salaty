@@ -85,7 +85,7 @@
 }
 
 .setting-group:hover {
-  transform: translateY(-2px);
+  /*transform: translateY(-2px);*/ /*j'ai le mit en commentaire car ça faisait bizarre avec les inputs'*/
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -100,7 +100,6 @@
 
 .setting-input {
   width: 100%;
-  padding: 6px 10px;
   border-radius: 6px;
   border: 1px solid var(--border-color);
   background: rgba(255, 255, 255, 0.08);
@@ -169,4 +168,78 @@
 .footer-text {
   font-style: italic;
   opacity: 0.8;
+}
+
+/* TomSelect Customization */
+.ts-wrapper.single .ts-control {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  border-radius: 6px;
+  padding: 6px 10px;
+  height: auto;
+  min-height: 32px;
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+.ts-wrapper.single .ts-control input {
+  color: var(--text-primary) !important;
+}
+
+/* Remove default arrow background if present and replace with custom styling logic or just ensure cleanness */
+.ts-control > .item {
+  color: var(--text-primary);
+}
+
+.ts-wrapper.focus .ts-control {
+  border-color: var(--accent-color) !important;
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.3) !important;
+}
+
+/* Dropdown */
+.ts-dropdown {
+  position: sticky;
+  background: #1a1a1a !important;
+  background: var(--bg-surface) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+  z-index: 2000;
+  margin-top: 4px;
+}
+
+.ts-dropdown .option {
+  color: var(--text-primary);
+  padding: 8px 12px;
+}
+
+.ts-dropdown .option.active,
+.ts-dropdown .option:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: var(--text-primary);
+}
+
+.ts-dropdown .option.selected {
+  background: var(--accent-color) !important;
+  color: #fff !important;
+}
+
+.ts-dropdown .optgroup-header {
+  color: var(--text-secondary);
+  background: transparent;
+  font-weight: 600;
+}
+
+/* Input placeholder text */
+.ts-wrapper.single .ts-control ::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+/* Override TomSelect default clear button */
+.ts-wrapper .ts-control .clear-button {
+  color: var(--text-secondary) !important;
 }

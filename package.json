@@ -5,7 +5,7 @@
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electron . --dev",
+    "dev": "electron . --enable-logging",
     "build": "electron-builder",
     "dist": "electron-builder --publish=never",
     "clean": "rm -rf dist",
@@ -49,5 +49,8 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
     }
+  },
+  "dependencies": {
+    "tom-select": "^2.4.3"
   }
 }

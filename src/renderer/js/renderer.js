@@ -1,5 +1,6 @@
 // src/renderer/js/renderer.js
 const { ipcRenderer } = require('electron');
+const { initSelectLocation } = require('../js/selectLocation');
 
 // Global variables
 let currentSettings = { theme: 'navy', city: '', country: '', language: 'en' };
@@ -150,11 +151,11 @@ function t(key, section = 'ui') {
   const lang = getCurrentLanguage();
   const parts = key.split('.');
   let value = translations[lang][section];
-  
+
   for (const part of parts) {
     value = value?.[part];
   }
-  
+
   return value || key;
 }
 
@@ -162,7 +163,7 @@ function t(key, section = 'ui') {
 function applyLanguageDirection() {
   const lang = getCurrentLanguage();
   const isRTL = lang === 'ar';
-  
+
   document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
   document.documentElement.lang = lang;
   document.body.classList.toggle('rtl', isRTL);
@@ -311,13 +312,13 @@ async function loadPrayerTimes() {
 
     const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(currentSettings.city)}&country=${encodeURIComponent(currentSettings.country)}`;
     const response = await fetch(url);
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
+
     if (data && data.code === 200) {
       prayerData = data.data;
       updatePrayerUI();
@@ -334,12 +335,12 @@ function updatePrayerUI() {
   if (!prayerData) return;
 
   const lang = getCurrentLanguage();
-  
+
   const locationEl = document.getElementById('location');
   const gregorianDateEl = document.getElementById('gregorianDate');
   const hijriDateEl = document.getElementById('hijriDate');
   const prayerListEl = document.getElementById('prayerList');
-  
+
   if (locationEl) {
     locationEl.textContent = `${currentSettings.city}, ${currentSettings.country}`;
   }
@@ -387,13 +388,13 @@ function updateCurrentAndNextPrayer() {
         const name = t(key, 'prayerNames');
         const time = prayerData.timings[key];
         if (!time) return null;
-        
+
         const [hours, minutes] = time.split(':').map(Number);
         let prayerSeconds = hours * 3600 + minutes * 60;
         if (prayerSeconds < currentSeconds) {
           prayerSeconds += 86400;
         }
-        
+
         return {
           key: key,
           name: name,
@@ -410,15 +411,15 @@ function updateCurrentAndNextPrayer() {
     const currentPrayerIndex = prayers.findIndex(p => p.seconds > currentSeconds) - 1;
     currentPrayer = currentPrayerIndex >= 0 ? prayers[currentPrayerIndex] : prayers[prayers.length - 1];
     nextPrayer = prayers[(currentPrayerIndex + 1) % prayers.length] || prayers[0];
-    
+
     if (!nextPrayer) return;
-    
+
     timeRemaining = nextPrayer.seconds - currentSeconds;
     if (timeRemaining < 0) timeRemaining = 0;
-    
+
     const prayerChanged = currentActivePrayer !== currentPrayer.key;
     currentActivePrayer = currentPrayer.key;
-    
+
     const prayerCardsContainer = document.getElementById('prayerCards');
     if (prayerCardsContainer) {
       prayerCardsContainer.innerHTML = `
@@ -436,7 +437,7 @@ function updateCurrentAndNextPrayer() {
         </div>
       `;
     }
-    
+
     if (prayerChanged) {
       updatePrayerUI();
     }
@@ -447,6 +448,9 @@ function updateCurrentAndNextPrayer() {
 
 // ==================== SETTINGS PAGE FUNCTIONS ====================
 function initSettingsPage() {
+
+  initSelectLocation();
+
   // Setup back button
   const backBtn = document.getElementById('backBtn');
   if (backBtn) {
@@ -572,10 +576,10 @@ function initLanguageOptions() {
 async function saveSettings() {
   const cityInput = document.getElementById('cityInput');
   const countryInput = document.getElementById('countryInput');
-  
+
   const city = cityInput ? cityInput.value.trim() : '';
   const country = countryInput ? countryInput.value.trim() : '';
-  
+
   if (!city || !country) {
     showToast(t('enterBothCityCountry'), 'error');
     return;
@@ -587,7 +591,7 @@ async function saveSettings() {
     currentSettings.city = city;
     currentSettings.country = country;
     currentSettings.theme = selectedTheme;
-    
+
     await ipcRenderer.invoke('save-settings', currentSettings);
     
     showToast(t('settingsSaved'), 'success');
