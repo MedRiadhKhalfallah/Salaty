@@ -1,7 +1,7 @@
 const translations = {
-  en: require('./locales/en.json'),
-  ar: require('./locales/ar.json'),
-  fr: require('./locales/fr.json')
+  en: require('../locales/en.json'),
+  ar: require('../locales/ar.json'),
+  fr: require('../locales/fr.json')
 };
 
 let currentLanguage = 'en';
