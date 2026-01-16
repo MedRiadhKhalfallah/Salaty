@@ -55,8 +55,8 @@ function createWindow() {
     }
   });
 
-  // Affiche le DevTools seulement en mode développement
-  if (process.env.NODE_ENV === 'development') {
+  // Affiche le DevTools seulement si --enable-logging est passé en argument
+  if (process.argv.includes('--enable-logging')) {
     mainWindow.webContents.openDevTools({ mode: 'detach' });
   }
 
