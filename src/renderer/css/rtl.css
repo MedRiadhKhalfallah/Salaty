@@ -31,7 +31,10 @@
 
 /* Quran RTL */
 [dir="rtl"] .quran-title,
-[dir="rtl"] .quran-footer-text,
+[dir="rtl"] .quran-footer-text {
+  text-align: center;
+  width: 100%;
+}
 [dir="rtl"] .quran-loading span {
   direction: rtl;
   text-align: right;
