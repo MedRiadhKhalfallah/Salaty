@@ -1,0 +1,250 @@
+/* Reset & Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: transparent;
+  overflow: hidden;
+  user-select: none;
+}
+
+.app-container {
+  width: 100%;
+  height: 100vh;
+  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.15));
+  backdrop-filter: blur(14px);
+  box-shadow: 8px 8px 32px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+  -webkit-app-region: drag;
+}
+
+/* Draggable Area */
+.drag-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  pointer-events: none;
+  -webkit-app-region: drag;
+}
+
+/* Window Controls */
+.window-controls {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  left: 16px;
+  display: flex;
+  -webkit-app-region: no-drag;
+  pointer-events: auto;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 1100;
+  align-items: center;
+}
+
+.window-controls .right-controls {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+}
+
+/* Main Page Header */
+.header {
+  padding: 48px 20px 16px;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.15), transparent);
+}
+
+.location {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+}
+
+.date-info {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 400;
+}
+
+.hijri-date {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Prayer Cards Container */
+.prayer-cards-container {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+
+/* Prayer Times List */
+.prayer-times {
+  padding: 0 20px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+/* Settings Container */
+.settings-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.settings-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Quran Container */
+.quran-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.quran-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.quran-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 auto 0 12px;
+}
+
+.quran-controls {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.quran-content {
+  flex: 1;
+  position: relative;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+}
+
+.quran-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  display: none;
+}
+
+.quran-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 10;
+}
+
+.quran-loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  text-align: center;
+}
+
+.quran-loading-content i {
+  font-size: 32px;
+  opacity: 0.8;
+}
+
+.quran-loading-content span {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.quran-loading-tips {
+  margin-top: 10px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  max-width: 300px;
+}
+
+.quran-loading-tips p {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--accent-color);
+}
+
+.quran-loading-tips ul {
+  margin: 0 0 12px 20px;
+  padding: 0;
+}
+
+.quran-loading-tips li {
+  font-size: 11px;
+  margin-bottom: 4px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.quran-footer {
+  text-align: center;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.quran-footer-text {
+  font-style: italic;
+  opacity: 0.8;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* Fullscreen mode */
+body.fullscreen .app-container {
+  border-radius: 0;
+}
+
+/* Interactive Elements (make them non-draggable) */
+button,
+input,
+select,
+textarea,
+a,
+.prayer-item,
+.settings-content *,
+.quran-content * {
+  -webkit-app-region: no-drag;
+  pointer-events: auto;
+}

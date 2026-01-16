@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Holy Quran - Salaty</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/themes.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/utilities.css">
+  <link rel="stylesheet" href="../css/rtl.css">
+</head>
+<body>
+  <div class="app-container theme-dark" id="app">
+    <div class="drag-area"></div>
+    
+    <div class="quran-container">
+      <div class="quran-header">
+        <button class="back-btn" id="backBtn" aria-label="Back to Main">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2 class="quran-title" id="quranTitle">Holy Quran</h2>
+        <div class="quran-controls">
+          <button class="control-btn fullscreen-btn" id="quranFullscreenBtn" aria-label="Toggle Fullscreen">
+            <i class="fas fa-expand"></i>
+          </button>
+          <button class="control-btn refresh-btn" id="quranRefreshBtn" aria-label="Refresh Quran">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="quran-content">
+        <div class="quran-loading" id="quranLoading">
+          <div class="quran-loading-content">
+            <i class="fas fa-book-quran fa-spin"></i>
+            <span id="loadingText">Loading Quran...</span>
+            <div class="quran-loading-tips">
+              <p>Tips for faster loading:</p>
+              <ul>
+                <li>Keep a stable internet connection</li>
+                <li>Use the refresh button if stuck</li>
+                <li>The Quran is loaded directly from Tanzil.net</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <iframe 
+          src="about:blank" 
+          class="quran-iframe" 
+          id="quranIframe"
+          allow="autoplay *"
+          sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-presentation allow-top-navigation"
+          referrerpolicy="no-referrer"
+          loading="eager"
+        ></iframe>
+      </div>
+      
+      <div class="quran-footer">
+        <div class="quran-footer-text" id="quranFooterText">
+          Listen, read and reflect on the Holy Quran
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/renderer.js"></script>
+</body>
+</html>

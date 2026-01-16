@@ -29,6 +29,14 @@
   text-align: right;
 }
 
+/* Quran RTL */
+[dir="rtl"] .quran-title,
+[dir="rtl"] .quran-footer-text,
+[dir="rtl"] .quran-loading span {
+  direction: rtl;
+  text-align: right;
+}
+
 /* Keep numbers LTR in RTL mode */
 [dir="rtl"] .prayer-time,
 [dir="rtl"] .countdown {
@@ -98,6 +106,20 @@
 
 [dir="rtl"] .settings-title {
   margin: 0 12px 0 auto;
+}
+
+/* Quran Panel RTL */
+[dir="rtl"] .quran-header {
+  direction: rtl;
+}
+
+[dir="rtl"] .quran-title {
+  margin: 0 12px 0 auto;
+}
+
+[dir="rtl"] .quran-controls {
+  margin-left: 0;
+  margin-right: auto;
 }
 
 /* Input Fields RTL */
