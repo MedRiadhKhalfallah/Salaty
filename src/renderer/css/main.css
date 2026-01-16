@@ -185,37 +185,13 @@ body {
 
 .quran-loading-content i {
   font-size: 32px;
-  opacity: 0.8;
+  color: #ffffff; /* White color for the icon */
+  opacity: 0.9; /* Slightly higher opacity for better visibility */
 }
 
 .quran-loading-content span {
   font-size: 14px;
   color: var(--text-secondary);
-}
-
-.quran-loading-tips {
-  margin-top: 10px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  max-width: 300px;
-}
-
-.quran-loading-tips p {
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: var(--accent-color);
-}
-
-.quran-loading-tips ul {
-  margin: 0 0 12px 20px;
-  padding: 0;
-}
-
-.quran-loading-tips li {
-  font-size: 11px;
-  margin-bottom: 4px;
-  color: rgba(255, 255, 255, 0.8);
 }
 
 .quran-footer {

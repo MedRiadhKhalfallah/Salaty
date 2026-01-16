@@ -122,10 +122,43 @@
   margin-right: auto;
 }
 
-/* Input Fields RTL */
-[dir="rtl"] .setting-input {
+/* Input Fields RTL - EXCEPT Country and City inputs */
+[dir="rtl"] .setting-input:not(#countryInput):not(#cityInput) {
   text-align: right;
   direction: rtl;
+}
+
+/* SPECIAL FIX: Keep Country and City inputs LTR even in RTL mode */
+[dir="rtl"] #countryInput,
+[dir="rtl"] #cityInput {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* Fix for TomSelect dropdowns in RTL mode */
+[dir="rtl"] .ts-wrapper.single .ts-control {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+[dir="rtl"] .ts-dropdown {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+[dir="rtl"] .ts-dropdown .option {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+[dir="rtl"] .ts-control > .item {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+[dir="rtl"] .ts-control input {
+  direction: ltr !important;
+  text-align: left !important;
 }
 
 /* Language Options */

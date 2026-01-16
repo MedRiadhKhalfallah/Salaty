@@ -147,6 +147,12 @@ function initMainPage() {
     });
   }
 
+  // Initialize loading text
+  const loadingEl = document.getElementById('loadingText');
+  if (loadingEl) {
+    loadingEl.textContent = t('loadingPrayerTimes');
+  }
+
   // Start prayer times functionality
   loadPrayerTimes();
   setInterval(updateCurrentAndNextPrayer, 1000);
@@ -155,14 +161,27 @@ function initMainPage() {
 
 async function loadPrayerTimes() {
   try {
+    const locationEl = document.getElementById('location');
+    
     if (!currentSettings.city || !currentSettings.country) {
-      const locationEl = document.getElementById('location');
       if (locationEl) {
         locationEl.textContent = t('locationNotSet');
       }
+      
+      // Show loading text while fetching
+      const loadingEl = document.getElementById('loadingText');
+      if (loadingEl) {
+        loadingEl.textContent = t('loadingPrayerTimes');
+      }
+      
       return;
     }
 
+    // Show loading state
+    if (locationEl) {
+      locationEl.textContent = t('loading');
+    }
+    
     const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(currentSettings.city)}&country=${encodeURIComponent(currentSettings.country)}`;
     const response = await fetch(url);
 
@@ -180,6 +199,13 @@ async function loadPrayerTimes() {
     }
   } catch (error) {
     console.error('Error loading prayer times:', error);
+    
+    // Show error in location
+    const locationEl = document.getElementById('location');
+    if (locationEl) {
+      locationEl.textContent = t('errorLoading');
+    }
+    
     showToast(t('errorLoading'), 'error');
   }
 }
@@ -203,6 +229,12 @@ function updatePrayerUI() {
   if (hijriDateEl) {
     const hijriMonth = lang === 'ar' ? prayerData.date.hijri.month.ar : prayerData.date.hijri.month.en;
     hijriDateEl.textContent = `${prayerData.date.hijri.day} ${hijriMonth} ${prayerData.date.hijri.year} ${t('ah')}`;
+  }
+
+    // Update loading text
+  const loadingEl = document.getElementById('loadingText');
+  if (loadingEl) {
+    loadingEl.textContent = t('loadingPrayerTimes');
   }
 
   const prayerTimesHTML = Object.keys(translations[lang].prayerNames).map((key) => {
