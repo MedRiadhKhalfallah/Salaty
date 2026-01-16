@@ -1,6 +1,7 @@
 // src/renderer/js/renderer.js
 const { ipcRenderer } = require('electron');
 const { initSelectLocation } = require('../js/selectLocation');
+const { translations, setLanguage, getLanguage, t, applyLanguageDirection } = require('../js/translations');
 
 // Global variables
 let currentSettings = { theme: 'navy', city: '', country: '', language: 'en' };
@@ -13,126 +14,6 @@ let quranIframeLoaded = false;
 let quranLoadingTimeout = null;
 let isFullscreen = false;
 
-// Translation object
-const translations = {
-  en: {
-    prayerNames: {
-      'Fajr': 'Fajr',
-      'Dhuhr': 'Dhuhr',
-      'Asr': 'Asr',
-      'Maghrib': 'Maghrib',
-      'Isha': 'Isha'
-    },
-    ui: {
-      loading: 'Loading...',
-      loadingPrayerTimes: 'Loading prayer times...',
-      currentPrayer: 'Current Prayer',
-      nextPrayer: 'Next Prayer',
-      endTime: 'End time',
-      now: 'Now',
-      settings: 'Settings',
-      quran: 'Quran',
-      city: 'City',
-      country: 'Country',
-      theme: 'Theme',
-      language: 'Language',
-      save: 'Save',
-      backToMain: 'Back to Main',
-      cityPlaceholder: 'e.g., Tunis',
-      countryPlaceholder: 'e.g., Tunisia',
-      cityHint: 'Your city',
-      countryHint: 'Your country',
-      madeWith: 'Made with ❤️ for the Muslim Ummah',
-      errorLoading: 'Error loading prayer times',
-      networkError: 'Network error. Please check your connection.',
-      retry: 'Retry',
-      settingsSaved: 'Settings saved successfully',
-      errorSaving: 'Error saving settings',
-      enterBothCityCountry: 'Please enter both city and country',
-      locationNotSet: 'Location not set',
-      ah: 'AH',
-      holyQuran: 'Holy Quran',
-      loadingQuran: 'Loading Quran...',
-      listenReadQuran: 'Listen, read and reflect on the Holy Quran',
-      enterFullscreen: 'Enter Fullscreen',
-      exitFullscreen: 'Exit Fullscreen',
-      quranError: 'Error loading Quran. Please check your connection.',
-      refreshQuran: 'Refresh Quran'
-    },
-    themes: {
-      navy: 'Navy',
-      green: 'Green',
-      brown: 'Brown',
-      gold: 'Gold',
-      pink: 'Pink',
-      purple: 'Purple',
-      emerald: 'Emerald',
-      ocean: 'Ocean',
-      royal: 'Royal',
-      indigo: 'Indigo',
-      classic: 'Classic'
-    }
-  },
-  ar: {
-    prayerNames: {
-      'Fajr': 'الفجر',
-      'Dhuhr': 'الظهر',
-      'Asr': 'العصر',
-      'Maghrib': 'المغرب',
-      'Isha': 'العشاء'
-    },
-    ui: {
-      loading: 'جاري التحميل...',
-      loadingPrayerTimes: 'جاري تحميل أوقات الصلاة...',
-      currentPrayer: 'الصلاة الحالية',
-      nextPrayer: 'الصلاة القادمة',
-      endTime: 'وقت الانتهاء',
-      now: 'الآن',
-      settings: 'الإعدادات',
-      quran: 'القرآن',
-      city: 'المدينة',
-      country: 'البلد',
-      theme: 'المظهر',
-      language: 'اللغة',
-      save: 'حفظ',
-      backToMain: 'العودة للرئيسية',
-      cityPlaceholder: 'مثال: تونس',
-      countryPlaceholder: 'مثال: تونس',
-      cityHint: 'مدينتك',
-      countryHint: 'بلدك',
-      madeWith: 'صُنع بـ ❤️ للأمة الإسلامية',
-      errorLoading: 'خطأ في تحميل أوقات الصلاة',
-      networkError: 'خطأ في الاتصال. يرجى التحقق من الإنترنت.',
-      retry: 'إعادة المحاولة',
-      settingsSaved: 'تم حفظ الإعدادات بنجاح',
-      errorSaving: 'خطأ في حفظ الإعدادات',
-      enterBothCityCountry: 'يرجى إدخال المدينة والبلد',
-      locationNotSet: 'الموقع غير محدد',
-      ah: 'هـ',
-      holyQuran: 'القرآن الكريم',
-      loadingQuran: 'جاري تحميل القرآن...',
-      listenReadQuran: 'استمع، اقرأ وتفكر في القرآن الكريم',
-      enterFullscreen: 'شاشة كاملة',
-      exitFullscreen: 'خروج من الشاشة الكاملة',
-      quranError: 'خطأ في تحميل القرآن. يرجى التحقق من اتصالك بالإنترنت.',
-      refreshQuran: 'تحديث القرآن'
-    },
-    themes: {
-      navy: 'أزرق داكن',
-      green: 'أخضر',
-      brown: 'بني',
-      gold: 'ذهبي',
-      pink: 'وردي',
-      purple: 'بنفسجي',
-      emerald: 'زمردي',
-      ocean: 'محيطي',
-      royal: 'ملكي',
-      indigo: 'نيلي',
-      classic: 'كلاسيكي'
-    }
-  }
-};
-
 const prayerIcons = {
   'Fajr': 'cloud-moon',
   'Dhuhr': 'sun',
@@ -141,41 +22,13 @@ const prayerIcons = {
   'Isha': 'moon'
 };
 
-// Get current language
-function getCurrentLanguage() {
-  return currentSettings.language || 'en';
-}
-
-// Get translated text
-function t(key, section = 'ui') {
-  const lang = getCurrentLanguage();
-  const parts = key.split('.');
-  let value = translations[lang][section];
-
-  for (const part of parts) {
-    value = value?.[part];
-  }
-
-  return value || key;
-}
-
-// Apply RTL/LTR direction
-function applyLanguageDirection() {
-  const lang = getCurrentLanguage();
-  const isRTL = lang === 'ar';
-
-  document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
-  document.documentElement.lang = lang;
-  document.body.classList.toggle('rtl', isRTL);
-}
-
 // Apply theme
 function applyTheme(theme) {
   const app = document.getElementById('app');
   if (!app) return;
-  
+
   const themeClasses = [
-    'theme-dark', 'theme-blue', 'theme-green', 'theme-brown', 
+    'theme-dark', 'theme-blue', 'theme-green', 'theme-brown',
     'theme-gold', 'theme-pink', 'theme-purple', 'theme-emerald',
     'theme-ocean', 'theme-royal', 'theme-indigo', 'theme-classic', 'theme-navy'
   ];
@@ -195,29 +48,29 @@ function formatTime(seconds) {
 function showToast(message, type = 'info') {
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
-  
+
   const app = document.getElementById('app');
   const styles = window.getComputedStyle(app);
-  
+
   const bgColor = styles.getPropertyValue('--accent-color') || 'rgba(76, 175, 80, 0.9)';
   toast.style.background = bgColor;
-  
+
   let icon = 'info-circle';
   if (type === 'success') icon = 'check-circle';
   if (type === 'error') {
     icon = 'exclamation-circle';
     toast.style.background = 'rgba(244, 67, 54, 0.9)';
   }
-  
+
   toast.innerHTML = `
     <i class="fas fa-${icon}"></i>
     <span>${message}</span>
   `;
-  
+
   document.body.appendChild(toast);
-  
+
   setTimeout(() => toast.classList.add('show'), 10);
-  
+
   setTimeout(() => {
     toast.classList.remove('show');
     setTimeout(() => toast.remove(), 300);
@@ -233,12 +86,14 @@ async function initializeApp() {
       currentSettings = { ...currentSettings, ...settings };
       selectedTheme = currentSettings.theme || 'navy';
       pendingTheme = selectedTheme;
-      
+
+      setLanguage(currentSettings.language || 'en');
+
       // Apply theme and language
       applyTheme(selectedTheme);
       applyLanguageDirection();
     }
-    
+
     // Check which page we're on and initialize accordingly
     const path = window.location.pathname;
     if (path.includes('index.html') || path.endsWith('/')) {
@@ -248,10 +103,10 @@ async function initializeApp() {
     } else if (path.includes('quran.html')) {
       initQuranPage();
     }
-    
+
     // Setup window controls (common to all pages)
     setupWindowControls();
-    
+
   } catch (error) {
     console.error('Error initializing app:', error);
   }
@@ -261,13 +116,13 @@ async function initializeApp() {
 function setupWindowControls() {
   const minimizeBtn = document.getElementById('minimizeBtn');
   const closeBtn = document.getElementById('closeBtn');
-  
+
   if (minimizeBtn) {
     minimizeBtn.addEventListener('click', async () => {
       await ipcRenderer.invoke('minimize-window');
     });
   }
-  
+
   if (closeBtn) {
     closeBtn.addEventListener('click', () => {
       ipcRenderer.invoke('close-window');
@@ -280,20 +135,20 @@ function initMainPage() {
   // Setup navigation buttons
   const settingsBtn = document.getElementById('mainSettingsBtn');
   const quranBtn = document.getElementById('mainQuranBtn');
-  
+
   if (settingsBtn) {
     settingsBtn.addEventListener('click', () => {
       ipcRenderer.invoke('navigate-to', 'settings');
     });
   }
-  
+
   if (quranBtn) {
     quranBtn.addEventListener('click', () => {
       ipcRenderer.invoke('resize-window', 850, 600);
       ipcRenderer.invoke('navigate-to', 'quran');
     });
   }
-  
+
   // Start prayer times functionality
   loadPrayerTimes();
   setInterval(updateCurrentAndNextPrayer, 1000);
@@ -334,7 +189,7 @@ async function loadPrayerTimes() {
 function updatePrayerUI() {
   if (!prayerData) return;
 
-  const lang = getCurrentLanguage();
+  const lang = getLanguage();
 
   const locationEl = document.getElementById('location');
   const gregorianDateEl = document.getElementById('gregorianDate');
@@ -375,7 +230,7 @@ function updateCurrentAndNextPrayer() {
   try {
     if (!prayerData || !prayerData.timings) return;
 
-    const lang = getCurrentLanguage();
+    const lang = getLanguage();
     const now = new Date();
     const currentSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
     let currentPrayer = null;
@@ -458,13 +313,13 @@ function initSettingsPage() {
       ipcRenderer.invoke('go-back');
     });
   }
-  
+
   // Setup save button
   const saveBtn = document.getElementById('saveBtn');
   if (saveBtn) {
     saveBtn.addEventListener('click', saveSettings);
   }
-  
+
   // Initialize UI
   updateSettingsUI();
   initThemeOptions();
@@ -483,7 +338,7 @@ function updateSettingsUI() {
     'countryHint': 'countryHint',
     'footerText': 'madeWith'
   };
-  
+
   for (const [id, key] of Object.entries(elements)) {
     const element = document.getElementById(id);
     if (element) {
@@ -494,12 +349,12 @@ function updateSettingsUI() {
       }
     }
   }
-  
+
   // Update placeholders
   const cityInput = document.getElementById('cityInput');
   const countryInput = document.getElementById('countryInput');
   const saveBtn = document.getElementById('saveBtn');
-  
+
   if (cityInput) {
     cityInput.placeholder = t('cityPlaceholder');
     cityInput.value = currentSettings.city || '';
@@ -516,27 +371,27 @@ function updateSettingsUI() {
 function initThemeOptions() {
   const themeOptionsContainer = document.getElementById('themeOptions');
   if (!themeOptionsContainer) return;
-  
+
   const themeOptions = themeOptionsContainer.querySelectorAll('.theme-option');
   themeOptions.forEach(opt => {
     const theme = opt.dataset.theme;
     opt.textContent = t(theme, 'themes');
-    
+
     // Mark selected theme
     if (theme === selectedTheme) {
       opt.classList.add('selected');
     } else {
       opt.classList.remove('selected');
     }
-    
+
     // Add click handler
     opt.addEventListener('click', () => {
       pendingTheme = theme;
-      
+
       // Update visual selection
       themeOptions.forEach(o => o.classList.remove('selected'));
       opt.classList.add('selected');
-      
+
       // Apply theme preview
       applyTheme(pendingTheme);
     });
@@ -546,7 +401,7 @@ function initThemeOptions() {
 function initLanguageOptions() {
   const languageOptionsContainer = document.getElementById('languageOptions');
   if (!languageOptionsContainer) return;
-  
+
   const languageOptions = languageOptionsContainer.querySelectorAll('.language-option');
   languageOptions.forEach(opt => {
     // Mark selected language
@@ -555,16 +410,17 @@ function initLanguageOptions() {
     } else {
       opt.classList.remove('selected');
     }
-    
+
     // Add click handler
     opt.addEventListener('click', () => {
       const newLang = opt.dataset.lang;
       currentSettings.language = newLang;
-      
+      setLanguage(newLang);
+
       // Update visual selection
       languageOptions.forEach(o => o.classList.remove('selected'));
       opt.classList.add('selected');
-      
+
       // Apply language direction and update UI
       applyLanguageDirection();
       updateSettingsUI();
@@ -587,15 +443,15 @@ async function saveSettings() {
 
   try {
     selectedTheme = pendingTheme;
-    
+
     currentSettings.city = city;
     currentSettings.country = country;
     currentSettings.theme = selectedTheme;
 
     await ipcRenderer.invoke('save-settings', currentSettings);
-    
+
     showToast(t('settingsSaved'), 'success');
-    
+
     // Go back to main screen after a short delay
     setTimeout(() => {
       ipcRenderer.invoke('go-back');
@@ -616,13 +472,13 @@ function initQuranPage() {
       ipcRenderer.invoke('go-back');
     });
   }
-  
+
   // Update UI text
   updateQuranUI();
-  
+
   // Setup controls
   setupQuranControls();
-  
+
   // Load Quran iframe
   loadQuranIframe();
 }
@@ -633,11 +489,11 @@ function updateQuranUI() {
   const loadingText = document.getElementById('loadingText');
   const quranFullscreenBtn = document.getElementById('quranFullscreenBtn');
   const quranRefreshBtn = document.getElementById('quranRefreshBtn');
-  
+
   if (quranTitle) quranTitle.textContent = t('holyQuran');
   if (quranFooterText) quranFooterText.textContent = t('listenReadQuran');
   if (loadingText) loadingText.textContent = t('loadingQuran');
-  
+
   if (quranFullscreenBtn) {
     quranFullscreenBtn.setAttribute('aria-label', isFullscreen ? t('exitFullscreen') : t('enterFullscreen'));
     const icon = quranFullscreenBtn.querySelector('i');
@@ -645,7 +501,7 @@ function updateQuranUI() {
       icon.className = isFullscreen ? 'fas fa-compress' : 'fas fa-expand';
     }
   }
-  
+
   if (quranRefreshBtn) {
     quranRefreshBtn.setAttribute('aria-label', t('refreshQuran'));
   }
@@ -654,11 +510,11 @@ function updateQuranUI() {
 function setupQuranControls() {
   const quranFullscreenBtn = document.getElementById('quranFullscreenBtn');
   const quranRefreshBtn = document.getElementById('quranRefreshBtn');
-  
+
   if (quranFullscreenBtn) {
     quranFullscreenBtn.addEventListener('click', toggleQuranFullscreen);
   }
-  
+
   if (quranRefreshBtn) {
     quranRefreshBtn.addEventListener('click', forceReloadQuran);
   }
@@ -667,52 +523,52 @@ function setupQuranControls() {
 function loadQuranIframe() {
   const quranIframe = document.getElementById('quranIframe');
   const quranLoading = document.getElementById('quranLoading');
-  
+
   if (!quranIframe || quranIframeLoaded) return;
-  
+
   console.log('Loading Tanzil Quran...');
-  
+
   // Clear any existing timeout
   if (quranLoadingTimeout) {
     clearTimeout(quranLoadingTimeout);
   }
-  
+
   // Load with cache-busting parameter
   const timestamp = new Date().getTime();
   const quranUrl = `https://tanzil.net/?embed=true&nohead=true&cache=${timestamp}`;
-  
+
   quranIframe.src = quranUrl;
   quranIframeLoaded = true;
-  
+
   // Set timeout for loading failure
   quranLoadingTimeout = setTimeout(() => {
     if (quranLoading && quranLoading.style.display !== 'none') {
       showQuranError();
     }
   }, 10000);
-  
+
   // Setup iframe event listeners
   quranIframe.onload = function() {
     console.log('Quran iframe loaded successfully');
-    
+
     if (quranLoadingTimeout) {
       clearTimeout(quranLoadingTimeout);
       quranLoadingTimeout = null;
     }
-    
+
     if (quranLoading) {
       quranLoading.style.display = 'none';
     }
     quranIframe.style.display = 'block';
   };
-  
+
   quranIframe.onerror = function() {
     console.error('Quran iframe failed to load');
-    
+
     if (quranLoadingTimeout) {
       clearTimeout(quranLoadingTimeout);
     }
-    
+
     showQuranError();
   };
 }
@@ -720,7 +576,7 @@ function loadQuranIframe() {
 function showQuranError() {
   const quranLoading = document.getElementById('quranLoading');
   if (!quranLoading) return;
-  
+
   quranLoading.innerHTML = `
     <div class="quran-loading-content">
       <i class="fas fa-exclamation-triangle"></i>
@@ -730,7 +586,7 @@ function showQuranError() {
       </button>
     </div>
   `;
-  
+
   const retryBtn = document.getElementById('retryQuranBtn');
   if (retryBtn) {
     retryBtn.addEventListener('click', forceReloadQuran);
@@ -740,7 +596,7 @@ function showQuranError() {
 function forceReloadQuran() {
   const quranIframe = document.getElementById('quranIframe');
   const quranLoading = document.getElementById('quranLoading');
-  
+
   if (quranLoading) {
     quranLoading.style.display = 'flex';
     quranLoading.innerHTML = `
@@ -750,12 +606,12 @@ function forceReloadQuran() {
       </div>
     `;
   }
-  
+
   if (quranIframe) {
     quranIframe.style.display = 'none';
     quranIframe.src = 'about:blank';
     quranIframeLoaded = false;
-    
+
     setTimeout(() => {
       loadQuranIframe();
     }, 100);
@@ -764,7 +620,7 @@ function forceReloadQuran() {
 
 function toggleQuranFullscreen() {
   isFullscreen = !isFullscreen;
-  
+
   if (isFullscreen) {
     ipcRenderer.invoke('resize-window', 1024, 768);
     document.body.classList.add('fullscreen');
@@ -772,7 +628,7 @@ function toggleQuranFullscreen() {
     ipcRenderer.invoke('resize-window', 850, 600);
     document.body.classList.remove('fullscreen');
   }
-  
+
   updateQuranUI();
 }
 
