@@ -55,6 +55,11 @@ function createWindow() {
     }
   });
 
+  // Affiche le DevTools seulement en mode développement
+  if (process.env.NODE_ENV === 'development') {
+    mainWindow.webContents.openDevTools({ mode: 'detach' });
+  }
+
   mainWindow.loadFile('index.html');
 
   // Save window position when moved
