@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Islamic Prayer Times</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css" rel="stylesheet">
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/themes.css">
   <link rel="stylesheet" href="styles/components.css">
@@ -15,7 +16,7 @@
 <body>
   <div class="app-container theme-dark" id="app">
     <div class="drag-area"></div>
-    
+
     <div class="header">
       <div class="window-controls">
         <button class="settings-btn" id="mainSettingsBtn" aria-label="Settings">
@@ -58,14 +59,14 @@
       <div class="setting-group location-group">
         <div class="location-row">
           <div class="location-input">
-            <label class="setting-label" for="cityInput" id="cityLabel">City</label>
-            <input type="text" class="setting-input" id="cityInput" placeholder="e.g., Tunis" aria-describedby="cityInput-hint">
-            <span id="cityHint" class="input-hint">Your city</span>
+            <label class="setting-label" for="countryInput">Country</label>
+            <select id="countryInput" class="setting-input" aria-describedby="countryInput-hint">
+            </select>
           </div>
           <div class="location-input">
-            <label class="setting-label" for="countryInput" id="countryLabel">Country</label>
-            <input type="text" class="setting-input" id="countryInput" placeholder="e.g., Tunisia" aria-describedby="countryInput-hint">
-            <span id="countryHint" class="input-hint">Your country</span>
+            <label class="setting-label" for="cityInput">City</label>
+            <select id="cityInput" class="setting-input" aria-describedby="cityInput-hint">
+            </select>
           </div>
         </div>
       </div>
@@ -102,7 +103,7 @@
       </div>
 
       <button class="save-btn" id="saveBtn" onclick="saveSettings()">Save</button>
-      
+
       <div class="version-info">
         <div class="footer-text" id="footerText">
           Made with ❤️ for the Muslim Ummah
