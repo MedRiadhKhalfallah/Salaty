@@ -31,6 +31,11 @@ function createWindow() {
     show: false
   });
 
+  // Affiche le DevTools seulement si --enable-logging est passé en argument
+  if (process.argv.includes('--enable-logging')) {
+    mainWindow.webContents.openDevTools({ mode: 'detach' });
+  }
+
   // Load main page
   mainWindow.loadFile(path.join(__dirname, '../renderer/pages/index.html'));
 

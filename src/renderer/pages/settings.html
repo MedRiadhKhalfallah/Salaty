@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Settings - Salaty</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css" rel="stylesheet">
   <link rel="stylesheet" href="../css/main.css">
   <link rel="stylesheet" href="../css/themes.css">
   <link rel="stylesheet" href="../css/components.css">
@@ -25,17 +26,18 @@
       </div>
 
       <div class="settings-content">
+
         <div class="setting-group location-group">
           <div class="location-row">
             <div class="location-input">
-              <label class="setting-label" for="cityInput" id="cityLabel">City</label>
-              <input type="text" class="setting-input" id="cityInput" placeholder="e.g., Tunis">
-              <span id="cityHint" class="input-hint">Your city</span>
+              <label class="setting-label" for="countryInput">Country</label>
+              <select id="countryInput" class="setting-input" aria-describedby="countryInput-hint">
+              </select>
             </div>
             <div class="location-input">
-              <label class="setting-label" for="countryInput" id="countryLabel">Country</label>
-              <input type="text" class="setting-input" id="countryInput" placeholder="e.g., Tunisia">
-              <span id="countryHint" class="input-hint">Your country</span>
+              <label class="setting-label" for="cityInput">City</label>
+              <select id="cityInput" class="setting-input" aria-describedby="cityInput-hint">
+              </select>
             </div>
           </div>
         </div>
@@ -79,6 +81,7 @@
           </div>
         </div>
       </div>
+
     </div>
   </div>
 
