@@ -49,6 +49,16 @@
   transform: scale(1.1);
 }
 
+.control-btn i {
+  font-size: 12px;
+  transition: all 0.3s ease;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.control-btn:hover i {
+  transform: scale(1.1);
+}
+
 /* Specific Control Buttons */
 .minimize-btn:hover {
   background: rgba(247, 183, 49, 0.2);
@@ -66,8 +76,29 @@
   background: rgba(255, 59, 48, 0.3);
 }
 
-/* Settings Button */
-.settings-btn {
+/* Quran Control Buttons */
+.fullscreen-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.refresh-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.refresh-btn i {
+  font-size: 12px;
+}
+
+.refresh-btn:hover i {
+  transform: scale(1.1) rotate(180deg);
+}
+
+.refresh-btn:active i {
+  transform: scale(1) rotate(180deg);
+}
+
+/* Settings and Quran Buttons (Main Page) */
+.settings-btn, .quran-btn {
   width: 32px;
   height: 32px;
   border-radius: 8px;
@@ -86,23 +117,78 @@
   overflow: hidden;
 }
 
-.settings-btn:hover {
+.settings-btn:hover, .quran-btn:hover {
   background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px) rotate(45deg);
+  transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.settings-btn:active {
-  transform: translateY(0) rotate(45deg);
+.settings-btn:active, .quran-btn:active {
+  transform: translateY(0);
   transition: transform 0.1s ease;
 }
 
-.settings-btn i {
+.settings-btn i, .quran-btn i {
   transition: transform 0.3s ease;
 }
 
 .settings-btn:hover i {
+  transform: scale(1.1) rotate(45deg);
+}
+
+.quran-btn:hover i {
   transform: scale(1.1);
+}
+
+.settings-btn:active i {
+  transform: rotate(45deg);
+}
+
+/* Back Button (for Settings and Quran pages) */
+.back-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: visible;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 2000;
+  margin-right: 12px;
+  -webkit-app-region: no-drag;
+  pointer-events: auto !important;
+}
+
+.back-btn i {
+  transition: transform 0.3s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.back-btn:hover i {
+  transform: translateX(-2px);
+}
+
+.back-btn:active {
+  transform: translateY(0);
+  transition: transform 0.1s ease;
+}
+
+.back-btn:active i {
+  transform: translateX(0);
 }
 
 /* Prayer Cards */
@@ -300,4 +386,33 @@
   font-weight: 600;
   font-size: 14px;
   color: var(--accent-color, #fff);
+}
+
+/* Ripple Effects */
+.control-btn::after,
+.settings-btn::after,
+.quran-btn::after,
+.back-btn::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform 0.6s, opacity 1s;
+}
+
+.control-btn:active::after,
+.settings-btn:active::after,
+.quran-btn:active::after,
+.back-btn:active::after {
+  transform: scale(0, 0);
+  opacity: 0.3;
+  transition: 0s;
 }

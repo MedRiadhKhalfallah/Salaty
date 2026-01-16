@@ -2,11 +2,15 @@
   "name": "salaty",
   "version": "1.0.0",
   "description": "Salaty Islamic Prayer Times Desktop App",
-  "main": "main.js",
+  "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
+    "dev": "electron . --dev",
     "build": "electron-builder",
-    "dist": "electron-builder --publish=never"
+    "dist": "electron-builder --publish=never",
+    "clean": "rm -rf dist",
+    "lint": "eslint src/",
+    "format": "prettier --write \"src/**/*.{js,html,css}\""
   },
   "author": "Yassin Daboussi",
   "license": "MIT",
@@ -18,22 +22,32 @@
     "appId": "com.yassindaboussi.salaty",
     "productName": "Salaty Islamic Prayer Times",
     "directories": {
-      "output": "dist"
+      "output": "dist",
+      "buildResources": "src/assets"
     },
     "files": [
-      "**/*"
+      "src/**/*",
+      "package.json",
+      "settings.json"
+    ],
+    "extraResources": [
+      "src/assets/**"
     ],
     "win": {
       "target": "nsis",
-      "icon": "icon.ico"
+      "icon": "src/assets/icons/app_icon.ico"
     },
     "mac": {
       "target": "dmg",
-      "icon": "icon.icns"
+      "icon": "src/assets/icons/icon.icns"
     },
     "linux": {
       "target": "AppImage",
-      "icon": "icon.png"
+      "icon": "src/assets/icons/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
     }
   }
 }
