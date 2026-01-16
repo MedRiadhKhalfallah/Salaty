@@ -120,7 +120,7 @@ body.settings-open .settings-btn {
 }
 
 .setting-group:hover {
-  transform: translateY(-2px);
+  /*transform: translateY(-2px);*/ /*j'ai le mit en commentaire car ça faisait bizarre avec les inputs'*/
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -135,7 +135,6 @@ body.settings-open .settings-btn {
 
 .setting-input {
   width: 100%;
-  padding: 6px 10px;
   border-radius: 6px;
   border: 1px solid var(--border-color);
   background: rgba(255, 255, 255, 0.08);
