@@ -7,9 +7,18 @@
   text-align: center;
 }
 
-/* Keep Gregorian date in LTR format */
+/* Date Container RTL Support */
+[dir="rtl"] .date-container {
+  direction: rtl;
+}
+
 [dir="rtl"] .date-info {
   direction: ltr !important;
+  text-align: center;
+}
+
+[dir="rtl"] .hijri-date {
+  direction: rtl;
   text-align: center;
 }
 
@@ -87,6 +96,24 @@
   margin-left: 0;
   margin-right: 8px;
   direction: rtl;
+}
+
+/* Next Prayer */
+.next-prayer {
+  margin: 12px 20px 16px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  text-align: center;
+  font-size: 13px;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.next-prayer .highlight {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--accent-color, #fff);
 }
 
 /* Settings Panel RTL */

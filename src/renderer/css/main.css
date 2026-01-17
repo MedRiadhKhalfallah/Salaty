@@ -60,7 +60,7 @@ body {
 
 /* Main Page Header */
 .header {
-  padding: 48px 20px 16px;
+  padding: 60px 20px 5px;
   text-align: center;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.15), transparent);
 }
@@ -73,6 +73,22 @@ body {
   letter-spacing: 0.3px;
 }
 
+/* Date Container */
+.date-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.date-separator {
+  opacity: 0.5;
+  font-weight: 300;
+}
+
 .date-info {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.85);
@@ -80,8 +96,8 @@ body {
 }
 
 .hijri-date {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* Prayer Cards Container */

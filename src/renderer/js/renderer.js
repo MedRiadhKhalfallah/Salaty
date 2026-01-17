@@ -234,15 +234,21 @@ function updatePrayerUI() {
   if (locationEl) {
     locationEl.textContent = `${currentSettings.city}, ${currentSettings.country}`;
   }
-  if (gregorianDateEl) {
-    gregorianDateEl.textContent = prayerData.date.readable;
-  }
-  if (hijriDateEl) {
+  
+  if (gregorianDateEl && hijriDateEl) {
+    // Get Gregorian date
+    const gregorianDate = prayerData.date.readable;
+    
+    // Get Hijri date
     const hijriMonth = lang === 'ar' ? prayerData.date.hijri.month.ar : prayerData.date.hijri.month.en;
-    hijriDateEl.textContent = `${prayerData.date.hijri.day} ${hijriMonth} ${prayerData.date.hijri.year} ${t('ah')}`;
+    const hijriDate = `${prayerData.date.hijri.day} ${hijriMonth} ${prayerData.date.hijri.year} ${t('ah')}`;
+    
+    // Update the elements
+    gregorianDateEl.textContent = gregorianDate;
+    hijriDateEl.textContent = hijriDate;
   }
 
-    // Update loading text
+  // Update loading text
   const loadingEl = document.getElementById('loadingText');
   if (loadingEl) {
     loadingEl.textContent = t('loadingPrayerTimes');
