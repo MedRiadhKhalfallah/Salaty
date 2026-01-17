@@ -4,24 +4,10 @@ const { t } = require('./translations');
 let athkarData = null;
 let currentCategory = null;
 let athkarState = {};
-let currentLanguage = 'en';
 
 // ==================== ATHKAR PAGE FUNCTIONS ====================
 function initAthkarPage() {
   console.log('Initializing Athkar page...');
-  
-  // Load current language from localStorage
-  try {
-    const savedLang = localStorage.getItem('appLanguage');
-    if (savedLang) {
-      currentLanguage = savedLang;
-      // Update HTML lang attribute
-      document.documentElement.lang = currentLanguage;
-      document.documentElement.dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
-    }
-  } catch (error) {
-    console.error('Error loading language:', error);
-  }
   
   // Setup back button
   const backBtn = document.getElementById('backBtn');
@@ -41,7 +27,7 @@ function initAthkarPage() {
     resetAllBtn.addEventListener('click', showResetConfirm);
   }
 
-  // Update UI text
+  // Update UI text - this will use the current language from translations module
   updateAthkarUI();
 
   // Load athkar data
@@ -492,16 +478,4 @@ function showSuccessToast(message, isError = false) {
   }, 2000);
 }
 
-// Function to update layout when language changes
-function updateLayoutForLanguage(lang) {
-  currentLanguage = lang;
-  document.documentElement.lang = lang;
-  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-  
-  // Re-render athkar list to update button positions
-  if (currentCategory) {
-    renderAthkarList();
-  }
-}
-
-module.exports = { initAthkarPage, updateLayoutForLanguage };
+module.exports = { initAthkarPage };
