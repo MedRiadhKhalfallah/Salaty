@@ -9,12 +9,11 @@
   z-index: 100;
 }
 
-/* CRITICAL FIX: Move drag area OUTSIDE the container */
-/* Remove the drag area from athkar.css - it should be in main.css only */
-
+/* Athkar Header - Language-based positioning */
 .athkar-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 0;
   padding-bottom: 8px;
   border-bottom: 1px solid var(--border-color);
@@ -22,27 +21,148 @@
   z-index: 101;
 }
 
+/* Back button styles */
+.back-btn {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--accent-color);
+}
+
+.back-btn i {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+/* Arabic/RTL layout: Reset on LEFT, Back on RIGHT */
+[dir="rtl"] .athkar-header,
+[lang="ar"] .athkar-header,
+[lang="fa"] .athkar-header,
+[lang="ur"] .athkar-header,
+[lang="he"] .athkar-header {
+  flex-direction: row; /* Normal row for Arabic - Reset left, Back right */
+}
+
+/* Default LTR layout: Back on LEFT, Reset on RIGHT */
+[dir="ltr"] .athkar-header:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
+[lang="en"] .athkar-header,
+[lang="fr"] .athkar-header,
+[lang="es"] .athkar-header,
+[lang="de"] .athkar-header,
+[lang="ru"] .athkar-header,
+[lang="zh"] .athkar-header,
+[lang="ja"] .athkar-header {
+  flex-direction: row; /* Normal row for other languages - Back left, Reset right */
+}
+
+/* Title - Always centered */
 .athkar-title {
   font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
-  margin: 0 auto 0 8px;
+  text-align: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  pointer-events: none;
+  width: auto;
+  white-space: nowrap;
 }
 
+/* Control buttons container */
 .athkar-controls {
   display: flex;
   gap: 6px;
-  margin-left: auto;
   z-index: 102;
+  flex-shrink: 0;
+}
+
+/* Arabic: Reset button on LEFT side */
+[dir="rtl"] .athkar-controls,
+[lang="ar"] .athkar-controls,
+[lang="fa"] .athkar-controls,
+[lang="ur"] .athkar-controls,
+[lang="he"] .athkar-controls {
+  order: 1; /* Reset on LEFT (first in order) */
+}
+
+/* Other languages: Reset button on RIGHT side */
+[dir="ltr"] .athkar-controls:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
+[lang="en"] .athkar-controls,
+[lang="fr"] .athkar-controls,
+[lang="es"] .athkar-controls,
+[lang="de"] .athkar-controls,
+[lang="ru"] .athkar-controls,
+[lang="zh"] .athkar-controls,
+[lang="ja"] .athkar-controls {
+  order: 3; /* Reset on RIGHT (last in order) */
+}
+
+/* Arabic: Back button on RIGHT side */
+[dir="rtl"] .back-btn,
+[lang="ar"] .back-btn,
+[lang="fa"] .back-btn,
+[lang="ur"] .back-btn,
+[lang="he"] .back-btn {
+  order: 3; /* Back on RIGHT (last in order) */
+  transform: rotate(180deg); /* Flip arrow direction for RTL */
+}
+
+/* Other languages: Back button on LEFT side */
+[dir="ltr"] .back-btn:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
+[lang="en"] .back-btn,
+[lang="fr"] .back-btn,
+[lang="es"] .back-btn,
+[lang="de"] .back-btn,
+[lang="ru"] .back-btn,
+[lang="zh"] .back-btn,
+[lang="ja"] .back-btn {
+  order: 1; /* Back on LEFT (first in order) */
+}
+
+/* Title order - Always in middle */
+[dir="rtl"] .athkar-title,
+[dir="ltr"] .athkar-title,
+[lang="ar"] .athkar-title,
+[lang="en"] .athkar-title,
+[lang="fr"] .athkar-title,
+[lang="es"] .athkar-title,
+[lang="de"] .athkar-title,
+[lang="ru"] .athkar-title,
+[lang="zh"] .athkar-title,
+[lang="ja"] .athkar-title,
+[lang="fa"] .athkar-title,
+[lang="ur"] .athkar-title,
+[lang="he"] .athkar-title {
+  order: 2; /* Always in middle */
 }
 
 /* Reset All Button */
 .reset-all-btn {
   background: rgba(255, 107, 107, 0.15);
   border: 1px solid rgba(255, 107, 107, 0.2);
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   cursor: pointer;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .reset-all-btn:hover {
@@ -218,7 +338,7 @@
   font-weight: 500;
 }
 
-/* Athkar List - Fix scrolling */
+/* Athkar List - Fix scrolling ALWAYS on right */
 .athkar-list {
   height: 100%;
   overflow-y: auto;
@@ -228,10 +348,18 @@
   -webkit-app-region: no-drag !important;
   -webkit-user-select: none;
   user-select: none;
+  direction: ltr !important; /* Force LTR for scrollbar */
+}
+
+/* Force scrollbar to always be on right side */
+.athkar-list {
+  scrollbar-gutter: stable;
 }
 
 .athkar-list::-webkit-scrollbar {
   width: 6px;
+  right: 0 !important;
+  left: auto !important;
 }
 
 .athkar-list::-webkit-scrollbar-track {
@@ -288,6 +416,7 @@
   opacity: 1;
 }
 
+/* Athkar Card Header - UNIFIED positioning: Hashtag on right, Copy on left for ALL languages */
 .athkar-card-header {
   display: flex;
   justify-content: space-between;
@@ -295,6 +424,20 @@
   margin-bottom: 8px;
   padding-bottom: 6px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* For ALL languages: Hashtag on right, Copy button on left */
+.athkar-card-header {
+  flex-direction: row-reverse !important; /* Reverse for ALL languages */
+}
+
+/* Adjust hashtag alignment for RTL languages */
+[dir="rtl"] .athkar-category,
+[lang="ar"] .athkar-category,
+[lang="fa"] .athkar-category,
+[lang="ur"] .athkar-category,
+[lang="he"] .athkar-category {
+  flex-direction: row-reverse; /* Reverse hashtag icon for RTL */
 }
 
 .athkar-category {
@@ -347,15 +490,15 @@
   font-size: 10px;
 }
 
-/* Athkar Content Text */
+/* Athkar Content Text - ALWAYS RTL for Arabic text */
 .athkar-content-text {
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.7;
   color: var(--text-primary);
   margin-bottom: 10px;
-  text-align: right;
+  text-align: right !important; /* Always right-aligned for Arabic */
   font-family: 'Scheherazade New', 'Traditional Arabic', 'Segoe UI', Tahoma, sans-serif;
-  direction: rtl;
+  direction: rtl !important; /* Always RTL for Arabic text */
   font-weight: 500;
   position: relative;
   padding: 0 4px;
@@ -373,20 +516,22 @@
   font-family: serif;
 }
 
-/* Athkar Description */
+/* Athkar Description - ALWAYS RTL for Arabic text */
 .athkar-description {
   font-size: 11px;
-  line-height: 1.4;
+  line-height: 1.6;
   color: var(--text-secondary);
   margin-bottom: 8px;
   padding: 6px 8px;
   background: rgba(255, 255, 255, 0.04);
   border-radius: 6px;
-  border-left: 2px solid var(--accent-color);
+  border-right: 2px solid var(--accent-color); /* Always on right */
   font-style: italic;
+  text-align: right !important; /* Always right-aligned */
+  direction: rtl !important; /* Always RTL */
 }
 
-/* Count Controls */
+/* Count Controls - REORDERED LAYOUT */
 .athkar-count-controls {
   display: flex;
   align-items: center;
@@ -395,6 +540,7 @@
   padding-top: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   gap: 8px;
+  flex-direction: row-reverse; /* Reverse order: buttons on right, count on left */
 }
 
 .count-info {
@@ -402,6 +548,7 @@
   flex-direction: column;
   gap: 2px;
   min-width: 60px;
+  order: 2; /* Move to end (left side) */
 }
 
 .count-label {
@@ -409,12 +556,14 @@
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  text-align: left; /* Always left-aligned */
 }
 
 .count-display {
   display: flex;
   align-items: baseline;
   gap: 2px;
+  justify-content: flex-start; /* Align to left */
 }
 
 .count-value {
@@ -442,6 +591,7 @@
   border-radius: 1.5px;
   overflow: hidden;
   margin: 0 4px;
+  order: 1; /* Middle */
 }
 
 .progress-bar {
@@ -451,12 +601,13 @@
   transition: width 0.2s ease;
 }
 
-/* Count Buttons */
+/* Count Buttons - Always on right side */
 .count-buttons {
   display: flex;
   gap: 4px;
   min-width: 70px;
-  justify-content: flex-end;
+  justify-content: flex-start; /* Align to left (but in reversed layout this becomes right) */
+  order: 0; /* First (right side in reversed layout) */
 }
 
 .count-btn {
@@ -548,18 +699,18 @@
   cursor: not-allowed;
 }
 
-/* Reference */
+/* Reference - ALWAYS RTL for Arabic text */
 .athkar-reference {
   font-size: 10px;
   color: rgba(255, 255, 255, 0.5);
   margin-top: 6px;
   font-style: italic;
-  text-align: right;
-  direction: rtl;
+  text-align: right !important; /* Always right-aligned */
+  direction: rtl !important; /* Always RTL */
   padding: 4px 8px;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 4px;
-  border-right: 1px solid var(--accent-color);
+  border-right: 1px solid var(--accent-color); /* Always on right */
 }
 
 /* Athkar Footer */
@@ -749,46 +900,6 @@
   box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
 }
 
-/* RTL Support */
-[dir="rtl"] .athkar-header {
-  direction: rtl;
-}
-
-[dir="rtl"] .athkar-title {
-  margin: 0 8px 0 auto;
-}
-
-[dir="rtl"] .athkar-controls {
-  margin-left: 0;
-  margin-right: auto;
-}
-
-[dir="rtl"] .athkar-content-text {
-  text-align: left;
-  direction: ltr;
-}
-
-[dir="rtl"] .athkar-content-text::before {
-  right: auto;
-  left: -6px;
-}
-
-[dir="rtl"] .athkar-reference {
-  text-align: left;
-  border-right: none;
-  border-left: 1px solid var(--accent-color);
-}
-
-[dir="rtl"] .athkar-description {
-  border-left: none;
-  border-right: 2px solid var(--accent-color);
-}
-
-[dir="rtl"] .athkar-list::-webkit-scrollbar {
-  left: 0;
-  right: auto;
-}
-
 /* Touch scrolling improvements */
 .category-nav,
 .athkar-list {
@@ -819,4 +930,65 @@
 .athkar-list::-webkit-scrollbar-thumb:active {
   background: var(--accent-color);
   opacity: 1;
+}
+
+/* FIX: Remove RTL overrides for athkar content - keep Arabic text RTL */
+/* This is the key fix - Arabic text should ALWAYS be RTL */
+[dir="rtl"] .athkar-content-text,
+[dir="ltr"] .athkar-content-text {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+[dir="rtl"] .athkar-description,
+[dir="ltr"] .athkar-description {
+  text-align: right !important;
+  direction: rtl !important;
+  border-right: 2px solid var(--accent-color);
+  border-left: none;
+}
+
+[dir="rtl"] .athkar-reference,
+[dir="ltr"] .athkar-reference {
+  text-align: right !important;
+  direction: rtl !important;
+  border-right: 1px solid var(--accent-color);
+  border-left: none;
+}
+
+/* Keep count controls layout consistent in both LTR and RTL */
+[dir="rtl"] .athkar-count-controls,
+[dir="ltr"] .athkar-count-controls {
+  flex-direction: row-reverse; /* Always buttons on right, count on left */
+}
+
+[dir="rtl"] .count-label,
+[dir="ltr"] .count-label {
+  text-align: left; /* Always left-aligned */
+}
+
+[dir="rtl"] .count-display,
+[dir="ltr"] .count-display {
+  justify-content: flex-start; /* Always left-aligned */
+}
+
+[dir="rtl"] .count-buttons,
+[dir="ltr"] .count-buttons {
+  justify-content: flex-start; /* Buttons aligned to start (right in reversed layout) */
+}
+
+/* Force scrollbar to always be on right side in RTL */
+[dir="rtl"] .athkar-list {
+  direction: ltr !important;
+}
+
+[dir="rtl"] .athkar-list::-webkit-scrollbar {
+  right: 0 !important;
+  left: auto !important;
+}
+
+/* Category name should be centered regardless of direction */
+[dir="rtl"] .category-name,
+[dir="ltr"] .category-name {
+  text-align: center;
 }
