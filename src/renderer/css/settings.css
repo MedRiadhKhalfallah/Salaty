@@ -243,3 +243,47 @@
 .ts-wrapper .ts-control .clear-button {
   color: var(--text-secondary) !important;
 }
+
+/* Make settings content scrollable and not draggable */
+.settings-content {
+  -webkit-app-region: no-drag;
+  pointer-events: auto;
+  overflow-y: auto;
+  
+  /* Add padding to the right to create space for scrollbar */
+  padding-right: 4px;
+  margin-right: 4px;
+}
+
+/* Custom scrollbar styling for settings */
+.settings-content::-webkit-scrollbar {
+  width: 8px;
+  -webkit-app-region: no-drag;
+}
+
+.settings-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  margin: 4px 0;
+}
+
+.settings-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.settings-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Make individual setting groups not draggable */
+.setting-group,
+.save-btn,
+.version-info {
+  -webkit-app-region: no-drag;
+}
+
+/* Additional: Ensure scrollbar doesn't overlap with content */
+.settings-container {
+  padding-right: 8px; /* Add some padding to the container */
+}

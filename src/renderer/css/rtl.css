@@ -111,18 +111,98 @@
   margin: 0 12px 0 auto;
 }
 
-/* Quran Panel RTL */
+/* Quran Panel RTL - FIXED VERSION */
+/* Keep Quran header layout consistent in all languages */
+.quran-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* Force LTR layout even in RTL languages for consistent icon placement */
+  direction: ltr !important;
+}
+
+.quran-title {
+  text-align: center;
+  flex-grow: 1;
+  margin: 0 12px;
+}
+
+.quran-controls {
+  display: flex;
+  gap: 8px;
+  /* Ensure controls maintain LTR order */
+  direction: ltr !important;
+}
+
+.control-btn {
+  /* Ensure control buttons maintain LTR order */
+  direction: ltr !important;
+}
+
+/* Remove all RTL transformations for Quran header and controls */
 [dir="rtl"] .quran-header {
-  direction: rtl;
+  direction: ltr !important;
 }
 
 [dir="rtl"] .quran-title {
-  margin: 0 12px 0 auto;
+  margin: 0 12px;
+  text-align: center;
 }
 
 [dir="rtl"] .quran-controls {
   margin-left: 0;
-  margin-right: auto;
+  margin-right: 0;
+  direction: ltr !important;
+}
+
+[dir="rtl"] .control-btn {
+  direction: ltr !important;
+}
+
+/* Fix for back button in Quran header - keep it pointing left */
+[dir="rtl"] .quran-header .back-btn {
+  margin-right: 0;
+  margin-left: 0;
+  /* Remove any flip transformations */
+}
+
+[dir="rtl"] .quran-header .back-btn i {
+  transform: none !important;
+}
+
+[dir="rtl"] .quran-header .back-btn:hover i {
+  transform: translateX(-2px) !important;
+}
+
+/* Fix for refresh and expand icons - prevent any RTL transformations */
+[dir="rtl"] .refresh-btn i,
+[dir="rtl"] .fullscreen-btn i,
+[dir="rtl"] .control-btn i {
+  transform: none !important;
+}
+
+[dir="rtl"] .refresh-btn:hover i {
+  animation: spinHover 0.5s ease;
+}
+
+[dir="rtl"] .fullscreen-btn:hover i {
+  transform: scale(1.1) !important;
+}
+
+/* Refresh animation */
+.refresh-btn.refreshing i {
+  animation: spin 1s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes spinHover {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(180deg); }
 }
 
 /* Input Fields RTL - EXCEPT Country and City inputs */
@@ -298,4 +378,56 @@
 [dir="rtl"] ::-webkit-scrollbar {
   left: 0;
   right: auto;
+}
+
+/* Additional fixes for consistency */
+
+/* Make sure all icons in the Quran section maintain their original direction */
+[dir="rtl"] .quran-content .fas,
+[dir="rtl"] .quran-content .far,
+[dir="rtl"] .quran-content .fab {
+  transform: none !important;
+}
+
+/* Ensure Quran loading spinner maintains direction */
+[dir="rtl"] .quran-loading-content .fa-spin {
+  animation: fa-spin 2s linear infinite !important;
+  transform-origin: center !important;
+}
+
+/* rtl.css - Add these scrollbar fixes at the end of the file */
+
+/* Fix for settings content scrollbar in RTL */
+[dir="rtl"] .settings-content {
+  /* Reverse the padding for RTL - scrollbar should be on right */
+  padding-right: 20px;  /* Original left padding */
+  padding-left: 12px;   /* Space for scrollbar on right */
+  margin-right: -4px;   /* Adjust margin */
+  margin-left: -12px;   /* Adjust margin */
+}
+
+/* Force scrollbar to appear on the right side in RTL */
+[dir="rtl"] .settings-content::-webkit-scrollbar {
+  left: auto !important;
+  right: 0 !important;
+}
+
+/* Fix scrollbar track and thumb positioning */
+[dir="rtl"] .settings-content::-webkit-scrollbar-track {
+  margin-left: 4px !important;
+  margin-right: 0 !important;
+}
+
+/* Ensure scrollbar thumb is visible on right side */
+[dir="rtl"] .settings-content::-webkit-scrollbar-thumb {
+  left: auto !important;
+  right: 0 !important;
+}
+
+[dir="rtl"] .settings-content {
+  /* Reset and apply RTL-specific padding */
+  padding: 0 !important;
+  margin: 0 !important;
+  padding-left: 12px !important;  /* Space for scrollbar on right */
+  margin-left: -12px !important;  /* Compensate for padding */
 }
