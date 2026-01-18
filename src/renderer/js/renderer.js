@@ -1,12 +1,86 @@
 // src/renderer/js/renderer.js
 const { ipcRenderer } = require('electron');
-const { setLanguage, t, applyLanguageDirection } = require('../js/translations');
+const { initSelectLocation } = require('../js/selectLocation');
+const { translations, setLanguage, getLanguage, t, applyLanguageDirection } = require('../js/translations');
 const { initQuranPage } = require('../js/quranUI');
 const { initAthkarPage } = require('../js/athkarUI');
-const { loadPrayerTimes, updateCurrentAndNextPrayer } = require('../js/prayer');
-const { state } = require('../js/globalStore');
-const { initSettingsPage } = require('../js/settingsUI');
-const { applyTheme } = require('../js/theme');
+const { notifyPrayer } = require('../js/adhan');
+
+// Global variables
+let currentSettings = { theme: 'navy', city: '', country: '', language: 'en' };
+let prayerData = null;
+let selectedTheme = 'navy';
+let pendingTheme = 'navy';
+let currentActivePrayer = null;
+let timeRemaining = 0;
+let isFirstLoad = true;
+let adhanEnabled = true;
+
+// Initialisation de l'état adhanEnabled pour chaque prière
+let adhanEnabledByPrayer = {};
+
+const prayerIcons = {
+  'Fajr': 'cloud-moon',
+  'Dhuhr': 'sun',
+  'Asr': 'cloud-sun',
+  'Maghrib': 'cloud',
+  'Isha': 'moon'
+};
+
+// Apply theme
+function applyTheme(theme) {
+  const app = document.getElementById('app');
+  if (!app) return;
+
+  const themeClasses = [
+    'theme-dark', 'theme-blue', 'theme-green', 'theme-brown',
+    'theme-gold', 'theme-pink', 'theme-purple', 'theme-emerald',
+    'theme-ocean', 'theme-royal', 'theme-indigo', 'theme-classic', 'theme-navy'
+  ];
+  app.classList.remove(...themeClasses);
+  app.classList.add(`theme-${theme}`);
+}
+
+// Format time helper
+function formatTime(seconds) {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Toast notification
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+
+  const app = document.getElementById('app');
+  const styles = window.getComputedStyle(app);
+
+  const bgColor = styles.getPropertyValue('--accent-color') || 'rgba(76, 175, 80, 0.9)';
+  toast.style.background = bgColor;
+
+  let icon = 'info-circle';
+  if (type === 'success') icon = 'check-circle';
+  if (type === 'error') {
+    icon = 'exclamation-circle';
+    toast.style.background = 'rgba(244, 67, 54, 0.9)';
+  }
+
+  toast.innerHTML = `
+    <i class="fas fa-${icon}"></i>
+    <span>${message}</span>
+  `;
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => toast.classList.add('show'), 10);
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 2500);
+}
 
 // ==================== INITIALIZATION ====================
 async function initializeApp() {
@@ -14,10 +88,11 @@ async function initializeApp() {
     // Load settings from main process
     const settings = await ipcRenderer.invoke('get-settings');
     if (settings) {
-      state.settings = { ...state.settings, ...settings };
-      const theme = state.settings.theme || 'navy';
+      currentSettings = { ...currentSettings, ...settings };
+      selectedTheme = currentSettings.theme || 'navy';
+      pendingTheme = selectedTheme;
 
-      setLanguage(state.settings.language || 'en');
+      setLanguage(currentSettings.language || 'en');
 
       // Correction : charger l'état adhanEnabled depuis les settings
       adhanEnabled = typeof currentSettings.adhanEnabled === 'boolean' ? currentSettings.adhanEnabled : true;
@@ -33,7 +108,7 @@ async function initializeApp() {
       }
 
       // Apply theme and language
-      applyTheme(theme);
+      applyTheme(selectedTheme);
       applyLanguageDirection();
     }
 
@@ -114,6 +189,377 @@ function initMainPage() {
   setInterval(loadPrayerTimes, 3600000);
 }
 
+async function loadPrayerTimes() {
+  try {
+    const locationEl = document.getElementById('location');
+
+    if (!currentSettings.city || !currentSettings.country) {
+      if (locationEl) {
+        locationEl.textContent = t('locationNotSet');
+      }
+
+      // Show loading text while fetching
+      const loadingEl = document.getElementById('loadingText');
+      if (loadingEl) {
+        loadingEl.textContent = t('loadingPrayerTimes');
+      }
+
+      return;
+    }
+
+    // Show loading state
+    if (locationEl) {
+      locationEl.textContent = t('loading');
+    }
+
+    const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(currentSettings.city)}&country=${encodeURIComponent(currentSettings.country)}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data && data.code === 200) {
+      prayerData = data.data;
+      updatePrayerUI();
+    } else {
+      throw new Error('Invalid response from server');
+    }
+  } catch (error) {
+    console.error('Error loading prayer times:', error);
+
+    // Show error in location
+    const locationEl = document.getElementById('location');
+    if (locationEl) {
+      locationEl.textContent = t('errorLoading');
+    }
+
+    showToast(t('errorLoading'), 'error');
+  }
+}
+
+function toggleAdhanEnabled() {
+  adhanEnabled = !adhanEnabled;
+  currentSettings.adhanEnabled = adhanEnabled;
+  ipcRenderer.invoke('save-settings', currentSettings);
+  updatePrayerUI();
+}
+
+function toggleAdhanForPrayer(prayerKey) {
+  adhanEnabledByPrayer[prayerKey] = !adhanEnabledByPrayer[prayerKey];
+  currentSettings.adhanEnabledByPrayer = adhanEnabledByPrayer;
+  ipcRenderer.invoke('save-settings', currentSettings);
+  updatePrayerUI();
+}
+
+function updatePrayerUI() {
+  if (!prayerData) return;
+  const lang = getLanguage();
+
+  const locationEl = document.getElementById('location');
+  const gregorianDateEl = document.getElementById('gregorianDate');
+  const hijriDateEl = document.getElementById('hijriDate');
+  const prayerListEl = document.getElementById('prayerList');
+
+  if (locationEl) {
+    locationEl.textContent = `${currentSettings.city}, ${currentSettings.country}`;
+  }
+  
+  if (gregorianDateEl && hijriDateEl) {
+    // Get Gregorian date
+    const gregorianDate = prayerData.date.readable;
+    
+    // Get Hijri date
+    const hijriMonth = lang === 'ar' ? prayerData.date.hijri.month.ar : prayerData.date.hijri.month.en;
+    const hijriDate = `${prayerData.date.hijri.day} ${hijriMonth} ${prayerData.date.hijri.year} ${t('ah')}`;
+    
+    // Update the elements
+    gregorianDateEl.textContent = gregorianDate;
+    hijriDateEl.textContent = hijriDate;
+  }
+
+  // Update loading text
+  const loadingEl = document.getElementById('loadingText');
+  if (loadingEl) {
+    loadingEl.textContent = t('loadingPrayerTimes');
+  }
+
+  const adhanBtnLabel = adhanEnabled ? t('disableAdhan') : t('enableAdhan');
+  const adhanBtnIcon = adhanEnabled ? 'volume-up' : 'volume-mute';
+  const adhanToggleBtn = `<button class="adhan-toggle-btn" id="adhanToggleBtn" title="${adhanBtnLabel}"><i class="fas fa-${adhanBtnIcon}"></i> ${adhanBtnLabel}</button>`;
+
+  const prayerTimesHTML = Object.keys(translations[lang].prayerNames).map((key) => {
+    const name = t(key, 'prayerNames');
+    const time = prayerData.timings[key];
+    const icon = prayerIcons[key] || 'clock';
+    const isCurrent = key === currentActivePrayer;
+    const adhanOn = adhanEnabledByPrayer[key] !== false;
+    const adhanBtnIcon = adhanOn ? 'volume-up' : 'volume-mute';
+    const adhanBtnLabel = adhanOn ? t('disableAdhan') : t('enableAdhan');
+    return `
+      <div class="prayer-item ${isCurrent ? 'current-prayer' : ''}" data-prayer="${key}">
+        <i class="fas fa-${icon}"></i>
+        <span class="prayer-name">${name}</span>
+        <span class="prayer-time">${time} ${isCurrent ? `<span class=\"current-indicator\">${t('now')}</span>` : ''}</span>
+        <button class="adhan-toggle-btn" data-prayer="${key}" title="${adhanBtnLabel}"><i class="fas fa-${adhanBtnIcon} adhan-toggle-icon"></i></button>
+      </div>
+    `;
+  }).join('');
+
+  if (prayerListEl) {
+    prayerListEl.innerHTML = prayerTimesHTML;
+    // Ajouter les listeners sur chaque bouton
+    prayerListEl.querySelectorAll('.adhan-toggle-btn').forEach(btn => {
+      btn.onclick = (e) => {
+        const key = btn.getAttribute('data-prayer');
+        toggleAdhanForPrayer(key);
+      };
+    });
+  }
+}
+
+function updateCurrentAndNextPrayer() {
+  try {
+    if (!prayerData || !prayerData.timings) return;
+
+    const lang = getLanguage();
+    const now = new Date();
+    const currentSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+    let currentPrayer = null;
+    let nextPrayer = null;
+    timeRemaining = 0;
+
+    const prayers = Object.keys(translations[lang].prayerNames)
+      .filter((key) => prayerData.timings[key])
+      .map((key) => {
+        const name = t(key, 'prayerNames');
+        const time = prayerData.timings[key];
+        if (!time) return null;
+
+        const [hours, minutes] = time.split(':').map(Number);
+        let prayerSeconds = hours * 3600 + minutes * 60;
+        if (prayerSeconds < currentSeconds) {
+          prayerSeconds += 86400;
+        }
+
+        return {
+          key: key,
+          name: name,
+          time: time,
+          seconds: prayerSeconds,
+          timeUntil: prayerSeconds - currentSeconds
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.seconds - b.seconds);
+
+    if (prayers.length === 0) return;
+
+    const currentPrayerIndex = prayers.findIndex(p => p.seconds > currentSeconds) - 1;
+    currentPrayer = currentPrayerIndex >= 0 ? prayers[currentPrayerIndex] : prayers[prayers.length - 1];
+    nextPrayer = prayers[(currentPrayerIndex + 1) % prayers.length] || prayers[0];
+
+    if (!nextPrayer) return;
+
+    timeRemaining = nextPrayer.seconds - currentSeconds;
+    if (timeRemaining < 0) timeRemaining = 0;
+
+    const prayerChanged = currentActivePrayer !== currentPrayer.key;
+    currentActivePrayer = currentPrayer.key;
+
+    const prayerCardsContainer = document.getElementById('prayerCards');
+    if (prayerCardsContainer) {
+      prayerCardsContainer.innerHTML = `
+        <div class="prayer-card current">
+          <div class="prayer-label">${t('currentPrayer')}</div>
+          <div class="prayer-name">${currentPrayer?.name || '--'}</div>
+          <div class="prayer-time">${currentPrayer?.time || '--:--'}</div>
+          <div class="time-remaining">${t('endTime')} - ${nextPrayer?.time || '--:--'}</div>
+        </div>
+        <div class="prayer-card next">
+          <div class="prayer-label">${t('nextPrayer')}</div>
+          <div class="prayer-name">${nextPrayer?.name || '--'}</div>
+          <div class="prayer-time">${nextPrayer?.time || '--:--'}</div>
+          <div class="countdown" id="countdown">${formatTime(timeRemaining)}</div>
+        </div>
+      `;
+    }
+
+    if (prayerChanged) {
+      updatePrayerUI();
+
+      if (!isFirstLoad) {
+        notifyPrayer(currentPrayer);
+      }
+      isFirstLoad = false;
+    }
+  } catch (error) {
+    console.error('Error in updateCurrentAndNextPrayer:', error);
+  }
+}
+
+// ==================== SETTINGS PAGE FUNCTIONS ====================
+function initSettingsPage() {
+
+  initSelectLocation();
+
+  // Setup back button
+  const backBtn = document.getElementById('backBtn');
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      ipcRenderer.invoke('go-back');
+    });
+  }
+
+  // Setup save button
+  const saveBtn = document.getElementById('saveBtn');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', saveSettings);
+  }
+
+  // Initialize UI
+  updateSettingsUI();
+  initThemeOptions();
+  initLanguageOptions();
+}
+
+function updateSettingsUI() {
+  // Update all text elements
+  const elements = {
+    'settingsTitle': 'settings',
+    'cityLabel': 'city',
+    'countryLabel': 'country',
+    'themeLabel': 'theme',
+    'languageLabel': 'language',
+    'cityHint': 'cityHint',
+    'countryHint': 'countryHint',
+    'footerText': 'madeWith'
+  };
+
+  for (const [id, key] of Object.entries(elements)) {
+    const element = document.getElementById(id);
+    if (element) {
+      if (id === 'footerText') {
+        element.innerHTML = t(key);
+      } else {
+        element.textContent = t(key);
+      }
+    }
+  }
+
+  // Update placeholders
+  const cityInput = document.getElementById('cityInput');
+  const countryInput = document.getElementById('countryInput');
+  const saveBtn = document.getElementById('saveBtn');
+
+  if (cityInput) {
+    cityInput.placeholder = t('cityPlaceholder');
+    cityInput.value = currentSettings.city || '';
+  }
+  if (countryInput) {
+    countryInput.placeholder = t('countryPlaceholder');
+    countryInput.value = currentSettings.country || '';
+  }
+  if (saveBtn) {
+    saveBtn.textContent = t('save');
+  }
+}
+
+function initThemeOptions() {
+  const themeOptionsContainer = document.getElementById('themeOptions');
+  if (!themeOptionsContainer) return;
+
+  const themeOptions = themeOptionsContainer.querySelectorAll('.theme-option');
+  themeOptions.forEach(opt => {
+    const theme = opt.dataset.theme;
+    opt.textContent = t(theme, 'themes');
+
+    // Mark selected theme
+    if (theme === selectedTheme) {
+      opt.classList.add('selected');
+    } else {
+      opt.classList.remove('selected');
+    }
+
+    // Add click handler
+    opt.addEventListener('click', () => {
+      pendingTheme = theme;
+
+      // Update visual selection
+      themeOptions.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+
+      // Apply theme preview
+      applyTheme(pendingTheme);
+    });
+  });
+}
+
+function initLanguageOptions() {
+  const languageOptionsContainer = document.getElementById('languageOptions');
+  if (!languageOptionsContainer) return;
+
+  const languageOptions = languageOptionsContainer.querySelectorAll('.language-option');
+  languageOptions.forEach(opt => {
+    // Mark selected language
+    if (opt.dataset.lang === currentSettings.language) {
+      opt.classList.add('selected');
+    } else {
+      opt.classList.remove('selected');
+    }
+
+    // Add click handler
+    opt.addEventListener('click', () => {
+      const newLang = opt.dataset.lang;
+      currentSettings.language = newLang;
+      setLanguage(newLang);
+
+      // Update visual selection
+      languageOptions.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+
+      // Apply language direction and update UI
+      applyLanguageDirection();
+      updateSettingsUI();
+      initThemeOptions(); // Update theme labels in new language
+    });
+  });
+}
+
+async function saveSettings() {
+  const cityInput = document.getElementById('cityInput');
+  const countryInput = document.getElementById('countryInput');
+
+  const city = cityInput ? cityInput.value.trim() : '';
+  const country = countryInput ? countryInput.value.trim() : '';
+
+  if (!city || !country) {
+    showToast(t('enterBothCityCountry'), 'error');
+    return;
+  }
+
+  try {
+    selectedTheme = pendingTheme;
+
+    currentSettings.city = city;
+    currentSettings.country = country;
+    currentSettings.theme = selectedTheme;
+
+    await ipcRenderer.invoke('save-settings', currentSettings);
+
+    showToast(t('settingsSaved'), 'success');
+
+    // Go back to main screen after a short delay
+    setTimeout(() => {
+      ipcRenderer.invoke('go-back');
+    }, 1500);
+  } catch (error) {
+    console.error('Error saving settings:', error);
+    showToast(t('errorSaving'), 'error');
+  }
+}
 
 // ==================== START THE APP ====================
 document.addEventListener('DOMContentLoaded', initializeApp);
