@@ -1,18 +1,10 @@
 {
-  "city": "Quebec",
-  "country": "Canada",
+  "city": "Gafsa",
+  "country": "Tunisia",
   "theme": "green",
   "language": "fr",
   "position": {
-    "x": 150,
-    "y": 144
-  },
-  "adhanEnabled": true,
-  "adhanEnabledByPrayer": {
-    "Fajr": true,
-    "Dhuhr": true,
-    "Asr": true,
-    "Maghrib": true,
-    "Isha": true
+    "x": 469,
+    "y": 121
   }
 }
