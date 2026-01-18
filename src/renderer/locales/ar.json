@@ -60,8 +60,7 @@
     "resetAllConfirmTitle": "إعادة ضبط جميع العداد",
     "resetAllConfirmMessage": "هل أنت متأكد أنك تريد إعادة ضبط جميع عداد الأذكار؟ لا يمكن التراجع عن هذا الإجراء.",
     "cancel": "إلغاء",
-    "resetAllConfirm": "إعادة الضبط",
-    "stopAdhan": "إيقاف الأذان"
+    "resetAllConfirm": "إعادة الضبط"
   },
   "themes": {
     "navy": "أزرق داكن",
