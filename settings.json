@@ -1,10 +1,10 @@
 {
-  "city": "Quebec",
-  "country": "Canada",
-  "theme": "navy",
-  "language": "en",
+  "city": "Gafsa",
+  "country": "Tunisia",
+  "theme": "green",
+  "language": "fr",
   "position": {
-    "x": 632,
-    "y": 220
+    "x": 469,
+    "y": 121
   }
 }
