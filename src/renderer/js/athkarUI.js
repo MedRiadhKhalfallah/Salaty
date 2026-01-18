@@ -27,7 +27,7 @@ function initAthkarPage() {
     resetAllBtn.addEventListener('click', showResetConfirm);
   }
 
-  // Update UI text
+  // Update UI text - this will use the current language from translations module
   updateAthkarUI();
 
   // Load athkar data
@@ -252,7 +252,7 @@ function createAthkarCard(item, index) {
     card.classList.add('completed');
   }
   
-  // Create card HTML
+  // Create card HTML with language-based positioning
   card.innerHTML = `
     <div class="athkar-card-header">
       <div class="athkar-category">
