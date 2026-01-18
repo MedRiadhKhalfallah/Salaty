@@ -1,0 +1,193 @@
+// src/renderer/js/settings.js
+const { ipcRenderer } = require('electron');
+const { initSelectLocation } = require('./selectLocation');
+const { setLanguage, t, applyLanguageDirection } = require('./translations');
+const { state } = require('./globalStore');
+const { showToast } = require('./toast');
+const { applyTheme } = require('./theme');
+
+let pendingTheme = 'navy';
+
+function initSettingsPage() {
+    initSelectLocation();
+
+    // Setup back button
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            ipcRenderer.invoke('go-back');
+        });
+    }
+
+    // Setup save button
+    const saveBtn = document.getElementById('saveBtn');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', saveSettings);
+    }
+
+    // Initialize UI
+    // Sync pendingTheme with current theme
+    pendingTheme = state.settings.theme || 'navy';
+
+    updateSettings();
+    initThemeOptions();
+    initLanguageOptions();
+}
+
+function updateSettings() {
+    // Update all text elements
+    const elements = {
+        'settingsTitle': 'settings',
+        'cityLabel': 'city',
+        'countryLabel': 'country',
+        'themeLabel': 'theme',
+        'languageLabel': 'language',
+        'cityHint': 'cityHint',
+        'countryHint': 'countryHint',
+        'footerText': 'madeWith'
+    };
+
+    for (const [id, key] of Object.entries(elements)) {
+        const element = document.getElementById(id);
+        if (element) {
+            if (id === 'footerText') {
+                element.innerHTML = t(key);
+            } else {
+                element.textContent = t(key);
+            }
+        }
+    }
+
+    // Update placeholders
+    const cityInput = document.getElementById('cityInput');
+    const countryInput = document.getElementById('countryInput');
+    const saveBtn = document.getElementById('saveBtn');
+
+    if (cityInput) {
+        cityInput.placeholder = t('cityPlaceholder');
+        cityInput.value = state.settings.city || '';
+    }
+    if (countryInput) {
+        countryInput.placeholder = t('countryPlaceholder');
+        countryInput.value = state.settings.country || '';
+    }
+    if (saveBtn) {
+        saveBtn.textContent = t('save');
+    }
+}
+
+function initThemeOptions() {
+    const themeOptionsContainer = document.getElementById('themeOptions');
+    if (!themeOptionsContainer) return;
+
+    const themeOptions = themeOptionsContainer.querySelectorAll('.theme-option');
+    themeOptions.forEach(opt => {
+        const theme = opt.dataset.theme;
+        opt.textContent = t(theme, 'themes');
+
+        // Mark selected theme using state.settings.theme for initial view,
+        // but in settings page we interact with pendingTheme somewhat.
+        // Actually renderer.js code logic was:
+        // Mark selected theme based on `selectedTheme` which was state.settings.theme.
+        // When clicking, we update `pendingTheme` and update visual selection.
+
+        // Let's use state.settings.theme as the initial "selected" one.
+        // But wait, if I click an option, it becomes "selected" in UI.
+
+        // In renderer.js:
+        // if (theme === selectedTheme) { opt.classList.add('selected'); }
+        // selectedTheme was a global variable.
+
+        // Here we should probably check against pendingTheme if we want to reflect current selection in settings page
+        // or state.settings.theme if we want to reflect saved settings.
+        // Usually settings page reflects saved settings until you click, then it reflects pending.
+
+        // Since initThemeOptions is called on init, pendingTheme is set to state.settings.theme.
+
+        if (theme === pendingTheme) {
+            opt.classList.add('selected');
+        } else {
+            opt.classList.remove('selected');
+        }
+
+        // Add click handler
+        opt.addEventListener('click', () => {
+            pendingTheme = theme;
+
+            // Update visual selection
+            themeOptions.forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+
+            // Apply theme preview
+            applyTheme(pendingTheme);
+        });
+    });
+}
+
+function initLanguageOptions() {
+    const languageOptionsContainer = document.getElementById('languageOptions');
+    if (!languageOptionsContainer) return;
+
+    const languageOptions = languageOptionsContainer.querySelectorAll('.language-option');
+    languageOptions.forEach(opt => {
+        // Mark selected language
+        if (opt.dataset.lang === state.settings.language) {
+            opt.classList.add('selected');
+        } else {
+            opt.classList.remove('selected');
+        }
+
+        // Add click handler
+        opt.addEventListener('click', () => {
+            const newLang = opt.dataset.lang;
+            state.settings.language = newLang;
+            setLanguage(newLang);
+
+            // Update visual selection
+            languageOptions.forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+
+            // Apply language direction and update UI
+            applyLanguageDirection();
+            updateSettings();
+            initThemeOptions(); // Update theme labels in new language
+        });
+    });
+}
+
+async function saveSettings() {
+    const cityInput = document.getElementById('cityInput');
+    const countryInput = document.getElementById('countryInput');
+
+    const city = cityInput ? cityInput.value.trim() : '';
+    const country = countryInput ? countryInput.value.trim() : '';
+
+    if (!city || !country) {
+        showToast(t('enterBothCityCountry'), 'error');
+        return;
+    }
+
+    try {
+        const selectedTheme = pendingTheme; // This was using global variable selectedTheme in renderer.js
+
+        state.settings.city = city;
+        state.settings.country = country;
+        state.settings.theme = selectedTheme;
+
+        await ipcRenderer.invoke('save-settings', state.settings);
+
+        showToast(t('settingsSaved'), 'success');
+
+        // Go back to main screen after a short delay
+        setTimeout(() => {
+            ipcRenderer.invoke('go-back');
+        }, 1500);
+    } catch (error) {
+        console.error('Error saving settings:', error);
+        showToast(t('errorSaving'), 'error');
+    }
+}
+
+module.exports = {
+    initSettingsPage
+};
