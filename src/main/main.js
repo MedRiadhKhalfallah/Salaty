@@ -1,14 +1,13 @@
-const { app, BrowserWindow, Tray, Menu } = require('electron');
+const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const ipcHandlers = require('./ipc-handlers');
 
 let mainWindow;
-let tray = null;
 
 function createWindow() {
   // Load settings
   ipcHandlers.loadSettings();
-
+  
   // Get settings after loading
   const settings = ipcHandlers.getSettingsData();
 
@@ -58,31 +57,6 @@ function createWindow() {
     mainWindow.hide();
   });
 
-  // Ajout du Tray
-  if (!tray) {
-    tray = new Tray(path.join(__dirname, '../assets/icons/app_icon.ico'));
-    const contextMenu = Menu.buildFromTemplate([
-      {
-        label: 'Afficher Salaty',
-        click: () => {
-          mainWindow.show();
-        }
-      },
-      {
-        label: 'Quitter',
-        click: () => {
-          tray.destroy();
-          app.quit();
-        }
-      }
-    ]);
-    tray.setToolTip('Salaty');
-    tray.setContextMenu(contextMenu);
-    tray.on('click', () => {
-      mainWindow.show();
-    });
-  }
-
   // Setup IPC handlers
   ipcHandlers.setupHandlers(mainWindow);
 }
@@ -90,20 +64,13 @@ function createWindow() {
 app.whenReady().then(() => {
   try {
     createWindow();
-    // Démarrage automatique avec Windows
-    app.setLoginItemSettings({
-      openAtLogin: true,
-      path: process.execPath,
-      args: []
-    });
   } catch (error) {
     console.error('Error creating window:', error);
   }
 });
 
 app.on('window-all-closed', () => {
-  // Ne quitte pas l'app si le tray existe
-  if (process.platform !== 'darwin' && !tray) {
+  if (process.platform !== 'darwin') {
     app.quit();
   }
 });
