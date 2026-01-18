@@ -60,8 +60,7 @@
     "resetAllConfirmTitle": "Reset All Counts",
     "resetAllConfirmMessage": "Are you sure you want to reset all athkar counts? This action cannot be undone.",
     "cancel": "Cancel",
-    "resetAllConfirm": "Reset All",
-    "stopAdhan": "Stop Adhan"
+    "resetAllConfirm": "Reset All"
   },
   "themes": {
     "navy": "Navy",
