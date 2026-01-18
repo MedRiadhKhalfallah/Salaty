@@ -19,6 +19,19 @@ async function initializeApp() {
 
       setLanguage(state.settings.language || 'en');
 
+      // Correction : charger l'état adhanEnabled depuis les settings
+      adhanEnabled = typeof currentSettings.adhanEnabled === 'boolean' ? currentSettings.adhanEnabled : true;
+
+      // Charger l'état adhanEnabledByPrayer depuis les settings ou initialiser à true
+      if (settings.adhanEnabledByPrayer) {
+        adhanEnabledByPrayer = { ...settings.adhanEnabledByPrayer };
+      } else {
+        adhanEnabledByPrayer = {};
+        Object.keys(translations[getLanguage()].prayerNames).forEach(key => {
+          adhanEnabledByPrayer[key] = true;
+        });
+      }
+
       // Apply theme and language
       applyTheme(theme);
       applyLanguageDirection();
