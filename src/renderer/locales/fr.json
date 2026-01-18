@@ -60,7 +60,8 @@
     "resetAllConfirmTitle": "Réinitialiser tous les compteurs",
     "resetAllConfirmMessage": "Êtes-vous sûr de vouloir réinitialiser tous les compteurs d'Athkar? Cette action ne peut pas être annulée.",
     "cancel": "Annuler",
-    "resetAllConfirm": "Réinitialiser"
+    "resetAllConfirm": "Réinitialiser",
+    "stopAdhan": "Arrêter l'Adhan"
   },
   "themes": {
     "navy": "Bleu marine",

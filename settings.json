@@ -1,10 +1,18 @@
 {
   "city": "Quebec",
   "country": "Canada",
-  "theme": "navy",
-  "language": "en",
+  "theme": "green",
+  "language": "fr",
   "position": {
-    "x": 632,
-    "y": 220
+    "x": 150,
+    "y": 144
+  },
+  "adhanEnabled": true,
+  "adhanEnabledByPrayer": {
+    "Fajr": true,
+    "Dhuhr": true,
+    "Asr": true,
+    "Maghrib": true,
+    "Isha": true
   }
 }
