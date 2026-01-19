@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Features - Salaty</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/themes.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/utilities.css">
+  <link rel="stylesheet" href="../css/rtl.css">
+  <link rel="stylesheet" href="../css/features.css">
+</head>
+<body>
+  <div class="app-container theme-dark" id="app">
+    <div class="drag-area"></div>
+    
+    <div class="features-container">
+      <div class="features-header">
+        <button class="back-btn" id="backBtn" aria-label="Back to Main">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2 class="features-title" id="featuresTitle">Islamic Features</h2>
+      </div>
+      
+      <div class="features-content" id="featuresContent">
+        <div class="features-grid">
+          
+          <!-- Quran Card -->
+          <div class="feature-card available" data-feature="quran">
+            <div class="feature-icon quran-icon">
+              <i class="fas fa-book-quran"></i>
+            </div>
+            <h3 class="feature-name" id="featureQuran">Holy Quran</h3>
+            <p class="feature-description" id="featureQuranDesc">Listen, read and reflect</p>
+          </div>
+
+          <!-- Athkar Card -->
+          <div class="feature-card available" data-feature="athkar">
+            <div class="feature-icon athkar-icon">
+              <i class="fas fa-book-open"></i>
+            </div>
+            <h3 class="feature-name" id="featureAthkar">Athkar</h3>
+            <p class="feature-description" id="featureAthkarDesc">Daily remembrances</p>
+          </div>
+
+          <!-- Tasbih Card -->
+          <div class="feature-card coming-soon" data-feature="tasbih">
+            <div class="coming-soon-badge" id="comingSoonBadge1">Coming Soon</div>
+            <div class="feature-icon tasbih-icon">
+              <i class="fas fa-hands-praying"></i>
+            </div>
+            <h3 class="feature-name" id="featureTasbih">Tasbih</h3>
+            <p class="feature-description" id="featureTasbihDesc">Digital prayer beads</p>
+          </div>
+
+          <!-- Asma Allah Card -->
+          <div class="feature-card coming-soon" data-feature="asma">
+            <div class="coming-soon-badge" id="comingSoonBadge4">Coming Soon</div>
+            <div class="feature-icon asma-icon">
+              <i class="fas fa-star-and-crescent"></i>
+            </div>
+            <h3 class="feature-name" id="featureAsma">99 Names of Allah</h3>
+            <p class="feature-description" id="featureAsmaDesc">Learn the beautiful names</p>
+          </div>
+
+          <!-- Hijri Calendar Card -->
+          <div class="feature-card coming-soon" data-feature="calendar">
+            <div class="coming-soon-badge" id="comingSoonBadge2">Coming Soon</div>
+            <div class="feature-icon calendar-icon">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+            <h3 class="feature-name" id="featureCalendar">Hijri Calendar</h3>
+            <p class="feature-description" id="featureCalendarDesc">Islamic calendar & events</p>
+          </div>
+
+          <!-- Ramadhan Card -->
+          <div class="feature-card coming-soon" data-feature="ramadhan">
+            <div class="coming-soon-badge" id="comingSoonBadge3">Coming Soon</div>
+            <div class="feature-icon ramadhan-icon">
+              <i class="fas fa-moon"></i>
+            </div>
+            <h3 class="feature-name" id="featureRamadhan">Ramadhan</h3>
+            <p class="feature-description" id="featureRamadhanDesc">Fasting times & tracker</p>
+          </div>
+
+          <!-- Qibla Card -->
+          <div class="feature-card coming-soon" data-feature="qibla">
+            <div class="coming-soon-badge" id="comingSoonBadge5">Coming Soon</div>
+            <div class="feature-icon qibla-icon">
+              <i class="fas fa-compass"></i>
+            </div>
+            <h3 class="feature-name" id="featureQibla">Qibla Finder</h3>
+            <p class="feature-description" id="featureQiblaDesc">Find prayer direction</p>
+          </div>
+
+          <!-- Monthly Prayer Times Card -->
+          <div class="feature-card coming-soon" data-feature="monthly-prayer-times">
+            <div class="coming-soon-badge" id="comingSoonBadge6">Coming Soon</div>
+            <div class="feature-icon monthly-icon">
+              <i class="fas fa-calendar-days"></i>
+            </div>
+            <h3 class="feature-name" id="featureMonthly">Monthly Prayer Times</h3>
+            <p class="feature-description" id="featureMonthlyDesc">All prayer times for the month</p>
+          </div>
+
+        </div>
+      </div>
+      
+      <div class="features-footer">
+        <div class="features-footer-text" id="featuresFooterText">
+          More features coming soon, In Sha Allah
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/renderer.js"></script>
+</body>
+</html>
