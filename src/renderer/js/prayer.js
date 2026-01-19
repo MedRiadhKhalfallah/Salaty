@@ -1,12 +1,17 @@
 // src/renderer/js/prayer.js
 // Utilitaires pour la gestion de la date de prière (calcul, formatage, etc.)
+const { ipcRenderer } = require('electron');
 const { translations, getLanguage, t } = require('../js/translations');
 const {   showToast, } = require('../js/toast');
 const { getSecondsFromTime, formatTime, getGregorianDate, getHijriDate } = require('../js/dateUtils');
 const { state, prayerIcons } = require('../js/globalStore');
+const { notifyPrayer } = require('../js/adhan');
 
 let prayerData = null;
 let currentActivePrayer = null;
+let isFirstLoad = true;
+let adhanEnabled = true;
+let adhanEnabledByPrayer = {};
 
 /**
  * Retourne la prière courante et la suivante, ainsi que le temps restant
@@ -107,21 +112,52 @@ function updatePrayerUI() {
     if (loadingEl) {
         loadingEl.textContent = t('loadingPrayerTimes');
     }
+
+    const adhanBtnLabel = adhanEnabled ? t('disableAdhan') : t('enableAdhan');
+    const adhanBtnIcon = adhanEnabled ? 'volume-up' : 'volume-mute';
+    const adhanToggleBtn = `<button class="adhan-toggle-btn" id="adhanToggleBtn" title="${adhanBtnLabel}"><i class="fas fa-${adhanBtnIcon}"></i> ${adhanBtnLabel}</button>`;
+
+
+    // Correction : charger l'état adhanEnabled depuis les settings
+    adhanEnabled = typeof state.settings.adhanEnabled === 'boolean' ? state.settings.adhanEnabled : true;
+
+    // Charger l'état adhanEnabledByPrayer depuis les settings ou initialiser à true
+    if (state.settings.adhanEnabledByPrayer) {
+        adhanEnabledByPrayer = { ...state.settings.adhanEnabledByPrayer };
+    } else {
+        adhanEnabledByPrayer = {};
+        Object.keys(translations[getLanguage()].prayerNames).forEach(key => {
+            adhanEnabledByPrayer[key] = true;
+        });
+    }
+
     const prayerTimesHTML = Object.keys(translations[lang].prayerNames).map((key) => {
         const name = t(key, 'prayerNames');
         const time = prayerData.timings[key];
         const icon = prayerIcons[key] || 'clock';
         const isCurrent = key === currentActivePrayer;
+        const adhanOn = adhanEnabledByPrayer[key] !== false;
+        const adhanBtnIcon = adhanOn ? 'volume-up' : 'volume-mute';
+        const adhanBtnLabel = adhanOn ? t('disableAdhan') : t('enableAdhan');
+
         return `
       <div class="prayer-item ${isCurrent ? 'current-prayer' : ''}" data-prayer="${key}">
         <i class="fas fa-${icon}"></i>
         <span class="prayer-name">${name}</span>
         <span class="prayer-time">${time} ${isCurrent ? `<span class="current-indicator">${t('now')}</span>` : ''}</span>
+        <button class="adhan-toggle-btn" data-prayer="${key}" title="${adhanBtnLabel}"><i class="fas fa-${adhanBtnIcon} adhan-toggle-icon"></i></button>
       </div>
     `;
     }).join('');
     if (prayerListEl) {
         prayerListEl.innerHTML = prayerTimesHTML;
+        // Ajouter les listeners sur chaque bouton
+        prayerListEl.querySelectorAll('.adhan-toggle-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                const key = btn.getAttribute('data-prayer');
+                toggleAdhanForPrayer(key);
+            };
+        });
     }
 }
 
@@ -158,10 +194,21 @@ function updateCurrentAndNextPrayer() {
         }
         if (prayerChanged) {
             updatePrayerUI();
+            if (!isFirstLoad) {
+                notifyPrayer(currentPrayer);
+            }
+            isFirstLoad = false;
         }
     } catch (error) {
         console.error('Error in updateCurrentAndNextPrayer:', error);
     }
+}
+
+function toggleAdhanForPrayer(prayerKey) {
+    adhanEnabledByPrayer[prayerKey] = !adhanEnabledByPrayer[prayerKey];
+    state.settings.adhanEnabledByPrayer = adhanEnabledByPrayer;
+    ipcRenderer.invoke('save-settings', state.settings);
+    updatePrayerUI();
 }
 
 module.exports = {
