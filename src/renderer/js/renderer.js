@@ -5,6 +5,7 @@ const { initQuranPage } = require('../js/quranUI');
 const { initAthkarPage } = require('../js/athkarUI');
 const { initFeaturesPage } = require('../js/featuresUI');
 const { loadPrayerTimes, updateCurrentAndNextPrayer } = require('../js/prayer');
+const { toggleRamadanMode } = require('../js/ramadan');
 const { state } = require('../js/globalStore');
 const { initSettingsPage } = require('../js/settings');
 const { applyTheme } = require('../js/theme');
@@ -83,6 +84,13 @@ function initMainPage() {
     featuresBtn.addEventListener('click', () => {
       ipcRenderer.invoke('resize-window', 320, 555);
       ipcRenderer.invoke('navigate-to', 'features');
+    });
+  }
+
+  const ramadanBtn = document.getElementById('mainRamadanBtn');
+  if (ramadanBtn) {
+    ramadanBtn.addEventListener('click', () => {
+      toggleRamadanMode();
     });
   }
 
