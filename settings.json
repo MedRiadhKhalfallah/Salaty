@@ -1,18 +1,10 @@
 {
-  "city": "Ariana",
+  "city": "Tunis",
   "country": "Tunisia",
   "theme": "navy",
   "language": "en",
   "position": {
-    "x": 1180,
-    "y": 196
-  },
-  "adhanEnabled": true,
-  "adhanEnabledByPrayer": {
-    "Fajr": false,
-    "Dhuhr": false,
-    "Asr": false,
-    "Maghrib": true,
-    "Isha": true
+    "x": 666,
+    "y": 142
   }
 }

@@ -11,6 +11,7 @@
 .features-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--border-color);
   position: relative;
@@ -36,6 +37,21 @@
   margin: 0;
   z-index: 2;
   position: relative;
+  order: 1;
+}
+
+/* Features Controls */
+.features-controls {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  z-index: 2;
+  position: relative;
+  order: 3;
+}
+
+.features-title {
+  order: 2;
 }
 
 /* Features Content */
@@ -326,6 +342,35 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Style pour le mode plein écran */
+.features-container.fullscreen .features-grid {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.features-container.fullscreen .feature-card {
+  padding: 24px 16px;
+  min-height: 180px;
+}
+
+.features-container.fullscreen .feature-icon {
+  width: 72px;
+  height: 72px;
+}
+
+.features-container.fullscreen .feature-icon i {
+  font-size: 36px;
+}
+
+.features-container.fullscreen .feature-name {
+  font-size: 18px;
+}
+
+.features-container.fullscreen .feature-description {
+  font-size: 13px;
 }
 
 /* RTL Support */

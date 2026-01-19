@@ -1,6 +1,8 @@
 const { ipcRenderer } = require('electron');
 const { t } = require('./translations');
 
+let isFeaturesFullscreen = false;
+
 // ==================== FEATURES PAGE FUNCTIONS ====================
 function initFeaturesPage() {
   console.log('Initializing Features page...');
@@ -11,9 +13,18 @@ function initFeaturesPage() {
     console.log('Back button found');
     backBtn.addEventListener('click', () => {
       console.log('Back button clicked');
-      ipcRenderer.invoke('resize-window', 320, 540);
+      if (isFeaturesFullscreen) {
+        toggleFeaturesFullscreen(); // Exit fullscreen first
+      }
+      ipcRenderer.invoke('resize-window', 320, 555);
       ipcRenderer.invoke('go-back');
     });
+  }
+
+  // Setup fullscreen button
+  const fullscreenBtn = document.getElementById('featuresFullscreenBtn');
+  if (fullscreenBtn) {
+    fullscreenBtn.addEventListener('click', toggleFeaturesFullscreen);
   }
 
   // Update UI text
@@ -50,6 +61,9 @@ function updateFeaturesUI() {
   // Coming soon badges
   const comingSoonBadges = document.querySelectorAll('.coming-soon-badge');
 
+  // Fullscreen button
+  const fullscreenBtn = document.getElementById('featuresFullscreenBtn');
+
   if (featuresTitle) featuresTitle.textContent = t('islamicFeatures');
   if (featuresFooterText) featuresFooterText.textContent = t('moreFeaturesComingSoon');
   
@@ -74,6 +88,15 @@ function updateFeaturesUI() {
   comingSoonBadges.forEach(badge => {
     badge.textContent = t('comingSoon');
   });
+
+  // Update fullscreen button
+  if (fullscreenBtn) {
+    fullscreenBtn.setAttribute('aria-label', isFeaturesFullscreen ? t('exitFullscreen') : t('enterFullscreen'));
+    const icon = fullscreenBtn.querySelector('i');
+    if (icon) {
+      icon.className = isFeaturesFullscreen ? 'fas fa-compress' : 'fas fa-expand';
+    }
+  }
 }
 
 function setupFeatureCards() {
@@ -90,19 +113,42 @@ function setupFeatureCards() {
   if (athkarCard) {
     athkarCard.addEventListener('click', openAthkar);
   }
-
 }
 
 function openQuran() {
   console.log('Opening Quran...');
+  if (isFeaturesFullscreen) {
+    toggleFeaturesFullscreen(); // Exit fullscreen first
+  }
   ipcRenderer.invoke('resize-window', 850, 600);
   ipcRenderer.invoke('navigate-to', 'quran');
 }
 
 function openAthkar() {
   console.log('Opening Athkar...');
-  ipcRenderer.invoke('resize-window', 850, 600);
+  if (isFeaturesFullscreen) {
+    toggleFeaturesFullscreen(); // Exit fullscreen first
+  }
+  ipcRenderer.invoke('resize-window', 320, 555);
   ipcRenderer.invoke('navigate-to', 'athkar');
+}
+
+function toggleFeaturesFullscreen() {
+  isFeaturesFullscreen = !isFeaturesFullscreen;
+
+  if (isFeaturesFullscreen) {
+    // Enter fullscreen
+    ipcRenderer.invoke('resize-window', 850, 600);
+    document.body.classList.add('fullscreen');
+    document.querySelector('.features-container').classList.add('fullscreen');
+  } else {
+    // Exit fullscreen
+    ipcRenderer.invoke('resize-window', 320, 555);
+    document.body.classList.remove('fullscreen');
+    document.querySelector('.features-container').classList.remove('fullscreen');
+  }
+
+  updateFeaturesUI();
 }
 
 module.exports = { initFeaturesPage };

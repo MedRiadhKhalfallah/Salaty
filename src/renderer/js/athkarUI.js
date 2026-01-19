@@ -4,10 +4,12 @@ const { t } = require('./translations');
 let athkarData = null;
 let currentCategory = null;
 let athkarState = {};
+let isAthkarFullscreen = false;
 
 // ==================== ATHKAR PAGE FUNCTIONS ====================
 function initAthkarPage() {
   console.log('Initializing Athkar page...');
+  console.log('isAthkarFullscreen initial:', isAthkarFullscreen);
   
   // Setup back button
   const backBtn = document.getElementById('backBtn');
@@ -15,9 +17,31 @@ function initAthkarPage() {
     console.log('Back button found');
     backBtn.addEventListener('click', () => {
       console.log('Back button clicked');
-      ipcRenderer.invoke('resize-window', 320, 540);
-      ipcRenderer.invoke('go-back');
+      if (isAthkarFullscreen) {
+        console.log('Exiting fullscreen before navigating back');
+        toggleAthkarFullscreen(); // Exit fullscreen first
+      }
+      ipcRenderer.invoke('resize-window', 320, 555);
+      ipcRenderer.invoke('navigate-to', 'features');
     });
+  }
+
+  // Setup fullscreen button - CORRECTION ICI
+  const fullscreenBtn = document.getElementById('athkarFullscreenBtn');
+  console.log('Fullscreen button element:', fullscreenBtn);
+  
+  if (fullscreenBtn) {
+    console.log('Fullscreen button found, adding event listener');
+    fullscreenBtn.addEventListener('click', toggleAthkarFullscreen);
+    
+    // Test direct pour vérifier si l'événement est attaché
+    fullscreenBtn.addEventListener('click', () => {
+      console.log('Fullscreen button clicked directly');
+    });
+  } else {
+    console.error('Fullscreen button NOT FOUND! Check HTML ID');
+    // Vérifier les éléments dans le DOM
+    console.log('All buttons in DOM:', document.querySelectorAll('button'));
   }
 
   // Setup reset all button
@@ -35,13 +59,19 @@ function initAthkarPage() {
 
   // Load saved state
   loadAthkarState();
+  
+  // Log pour vérifier que la fonction est bien appelée
+  console.log('initAthkarPage completed');
 }
 
 function updateAthkarUI() {
+  console.log('Updating Athkar UI, isAthkarFullscreen:', isAthkarFullscreen);
+  
   const athkarTitle = document.getElementById('athkarTitle');
   const athkarFooterText = document.getElementById('athkarFooterText');
   const loadingText = document.getElementById('loadingText');
   const resetAllBtn = document.getElementById('resetAllBtn');
+  const fullscreenBtn = document.getElementById('athkarFullscreenBtn');
 
   if (athkarTitle) athkarTitle.textContent = t('athkar');
   if (athkarFooterText) athkarFooterText.textContent = t('remembrancesFromSunnah');
@@ -49,6 +79,16 @@ function updateAthkarUI() {
 
   if (resetAllBtn) {
     resetAllBtn.setAttribute('aria-label', t('resetAll'));
+  }
+
+  if (fullscreenBtn) {
+    console.log('Updating fullscreen button, current state:', isAthkarFullscreen);
+    fullscreenBtn.setAttribute('aria-label', isAthkarFullscreen ? t('exitFullscreen') : t('enterFullscreen'));
+    const icon = fullscreenBtn.querySelector('i');
+    if (icon) {
+      console.log('Updating icon, new class:', isAthkarFullscreen ? 'fas fa-compress' : 'fas fa-expand');
+      icon.className = isAthkarFullscreen ? 'fas fa-compress' : 'fas fa-expand';
+    }
   }
 }
 
@@ -476,6 +516,63 @@ function showSuccessToast(message, isError = false) {
     toast.classList.remove('show');
     setTimeout(() => toast.remove(), 200);
   }, 2000);
+}
+
+function toggleAthkarFullscreen() {
+  console.log('toggleAthkarFullscreen called, current state:', isAthkarFullscreen);
+  console.log('ipcRenderer available:', !!ipcRenderer);
+  
+  isAthkarFullscreen = !isAthkarFullscreen;
+
+  console.log('New fullscreen state:', isAthkarFullscreen);
+
+  if (isAthkarFullscreen) {
+    // Enter fullscreen
+    console.log('Entering fullscreen mode');
+    try {
+      ipcRenderer.invoke('resize-window', 850, 600).then(() => {
+        console.log('Window resized to fullscreen');
+      }).catch(err => {
+        console.error('Error resizing window:', err);
+      });
+      document.body.classList.add('fullscreen');
+      const container = document.querySelector('.athkar-container');
+      if (container) {
+        container.classList.add('fullscreen');
+        console.log('Added fullscreen class to container');
+      }
+    } catch (error) {
+      console.error('Error in fullscreen mode:', error);
+    }
+  } else {
+    // Exit fullscreen
+    console.log('Exiting fullscreen mode');
+    try {
+      ipcRenderer.invoke('resize-window', 320, 555).then(() => {
+        console.log('Window resized to normal');
+      }).catch(err => {
+        console.error('Error resizing window:', err);
+      });
+      document.body.classList.remove('fullscreen');
+      const container = document.querySelector('.athkar-container');
+      if (container) {
+        container.classList.remove('fullscreen');
+        console.log('Removed fullscreen class from container');
+      }
+    } catch (error) {
+      console.error('Error exiting fullscreen mode:', error);
+    }
+  }
+
+  // Mettre à jour l'interface utilisateur
+  updateAthkarUI();
+  
+  // Forcer un re-render pour s'assurer que les changements sont visibles
+  setTimeout(() => {
+    if (currentCategory) {
+      renderAthkarList();
+    }
+  }, 100);
 }
 
 module.exports = { initAthkarPage };

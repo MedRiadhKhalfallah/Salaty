@@ -33,9 +33,11 @@ async function initializeApp() {
       initSettingsPage();
     } else if (path.includes('quran.html')) {
       initQuranPage();
-    }else if (path.includes('athkar.html')) {
+    } else if (path.includes('athkar.html')) {
+      console.log('Initializing Athkar page from renderer.js');
       initAthkarPage();
     } else if (path.includes('features.html')) {
+      console.log('Initializing Features page from renderer.js');
       initFeaturesPage();
     }
 
@@ -71,7 +73,6 @@ function initMainPage() {
   const settingsBtn = document.getElementById('mainSettingsBtn');
   const featuresBtn = document.getElementById('mainFeaturesBtn');
 
-
   if (settingsBtn) {
     settingsBtn.addEventListener('click', () => {
       ipcRenderer.invoke('navigate-to', 'settings');
@@ -80,7 +81,7 @@ function initMainPage() {
 
   if (featuresBtn) {
     featuresBtn.addEventListener('click', () => {
-      ipcRenderer.invoke('resize-window', 850, 600);
+      ipcRenderer.invoke('resize-window', 320, 555);
       ipcRenderer.invoke('navigate-to', 'features');
     });
   }
@@ -96,7 +97,6 @@ function initMainPage() {
   setInterval(updateCurrentAndNextPrayer, 1000);
   setInterval(loadPrayerTimes, 3600000);
 }
-
 
 // ==================== START THE APP ====================
 document.addEventListener('DOMContentLoaded', initializeApp);

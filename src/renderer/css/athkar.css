@@ -34,6 +34,7 @@
   justify-content: center;
   transition: all 0.2s ease;
   flex-shrink: 0;
+  order: 1;
 }
 
 .back-btn:hover {
@@ -44,27 +45,6 @@
 .back-btn i {
   color: var(--text-primary);
   font-size: 14px;
-}
-
-/* Arabic/RTL layout: Reset on LEFT, Back on RIGHT */
-[dir="rtl"] .athkar-header,
-[lang="ar"] .athkar-header,
-[lang="fa"] .athkar-header,
-[lang="ur"] .athkar-header,
-[lang="he"] .athkar-header {
-  flex-direction: row; /* Normal row for Arabic - Reset left, Back right */
-}
-
-/* Default LTR layout: Back on LEFT, Reset on RIGHT */
-[dir="ltr"] .athkar-header:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .athkar-header,
-[lang="fr"] .athkar-header,
-[lang="es"] .athkar-header,
-[lang="de"] .athkar-header,
-[lang="ru"] .athkar-header,
-[lang="zh"] .athkar-header,
-[lang="ja"] .athkar-header {
-  flex-direction: row; /* Normal row for other languages - Back left, Reset right */
 }
 
 /* Title - Always centered */
@@ -80,6 +60,7 @@
   pointer-events: none;
   width: auto;
   white-space: nowrap;
+  order: 2;
 }
 
 /* Control buttons container */
@@ -88,6 +69,7 @@
   gap: 6px;
   z-index: 102;
   flex-shrink: 0;
+  order: 3;
 }
 
 /* Arabic: Reset button on LEFT side */
@@ -171,6 +153,31 @@
 
 .reset-all-btn i {
   color: #ff6b6b;
+  font-size: 12px;
+}
+
+/* Fullscreen Button */
+.fullscreen-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.fullscreen-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--accent-color);
+}
+
+.fullscreen-btn i {
+  color: var(--text-primary);
   font-size: 12px;
 }
 
@@ -991,4 +998,39 @@
 [dir="rtl"] .category-name,
 [dir="ltr"] .category-name {
   text-align: center;
+}
+
+/* Style pour le mode plein écran Athkar */
+.athkar-container.fullscreen .category-nav {
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  max-height: 120px;
+}
+
+.athkar-container.fullscreen .athkar-card {
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.athkar-container.fullscreen .athkar-content-text {
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.athkar-container.fullscreen .athkar-description {
+  font-size: 13px;
+}
+
+.athkar-container.fullscreen .count-value {
+  font-size: 24px;
+}
+
+.athkar-container.fullscreen .count-btn {
+  width: 36px;
+  height: 36px;
+  font-size: 16px;
+}
+
+.athkar-container.fullscreen .athkar-list {
+  padding: 20px;
 }
