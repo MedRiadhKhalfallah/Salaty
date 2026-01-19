@@ -98,7 +98,9 @@
 }
 
 /* Settings and Quran Buttons (Main Page) */
-.settings-btn, .quran-btn {
+.settings-btn,
+.features-btn, 
+.quran-btn {
   width: 32px;
   height: 32px;
   border-radius: 8px;
@@ -117,23 +119,33 @@
   overflow: hidden;
 }
 
-.settings-btn:hover, .quran-btn:hover {
+.settings-btn:hover,
+.features-btn:hover, 
+.quran-btn:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.settings-btn:active, .quran-btn:active {
+.settings-btn:active,
+.features-btn:active, 
+.quran-btn:active {
   transform: translateY(0);
   transition: transform 0.1s ease;
 }
 
-.settings-btn i, .quran-btn i {
+.settings-btn i, 
+.features-btn i, 
+.quran-btn i {
   transition: transform 0.3s ease;
 }
 
 .settings-btn:hover i {
   transform: scale(1.1) rotate(45deg);
+}
+
+.features-btn:hover i {
+  transform: scale(1.1);
 }
 
 .quran-btn:hover i {
