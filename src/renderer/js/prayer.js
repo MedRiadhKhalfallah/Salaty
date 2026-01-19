@@ -6,6 +6,7 @@ const {   showToast, } = require('../js/toast');
 const { getSecondsFromTime, formatTime, getGregorianDate, getHijriDate } = require('../js/dateUtils');
 const { state, prayerIcons } = require('../js/globalStore');
 const { notifyPrayer } = require('../js/adhan');
+const { updateRamadanCountdown } = require('../js/ramadan');
 
 let prayerData = null;
 let currentActivePrayer = null;
@@ -78,6 +79,7 @@ async function loadPrayerTimes() {
         if (data && data.code === 200) {
             prayerData = data.data;
             updatePrayerUI();
+            updateRamadanCountdown(prayerData);
         } else {
             throw new Error('Invalid response from server');
         }
@@ -217,4 +219,5 @@ module.exports = {
     formatTime,
     loadPrayerTimes,
     updateCurrentAndNextPrayer,
+    updateRamadanCountdown // Export for completeness if needed
 };

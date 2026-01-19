@@ -89,6 +89,16 @@ body {
   font-weight: 300;
 }
 
+.ramadan-countdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #fbbf24;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
 .date-info {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.85);

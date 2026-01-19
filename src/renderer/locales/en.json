@@ -13,6 +13,8 @@
     "nextPrayer": "Next Prayer",
     "endTime": "End time",
     "now": "Now",
+    "daysUntilRamadan": "Days until Ramadan: {days}",
+    "ramadanMubarak": "Ramadan Mubarak!",
     "settings": "Settings",
     "quran": "Quran",
     "city": "City",

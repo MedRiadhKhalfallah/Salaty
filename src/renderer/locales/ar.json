@@ -13,6 +13,8 @@
     "nextPrayer": "الصلاة القادمة",
     "endTime": "وقت الانتهاء",
     "now": "الآن",
+    "daysUntilRamadan": "أيام حتى رمضان: {days}",
+    "ramadanMubarak": "رمضان مبارك!",
     "settings": "الإعدادات",
     "quran": "القرآن",
     "city": "المدينة",
