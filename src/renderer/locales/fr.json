@@ -13,6 +13,8 @@
     "nextPrayer": "Prochaine prière",
     "endTime": "Heure de fin",
     "now": "Maintenant",
+    "daysUntilRamadan": "Jours avant Ramadan : {days}",
+    "ramadanMubarak": "Ramadan Mubarak !",
     "settings": "Paramètres",
     "quran": "Coran",
     "city": "Ville",
