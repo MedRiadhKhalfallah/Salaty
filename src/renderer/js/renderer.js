@@ -3,6 +3,7 @@ const { ipcRenderer } = require('electron');
 const { setLanguage, t, applyLanguageDirection } = require('../js/translations');
 const { initQuranPage } = require('../js/quranUI');
 const { initAthkarPage } = require('../js/athkarUI');
+const { initFeaturesPage } = require('../js/featuresUI');
 const { loadPrayerTimes, updateCurrentAndNextPrayer } = require('../js/prayer');
 const { state } = require('../js/globalStore');
 const { initSettingsPage } = require('../js/settings');
@@ -34,6 +35,8 @@ async function initializeApp() {
       initQuranPage();
     }else if (path.includes('athkar.html')) {
       initAthkarPage();
+    } else if (path.includes('features.html')) {
+      initFeaturesPage();
     }
 
     // Setup window controls (common to all pages)
@@ -66,8 +69,8 @@ function setupWindowControls() {
 function initMainPage() {
   // Setup navigation buttons
   const settingsBtn = document.getElementById('mainSettingsBtn');
-  const quranBtn = document.getElementById('mainQuranBtn');
-  const athkarBtn = document.getElementById('mainAthkarBtn');
+  const featuresBtn = document.getElementById('mainFeaturesBtn');
+
 
   if (settingsBtn) {
     settingsBtn.addEventListener('click', () => {
@@ -75,17 +78,10 @@ function initMainPage() {
     });
   }
 
-  if (quranBtn) {
-    quranBtn.addEventListener('click', () => {
+  if (featuresBtn) {
+    featuresBtn.addEventListener('click', () => {
       ipcRenderer.invoke('resize-window', 850, 600);
-      ipcRenderer.invoke('navigate-to', 'quran');
-    });
-  }
-
-  if (athkarBtn) {
-    athkarBtn.addEventListener('click', () => {
-      ipcRenderer.invoke('resize-window', 850, 600);
-      ipcRenderer.invoke('navigate-to', 'athkar');
+      ipcRenderer.invoke('navigate-to', 'features');
     });
   }
 
