@@ -4,7 +4,14 @@
   "theme": "navy",
   "language": "en",
   "position": {
-    "x": 666,
-    "y": 142
+    "x": 1180,
+    "y": 247
+  },
+  "adhanEnabledByPrayer": {
+    "Fajr": true,
+    "Dhuhr": true,
+    "Asr": true,
+    "Maghrib": true,
+    "Isha": true
   }
 }
