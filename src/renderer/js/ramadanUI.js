@@ -1,0 +1,256 @@
+const { ipcRenderer } = require('electron');
+const { state } = require('./globalStore');
+const { t } = require('./translations');
+
+let ramadanData = [];
+let assignedHijriYear = null;
+
+function initRamadanPage() {
+    console.log('Initializing Ramadan page...');
+
+    // Back Button
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+        backBtn.replaceWith(backBtn.cloneNode(true)); // Remove old listeners
+        document.getElementById('backBtn').addEventListener('click', () => {
+             ipcRenderer.invoke('resize-window', 320, 555);
+             ipcRenderer.invoke('navigate-to', 'features');
+        });
+    }
+
+    // Modal Close
+    const modalClose = document.getElementById('modalClose');
+    const modal = document.getElementById('dayModal');
+    if (modalClose && modal) {
+        modalClose.onclick = () => {
+            modal.classList.remove('show');
+        };
+        // Close on click outside
+        window.onclick = (event) => {
+            if (event.target === modal) {
+                modal.classList.remove('show');
+            }
+        };
+    }
+
+    fetchRamadanData();
+}
+
+async function fetchRamadanData() {
+    const { city, country } = state.settings;
+    if (!city || !country) {
+        document.getElementById('trackerGrid').innerHTML = `<p style="text-align:center; color:white; width: 100%;">Please set your location in Settings first.</p>`;
+        return;
+    }
+
+    try {
+        // 1. Get current Hijri Year first
+        const method = state.settings.method || 2; // Default to ISNA if not set
+        const todayUrl = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=${method}`;
+
+        const todayRes = await fetch(todayUrl);
+        const todayData = await todayRes.json();
+
+        if (!todayData || !todayData.data) throw new Error("Could not fetch today's data");
+
+        const currentDate = todayData.data.date;
+        const currentHijriMonth = currentDate.hijri.month.number;
+        let targetHijriYear = parseInt(currentDate.hijri.year);
+
+        // If Ramadan (9) has passed this year, show next year's Ramadan
+        if (currentHijriMonth > 9) {
+            targetHijriYear++;
+        }
+
+        assignedHijriYear = targetHijriYear;
+        const titleEl = document.querySelector('.ramadan-title');
+        if (titleEl) titleEl.textContent = `Ramadhan ${assignedHijriYear}`;
+
+        // 2. Fetch Ramadan Month Data
+        const ramadanUrl = `https://api.aladhan.com/v1/hijriCalendarByCity/${targetHijriYear}/9?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=${method}`;
+
+        const ramadanRes = await fetch(ramadanUrl);
+        const ramadanJson = await ramadanRes.json();
+
+        if (ramadanJson && ramadanJson.data) {
+            ramadanData = ramadanJson.data;
+            renderCalendar(ramadanData);
+            updateTodayCard(ramadanData);
+        }
+
+    } catch (error) {
+        console.error("Error fetching Ramadan data:", error);
+        document.getElementById('trackerGrid').innerHTML = `<p style="text-align:center; color:white;">Error loading data. Check internet connection.</p>`;
+    }
+}
+
+function renderCalendar(data) {
+    const grid = document.getElementById('trackerGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    const trackedDays = JSON.parse(localStorage.getItem(`ramadanTracker_${assignedHijriYear}`) || '[]');
+
+    data.forEach((dayData, index) => {
+        const hijriDay = dayData.date.hijri.day;
+        const gregorianDate = dayData.date.gregorian.date; // DD-MM-YYYY
+        const [gDay, gMonth] = gregorianDate.split('-');
+        const monthName = new Date(dayData.date.gregorian.date.split('-').reverse().join('-')).toLocaleString('default', { month: 'short' });
+
+        const el = document.createElement('div');
+        el.className = 'day-tracker';
+
+        // Check special days
+        if (parseInt(hijriDay) === 15) {
+            el.classList.add('special-day');
+            const badge = document.createElement('i');
+            badge.className = 'fas fa-star special-badge';
+            el.appendChild(badge);
+        }
+        if (parseInt(hijriDay) === 27) {
+            el.classList.add('laylat-al-qadr');
+            const badge = document.createElement('i');
+            badge.className = 'fas fa-moon special-badge';
+            el.appendChild(badge);
+        }
+
+        // Check if completed
+        if (trackedDays.includes(hijriDay)) {
+            el.classList.add('completed');
+        }
+
+        el.innerHTML += `
+            <span class="hijri-day">${hijriDay}</span>
+            <span class="gregorian-date">${gDay} ${monthName}</span>
+        `;
+
+        el.addEventListener('click', () => openDayModal(dayData, el));
+
+        grid.appendChild(el);
+    });
+}
+
+function updateTodayCard(data) {
+    // Find if today is in the list
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to midnight
+
+    const d = String(today.getDate()).padStart(2, '0');
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const y = today.getFullYear();
+    const todayStr = `${d}-${m}-${y}`;
+
+    const todayData = data.find(item => item.date.gregorian.date === todayStr);
+
+    const suhoorEl = document.getElementById('todaySuhoor');
+    const iftarEl = document.getElementById('todayIftar');
+    const cardTitle = document.querySelector('#todayCard h3');
+
+    if (todayData) {
+        // We are in Ramadan and found today!
+        if (suhoorEl) suhoorEl.textContent = formatTimeStr(todayData.timings.Fajr);
+        if (iftarEl) iftarEl.textContent = formatTimeStr(todayData.timings.Maghrib);
+
+        if (cardTitle) {
+            cardTitle.textContent = `Ramadan Day ${todayData.date.hijri.day}`;
+        }
+    } else {
+        // Not Ramadan or data not matching
+        if (data.length > 0) {
+            // Check start date
+            const firstDayStr = data[0].date.gregorian.date;
+            const [fd, fm, fy] = firstDayStr.split('-');
+            const firstDayDate = new Date(fy, fm - 1, fd);
+            firstDayDate.setHours(0, 0, 0, 0);
+
+            if (today < firstDayDate) {
+                // Before Ramadan
+                const diffTime = firstDayDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (cardTitle) cardTitle.textContent = `${diffDays} Days until Ramadan`;
+
+                // Show 1st day times as requested
+                if (suhoorEl) suhoorEl.textContent = formatTimeStr(data[0].timings.Fajr);
+                if (iftarEl) iftarEl.textContent = formatTimeStr(data[0].timings.Maghrib);
+            } else {
+                // Likely After Ramadan
+                if (cardTitle) cardTitle.textContent = "Ramadan Ended";
+                if (suhoorEl) suhoorEl.textContent = "--:--";
+                if (iftarEl) iftarEl.textContent = "--:--";
+            }
+        } else {
+            if (suhoorEl) suhoorEl.textContent = "--:--";
+            if (iftarEl) iftarEl.textContent = "--:--";
+        }
+    }
+}
+
+function openDayModal(dayData, element) {
+    const modal = document.getElementById('dayModal');
+    if (!modal) return;
+
+    const hijriDay = dayData.date.hijri.day;
+    const gregDate = dayData.date.gregorian.date;
+
+    // Update Modal Content
+    document.getElementById('modalTitle').textContent = `Ramadhan ${hijriDay} (${gregDate})`;
+    document.getElementById('modalSuhoor').textContent = formatTimeStr(dayData.timings.Fajr);
+    document.getElementById('modalIftar').textContent = formatTimeStr(dayData.timings.Maghrib);
+
+    // Track button logic
+    // We remove any existing track button to avoid duplicates/listeners issues
+    const existingTrackBtn = document.getElementById('trackBtn');
+    if (existingTrackBtn) existingTrackBtn.remove();
+
+    const trackedDays = JSON.parse(localStorage.getItem(`ramadanTracker_${assignedHijriYear}`) || '[]');
+    const isTracked = trackedDays.includes(hijriDay);
+
+    const trackBtn = document.createElement('button');
+    trackBtn.id = 'trackBtn';
+    trackBtn.className = 'control-btn'; // Reuse main CSS
+    trackBtn.style.marginTop = '15px';
+    trackBtn.style.width = '100%';
+    trackBtn.style.padding = '10px';
+    trackBtn.style.borderRadius = '8px';
+    trackBtn.style.background = isTracked ? 'var(--accent-color)' : 'rgba(255,255,255,0.1)';
+    trackBtn.style.color = 'white';
+    trackBtn.style.border = '1px solid var(--border-color)';
+    trackBtn.innerHTML = isTracked ? '<i class="fas fa-check"></i> Fasting Completed' : 'Mark as Completed';
+
+    trackBtn.onclick = () => {
+        toggleDayTracking(hijriDay, element, trackBtn);
+    };
+
+    const modalContent = document.querySelector('.cal-modal-content');
+    modalContent.appendChild(trackBtn);
+
+    modal.classList.add('show');
+}
+
+function toggleDayTracking(hijriDay, dayElement, btn) {
+    let trackedDays = JSON.parse(localStorage.getItem(`ramadanTracker_${assignedHijriYear}`) || '[]');
+
+    if (trackedDays.includes(hijriDay)) {
+        // Untrack
+        trackedDays = trackedDays.filter(d => d !== hijriDay);
+        dayElement.classList.remove('completed');
+        btn.style.background = 'rgba(255,255,255,0.1)';
+        btn.innerHTML = 'Mark as Completed';
+    } else {
+        // Track
+        trackedDays.push(hijriDay);
+        dayElement.classList.add('completed');
+        btn.style.background = 'var(--accent-color)';
+        btn.innerHTML = '<i class="fas fa-check"></i> Fasting Completed';
+    }
+
+    localStorage.setItem(`ramadanTracker_${assignedHijriYear}`, JSON.stringify(trackedDays));
+}
+
+// Remove the (EST) part for cleaner display if present
+function formatTimeStr(time) {
+    return time.split(' ')[0];
+}
+
+module.exports = { initRamadanPage };

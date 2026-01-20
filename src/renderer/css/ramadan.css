@@ -1,0 +1,259 @@
+/* Ramadan Page Styles */
+.ramadan-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow: hidden;
+  /* CRITICAL: Allow interaction in the container, overrides global drag */
+  -webkit-app-region: no-drag;
+}
+
+/* Header */
+.ramadan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+  /* Ensure header is not draggable via this class, letting drag-area handle top drag if needed.
+     Or if we want this specific area to be draggable: -webkit-app-region: drag; */
+}
+
+/* Ensure buttons in header are always clickable even if header is draggable */
+.ramadan-header button {
+  -webkit-app-region: no-drag;
+}
+
+.ramadan-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.ramadan-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 5px; /* For scrollbar space */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* CRITICAL: Ensure scrolling works */
+  -webkit-app-region: no-drag;
+}
+
+/* Custom Scrollbar */
+.ramadan-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ramadan-content::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+  border-radius: 3px;
+}
+
+.ramadan-content::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 3px;
+}
+
+.fasting-card {
+  background: var(--bg-surface);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+}
+
+.fasting-card h3 {
+  margin: 0 0 15px 0;
+  color: var(--accent-color);
+  font-size: 1.1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+/* Grid for the calendar */
+.tracker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  gap: 12px;
+}
+
+.day-tracker {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70px;
+}
+
+.day-tracker:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  border-color: var(--accent-color);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.day-tracker.completed {
+  background-color: var(--accent-color);
+  color: #fff;
+  border-color: var(--accent-color);
+}
+
+.day-tracker.completed .gregorian-date {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Typography Enhancements */
+.day-tracker .hijri-day {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+  color: var(--text-primary);
+}
+
+.day-tracker .gregorian-date {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Special Days Styling */
+.day-tracker.special-day {
+  border: 2px solid #ffd700; /* Gold */
+  box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.1);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(0, 0, 0, 0.1));
+}
+
+.day-tracker.laylat-al-qadr {
+  border: 2px solid #ff9f43; /* Orange/Gold */
+  box-shadow: 0 0 15px rgba(255, 159, 67, 0.2);
+  background: linear-gradient(135deg, rgba(255, 159, 67, 0.1), rgba(0, 0, 0, 0.2));
+  animation: glow 3s infinite alternate;
+}
+
+@keyframes glow {
+  from { box-shadow: 0 0 5px rgba(255, 159, 67, 0.2); }
+  to { box-shadow: 0 0 15px rgba(255, 159, 67, 0.5); }
+}
+
+/* Indicator for special days */
+.special-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    color: #ffd700;
+    font-size: 12px;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
+}
+
+/* Modal Popup */
+.cal-modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+  -webkit-app-region: no-drag; /* CRITICAL: Allow interaction in modal */
+}
+
+.cal-modal.show {
+  display: flex !important;
+  animation: fadeIn 0.3s;
+}
+
+/* Modal Styling Improvements */
+.cal-modal-content {
+  background: rgba(20, 30, 48, 0.95);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  padding: 25px;
+  border-radius: 15px;
+  width: 80%;
+  max-width: 300px;
+  text-align: center;
+  position: relative;
+  animation: slideUp 0.3s;
+}
+
+.cal-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  color: var(--text-secondary);
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.cal-modal-close:hover {
+  color: var(--accent-color);
+}
+
+.cal-modal-title {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.prayer-time-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0;
+  padding: 12px 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  transition: transform 0.2s;
+}
+
+.prayer-time-row:hover {
+    transform: scale(1.02);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.prayer-time-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+}
+
+.prayer-time-value {
+    font-weight: bold;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

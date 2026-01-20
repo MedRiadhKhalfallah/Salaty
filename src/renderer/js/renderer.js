@@ -4,6 +4,7 @@ const { setLanguage, t, applyLanguageDirection } = require('../js/translations')
 const { initQuranPage } = require('../js/quranUI');
 const { initAthkarPage } = require('../js/athkarUI');
 const { initFeaturesPage } = require('../js/featuresUI');
+const { initRamadanPage } = require('../js/ramadanUI');
 const { loadPrayerTimes, updateCurrentAndNextPrayer } = require('../js/prayer');
 const { state } = require('../js/globalStore');
 const { initSettingsPage } = require('../js/settings');
@@ -39,6 +40,9 @@ async function initializeApp() {
     } else if (path.includes('features.html')) {
       console.log('Initializing Features page from renderer.js');
       initFeaturesPage();
+    } else if (path.includes('ramadan.html')) {
+      console.log('Initializing Ramadan page from renderer.js');
+      initRamadanPage();
     }
 
     // Setup window controls (common to all pages)

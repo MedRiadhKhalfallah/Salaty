@@ -6,7 +6,7 @@ let isFeaturesFullscreen = false;
 // ==================== FEATURES PAGE FUNCTIONS ====================
 function initFeaturesPage() {
   console.log('Initializing Features page...');
-  
+
   // Setup back button
   const backBtn = document.getElementById('backBtn');
   if (backBtn) {
@@ -37,7 +37,7 @@ function initFeaturesPage() {
 function updateFeaturesUI() {
   const featuresTitle = document.getElementById('featuresTitle');
   const featuresFooterText = document.getElementById('featuresFooterText');
-  
+
   // Feature names
   const featureQuran = document.getElementById('featureQuran');
   const featureAthkar = document.getElementById('featureAthkar');
@@ -47,7 +47,7 @@ function updateFeaturesUI() {
   const featureRamadhan = document.getElementById('featureRamadhan');
   const featureAsma = document.getElementById('featureAsma');
   const featureQibla = document.getElementById('featureQibla');
-  
+
   // Feature descriptions
   const featureQuranDesc = document.getElementById('featureQuranDesc');
   const featureAthkarDesc = document.getElementById('featureAthkarDesc');
@@ -57,7 +57,7 @@ function updateFeaturesUI() {
   const featureRamadhanDesc = document.getElementById('featureRamadhanDesc');
   const featureAsmaDesc = document.getElementById('featureAsmaDesc');
   const featureQiblaDesc = document.getElementById('featureQiblaDesc');
-  
+
   // Coming soon badges
   const comingSoonBadges = document.querySelectorAll('.coming-soon-badge');
 
@@ -66,7 +66,7 @@ function updateFeaturesUI() {
 
   if (featuresTitle) featuresTitle.textContent = t('islamicFeatures');
   if (featuresFooterText) featuresFooterText.textContent = t('moreFeaturesComingSoon');
-  
+
   if (featureQuran) featureQuran.textContent = t('holyQuran');
   if (featureAthkar) featureAthkar.textContent = t('athkar');
   if (featureMonthly) featureMonthly.textContent = t('prayerTimesMonthly');
@@ -75,7 +75,7 @@ function updateFeaturesUI() {
   if (featureRamadhan) featureRamadhan.textContent = t('ramadhan');
   if (featureAsma) featureAsma.textContent = t('asmaAllah');
   if (featureQibla) featureQibla.textContent = t('qiblaFinder');
-  
+
   if (featureQuranDesc) featureQuranDesc.textContent = t('quranDesc');
   if (featureAthkarDesc) featureAthkarDesc.textContent = t('athkarDesc');
   if (featureMonthlyDesc) featureMonthlyDesc.textContent = t('prayerTimesMonthlyDesc');
@@ -84,7 +84,7 @@ function updateFeaturesUI() {
   if (featureRamadhanDesc) featureRamadhanDesc.textContent = t('ramadhanDesc');
   if (featureAsmaDesc) featureAsmaDesc.textContent = t('asmaDesc');
   if (featureQiblaDesc) featureQiblaDesc.textContent = t('qiblaDesc');
-  
+
   comingSoonBadges.forEach(badge => {
     badge.textContent = t('comingSoon');
   });
@@ -102,16 +102,22 @@ function updateFeaturesUI() {
 function setupFeatureCards() {
   // Quran card
   const quranCard = document.querySelector('[data-feature="quran"]');
-  
+
   if (quranCard) {
     quranCard.addEventListener('click', openQuran);
   }
-  
+
   // Athkar card
   const athkarCard = document.querySelector('[data-feature="athkar"]');
-  
+
   if (athkarCard) {
     athkarCard.addEventListener('click', openAthkar);
+  }
+
+  // Ramadhan card
+  const ramadhanCard = document.querySelector('[data-feature="ramadhan"]');
+  if (ramadhanCard) {
+    ramadhanCard.addEventListener('click', openRamadhan);
   }
 }
 
@@ -131,6 +137,15 @@ function openAthkar() {
   }
   ipcRenderer.invoke('resize-window', 320, 555);
   ipcRenderer.invoke('navigate-to', 'athkar');
+}
+
+function openRamadhan() {
+  console.log('Opening Ramadhan...');
+  if (isFeaturesFullscreen) {
+    toggleFeaturesFullscreen(); // Exit fullscreen first
+  }
+  ipcRenderer.invoke('resize-window', 320, 555);
+  ipcRenderer.invoke('navigate-to', 'ramadan');
 }
 
 function toggleFeaturesFullscreen() {
