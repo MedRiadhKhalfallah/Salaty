@@ -235,7 +235,7 @@ body {
 
 /* Fullscreen mode */
 body.fullscreen .app-container {
-  border-radius: 0;
+  border-radius: 20;
 }
 
 /* Interactive Elements (make them non-draggable) */
