@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ramadhan - Salaty</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/themes.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/utilities.css">
+  <link rel="stylesheet" href="../css/rtl.css">
+  <link rel="stylesheet" href="../css/ramadan.css">
+</head>
+<body>
+  <div class="app-container theme-dark" id="app">
+    <div class="drag-area"></div>
+
+    <div class="ramadan-container">
+      <div class="ramadan-header">
+        <button class="back-btn" id="backBtn" aria-label="Back to Features">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2 class="ramadan-title">Ramadhan</h2>
+        <!-- Empty div for spacing balance -->
+        <div style="width: 32px;"></div>
+      </div>
+
+      <div class="ramadan-content">
+        <!-- Today's Overview -->
+        <div class="fasting-card" id="todayCard">
+            <h3>Today's Fasting</h3>
+            <div id="fastingTimes">
+                <div style="display: flex; justify-content: space-around; align-items: center; text-align: center;">
+                   <div>
+                       <i class="fas fa-moon" style="color: #a5b1c2; font-size: 1.2rem; margin-bottom: 5px;"></i>
+                       <div style="font-size: 0.9rem; color: var(--text-secondary);">Suhoor</div>
+                       <div style="font-size: 1.2rem; font-weight: bold;" id="todaySuhoor">--:--</div>
+                   </div>
+                   <div style="height: 40px; width: 1px; background: var(--border-color);"></div>
+                   <div>
+                       <i class="fas fa-sun" style="color: #f7b731; font-size: 1.2rem; margin-bottom: 5px;"></i>
+                       <div style="font-size: 0.9rem; color: var(--text-secondary);">Iftar</div>
+                       <div style="font-size: 1.2rem; font-weight: bold;" id="todayIftar">--:--</div>
+                   </div>
+               </div>
+            </div>
+        </div>
+
+        <div class="fasting-card">
+            <h3>Fasting Tracker</h3>
+            <div class="tracker-grid" id="trackerGrid">
+                <!-- Days will be injected here via JS -->
+                 <div class="day-tracker">
+                    <span class="hijri-day">1</span>
+                    <span class="gregorian-date">...</span>
+                 </div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for Daily Times -->
+    <div id="dayModal" class="cal-modal">
+        <div class="cal-modal-content">
+            <span class="cal-modal-close" id="modalClose">&times;</span>
+            <div class="cal-modal-title" id="modalTitle">Ramadhan Day X</div>
+
+            <div class="prayer-time-row">
+                <div class="prayer-time-label">
+                    <i class="fas fa-utensils"></i> Suhoor (Fajr)
+                </div>
+                <div class="prayer-time-value" id="modalSuhoor">--:--</div>
+            </div>
+
+            <div class="prayer-time-row">
+                <div class="prayer-time-label">
+                    <i class="fas fa-glass-water"></i> Iftar (Maghrib)
+                </div>
+                <div class="prayer-time-value" id="modalIftar">--:--</div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/renderer.js"></script>
+</body>
+</html>
