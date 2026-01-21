@@ -28,7 +28,6 @@
 [dir="rtl"] .countdown,
 [dir="rtl"] .setting-label,
 [dir="rtl"] .input-hint,
-[dir="rtl"] .settings-title,
 [dir="rtl"] .footer-text,
 [dir="rtl"] .current-indicator,
 [dir="rtl"] .loading,
@@ -116,27 +115,56 @@
   color: var(--accent-color, #fff);
 }
 
-/* Settings Panel RTL */
+/* ========================================
+   SETTINGS PANEL RTL - KEEP SAME AS LTR
+   ======================================== */
+
+/* Override RTL for entire settings to keep same layout as English/French */
+[dir="rtl"] .settings-container {
+  direction: ltr !important;
+}
+
 [dir="rtl"] .settings-header {
-  direction: rtl;
+  direction: ltr !important;
 }
 
 [dir="rtl"] .back-btn {
-  margin-right: 0;
-  margin-left: 12px;
+  margin-right: 12px;
+  margin-left: 0;
 }
 
 [dir="rtl"] .back-btn i {
-  transform: scaleX(-1);
+  transform: none !important;
 }
 
 [dir="rtl"] .back-btn:hover i {
-  transform: scaleX(-1) translateX(2px);
+  transform: translateX(-2px) !important;
 }
 
 [dir="rtl"] .settings-title {
-  margin: 0 12px 0 auto;
+  direction: rtl;
+  text-align: right;
+  margin: 0 auto 0 12px;
 }
+
+[dir="rtl"] .settings-content {
+  direction: ltr !important;
+}
+
+/* Make only the text content RTL, not the layout */
+[dir="rtl"] .settings-content .setting-label {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .settings-content .footer-text {
+  direction: rtl;
+  text-align: center;
+}
+
+/* ========================================
+   END SETTINGS PANEL FIXES
+   ======================================== */
 
 /* Quran Panel RTL - FIXED VERSION */
 /* Keep Quran header layout consistent in all languages */
@@ -401,12 +429,6 @@
   direction: rtl;
 }
 
-/* Scrollbar RTL */
-[dir="rtl"] ::-webkit-scrollbar {
-  left: 0;
-  right: auto;
-}
-
 /* Additional fixes for consistency */
 
 /* Make sure all icons in the Quran section maintain their original direction */
@@ -420,41 +442,4 @@
 [dir="rtl"] .quran-loading-content .fa-spin {
   animation: fa-spin 2s linear infinite !important;
   transform-origin: center !important;
-}
-
-/* rtl.css - Add these scrollbar fixes at the end of the file */
-
-/* Fix for settings content scrollbar in RTL */
-[dir="rtl"] .settings-content {
-  /* Reverse the padding for RTL - scrollbar should be on right */
-  padding-right: 20px;  /* Original left padding */
-  padding-left: 12px;   /* Space for scrollbar on right */
-  margin-right: -4px;   /* Adjust margin */
-  margin-left: -12px;   /* Adjust margin */
-}
-
-/* Force scrollbar to appear on the right side in RTL */
-[dir="rtl"] .settings-content::-webkit-scrollbar {
-  left: auto !important;
-  right: 0 !important;
-}
-
-/* Fix scrollbar track and thumb positioning */
-[dir="rtl"] .settings-content::-webkit-scrollbar-track {
-  margin-left: 4px !important;
-  margin-right: 0 !important;
-}
-
-/* Ensure scrollbar thumb is visible on right side */
-[dir="rtl"] .settings-content::-webkit-scrollbar-thumb {
-  left: auto !important;
-  right: 0 !important;
-}
-
-[dir="rtl"] .settings-content {
-  /* Reset and apply RTL-specific padding */
-  padding: 0 !important;
-  margin: 0 !important;
-  padding-left: 12px !important;  /* Space for scrollbar on right */
-  margin-left: -12px !important;  /* Compensate for padding */
 }
