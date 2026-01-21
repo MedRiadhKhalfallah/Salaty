@@ -8,6 +8,7 @@ const { initRamadanPage } = require('../js/ramadanUI');
 const { loadPrayerTimes, updateCurrentAndNextPrayer } = require('../js/prayer');
 const { state } = require('../js/globalStore');
 const { initSettingsPage } = require('../js/settings');
+const { initQiblaPage } = require('../js/qibla');
 const { applyTheme } = require('../js/theme');
 
 // ==================== INITIALIZATION ====================
@@ -43,6 +44,9 @@ async function initializeApp() {
     } else if (path.includes('ramadan.html')) {
       console.log('Initializing Ramadan page from renderer.js');
       initRamadanPage();
+    } else if (path.includes('qibla.html')) {
+      console.log('Initializing Qibla page from renderer.js');
+      initQiblaPage();
     }
 
     // Setup window controls (common to all pages)

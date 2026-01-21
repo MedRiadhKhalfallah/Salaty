@@ -1,11 +1,11 @@
 {
-  "city": "Tunis",
-  "country": "Tunisia",
+  "city": "Quebec",
+  "country": "Canada",
   "theme": "green",
-  "language": "ar",
+  "language": "fr",
   "position": {
-    "x": 342,
-    "y": 155
+    "x": 1143,
+    "y": 261
   },
   "adhanEnabledByPrayer": {
     "Fajr": true,
