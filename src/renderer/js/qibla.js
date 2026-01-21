@@ -1,6 +1,7 @@
 const { ipcRenderer } = require('electron');
 const { state } = require('./globalStore');
 const { t } = require('./translations');
+const { showToast } = require('./toast');
 const L = require('leaflet');
 
 let map = null;
@@ -52,6 +53,11 @@ async function initQiblaPage() {
         locationText.textContent = t('loading') || 'Loading...';
     }
 
+    const instructionText = document.getElementById('instructionText');
+    if (instructionText) {
+        instructionText.textContent = t('dragToAdjustInfo') || 'Vous pouvez déplacer le marqueur pour corriger votre position.';
+    }
+
     let lat = null;
     let lng = null;
 
@@ -69,27 +75,40 @@ async function initQiblaPage() {
         lat = position.coords.latitude;
         lng = position.coords.longitude;
         console.log('Browser Geolocation success:', lat, lng);
-        if (locationText) locationText.textContent = 'Precise Location (GPS)';
+        if (locationText) locationText.textContent = t('preciseLocation') || 'Precise Location (GPS)';
     } catch (e) {
         console.warn('Browser geolocation failed:', e.message);
     }
 
     // 2. IP Geolocation (if step 1 failed)
-    if ((!lat || !lng) && !usingSettingsFallback()) {
+    if (!lat || !lng) {
         try {
-            console.log('Attempting IP Geolocation...');
+            console.log('Attempting IP Geolocation (ipapi.co)...');
             if (locationText) locationText.textContent = 'Detecting via IP...';
-            // Using ipapi.co (HTTPS supported)
             const res = await fetch('https://ipapi.co/json/');
+            if (!res.ok) throw new Error('ipapi.co failed');
             const data = await res.json();
             if (data.latitude && data.longitude) {
                 lat = Number.parseFloat(data.latitude);
                 lng = Number.parseFloat(data.longitude);
                 console.log('IP Geolocation success:', lat, lng);
-                if (locationText) locationText.textContent = `${data.city}, ${data.country_name} (IP)`;
+                if (locationText) locationText.textContent = `${data.city}, ${data.country_name} (Approx)`;
             }
         } catch (e) {
-             console.warn('IP location failed:', e.message);
+             console.warn('First IP location failed:', e.message);
+             // 2b. Fallback IP Geolocation (ip-api.com)
+             try {
+                console.log('Attempting IP Geolocation Fallback (ip-api.com)...');
+                const res = await fetch('http://ip-api.com/json/');
+                const data = await res.json();
+                if (data.status === 'success') {
+                    lat = data.lat;
+                    lng = data.lon;
+                     if (locationText) locationText.textContent = `${data.city}, ${data.country} (Approx)`;
+                }
+             } catch(e2) {
+                 console.warn('Second IP location failed:', e2.message);
+             }
         }
     }
 
@@ -120,6 +139,9 @@ async function initQiblaPage() {
     // Final check and Map Init
     if (lat && lng) {
         initMap(lat, lng);
+        if (locationText && locationText.textContent.includes('Approx')) {
+             showToast(t('locationApprox', 'Location is approximate. Drag marker to adjust.'), 'info');
+        }
     } else {
         console.error('No location found.');
         if (locationText) locationText.textContent = t('locationNotSet') || 'Location not found. Please check settings.';
@@ -161,6 +183,11 @@ function initMap(userLat, userLng) {
         attributionControl: false
     }).setView([userLat, userLng], 5);
 
+    // Add Zoom Control bottom right
+    L.control.zoom({
+        position: 'bottomright'
+    }).addTo(map);
+
     // Add Tile Layer (CartoDB Positron for clean look, or OSM)
     // Using OSM here for consistency
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -172,10 +199,13 @@ function initMap(userLat, userLng) {
         if(map) map.invalidateSize();
     }, 200);
 
-    updateMapContent(userLat, userLng);
+    updateMapContent(userLat, userLng, true);
 }
 
-function updateMapContent(lat, lng) {
+function updateMapContent(lat, lng, shouldFitBounds = true) {
+    currentUserLat = lat;
+    currentUserLng = lng;
+
     // Calculate Qibla Angle locally (spherical geometry)
     const qiblaAngle = getQiblaAngle(lat, lng);
 
@@ -194,29 +224,47 @@ function updateMapContent(lat, lng) {
     });
 
     // We rotate the inner container by the qibla angle.
-    // The arrow icon itself points UP (0 deg).
     const arrowIcon = L.divIcon({
         className: 'qibla-arrow-icon',
         html: `
             <div id="arrow-container" style="
                 width: 40px; height: 40px; 
                 display: flex; align-items: center; justify-content: center;
-                transition: transform 1s ease-out;
+                transition: transform 0.5s ease-out;
                 transform: rotate(${qiblaAngle}deg);
+                cursor: grab;
             ">
-                <i class="fas fa-arrow-up" style="color: #2ecc71; font-size: 30px; text-shadow: 0 0 5px #000;"></i>
+                <i class="fas fa-location-arrow" style="color: #2ecc71; font-size: 30px; text-shadow: 0 0 5px #000; transform: rotate(-45deg);"></i>
             </div>
         `,
         iconSize: [40, 40],
         iconAnchor: [20, 20]
     });
 
+    // Remove old layers
+    if (kaabaMarker) map.removeLayer(kaabaMarker);
+    if (userMarker) map.removeLayer(userMarker);
+    if (qiblaLine) map.removeLayer(qiblaLine);
+
     // Markers
     kaabaMarker = L.marker(KAABA_COORDS, { icon: kaabaIcon }).addTo(map)
                   .bindPopup('Kaaba');
 
-    userMarker = L.marker([lat, lng], { icon: arrowIcon }).addTo(map)
-                .bindPopup(t('ui', 'nav_location') || 'You are here');
+    userMarker = L.marker([lat, lng], {
+        icon: arrowIcon,
+        draggable: true,
+        autoPan: true
+    }).addTo(map);
+
+    // Bind popup with instruction
+    userMarker.bindPopup(t('dragToAdjust') || 'You are here. Drag to adjust.');
+
+    // Event Listener for Drag
+    userMarker.on('dragend', (event) => {
+        const position = event.target.getLatLng();
+        // Recalculate everything based on new position
+        updateMapContent(position.lat, position.lng, false);
+    });
 
     // DRAW GEODESIC CURVE (Great Circle)
     // 100 intermediate points for smoothness
@@ -231,8 +279,10 @@ function updateMapContent(lat, lng) {
     }).addTo(map);
 
     // Fit bounds to show the whole path
-    const bounds = L.latLngBounds(curvePoints);
-    map.fitBounds(bounds, { padding: [50, 50] });
+    if (shouldFitBounds && (!map.getBounds().contains(curvePoints[0]) || !map.getBounds().contains(curvePoints[curvePoints.length-1]))) {
+       const bounds = L.latLngBounds(curvePoints);
+       map.fitBounds(bounds, { padding: [50, 50] });
+    }
 }
 
 // === MATH HELPERS ===

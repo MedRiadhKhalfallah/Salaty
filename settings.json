@@ -2,10 +2,10 @@
   "city": "Quebec",
   "country": "Canada",
   "theme": "green",
-  "language": "fr",
+  "language": "ar",
   "position": {
-    "x": 1143,
-    "y": 261
+    "x": 1109,
+    "y": 105
   },
   "adhanEnabledByPrayer": {
     "Fajr": true,
