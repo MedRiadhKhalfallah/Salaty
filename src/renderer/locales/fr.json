@@ -81,7 +81,16 @@
     "asmaDesc": "Apprenez les beaux noms",
     "qiblaDesc": "Trouvez la direction de prière",
     "prayerTimesMonthly": "Horaires mensuels",
-    "prayerTimesMonthlyDesc": "Tous les horaires de prière du mois"
+    "prayerTimesMonthlyDesc": "Tous les horaires de prière du mois",
+    "ramadanDay": "Jour de Ramadan {day}",
+    "daysUntilRamadanCount": "{days} Jours avant Ramadan",
+    "ramadanEnded": "Ramadan Terminé",
+    "iftar": "Iftar",
+    "suhoor": "Suhoor",
+    "markAsCompleted": "Marquer comme complet",
+    "fastingCompleted": "Jeûne complet",
+    "todayFasting": "Jeûne d'aujourd'hui",
+    "fastingTracker": "Suivi du Jeûne"
   },
   "themes": {
     "navy": "Bleu marine",

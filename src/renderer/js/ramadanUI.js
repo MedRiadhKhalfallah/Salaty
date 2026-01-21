@@ -4,6 +4,7 @@ const { t } = require('./translations');
 
 let ramadanData = [];
 let assignedHijriYear = null;
+let isRamadanFullscreen = false;
 
 function initRamadanPage() {
     console.log('Initializing Ramadan page...');
@@ -11,10 +12,27 @@ function initRamadanPage() {
     // Back Button
     const backBtn = document.getElementById('backBtn');
     if (backBtn) {
-        backBtn.replaceWith(backBtn.cloneNode(true)); // Remove old listeners
-        document.getElementById('backBtn').addEventListener('click', () => {
+        const newBackBtn = backBtn.cloneNode(true);
+        backBtn.replaceWith(newBackBtn);
+
+
+        newBackBtn.addEventListener('click', () => {
              ipcRenderer.invoke('resize-window', 320, 555);
              ipcRenderer.invoke('navigate-to', 'features');
+        });
+    }
+
+    // Fullscreen Button
+    const fullscreenBtn = document.getElementById('ramadanFullscreenBtn');
+    if (fullscreenBtn) {
+        // Remove existing listener to avoid duplicates if re-initialized
+        fullscreenBtn.replaceWith(fullscreenBtn.cloneNode(true));
+        const newFullscreenBtn = document.getElementById('ramadanFullscreenBtn');
+
+        newFullscreenBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Stop event bubbling
+            console.log('Fullscreen button clicked');
+            toggleRamadanFullscreen();
         });
     }
 
@@ -32,6 +50,29 @@ function initRamadanPage() {
             }
         };
     }
+
+    // Apply Static Translations
+    const todayFastingTitle = document.getElementById('todayFastingTitle');
+    if (todayFastingTitle) todayFastingTitle.textContent = t('todayFasting');
+
+    const trackerTitle = document.getElementById('trackerTitle');
+    if (trackerTitle) trackerTitle.textContent = t('fastingTracker');
+
+    const labelTodaySuhoor = document.getElementById('labelTodaySuhoor');
+    if (labelTodaySuhoor) labelTodaySuhoor.textContent = t('suhoor');
+
+    const labelTodayIftar = document.getElementById('labelTodayIftar');
+    if (labelTodayIftar) labelTodayIftar.textContent = t('iftar');
+
+    // Add translation for page title initially
+    const pageTitle = document.querySelector('.ramadan-title');
+    if (pageTitle) pageTitle.textContent = t('ramadhan');
+
+    const modalLabelSuhoor = document.getElementById('modalLabelSuhoor');
+    if (modalLabelSuhoor) modalLabelSuhoor.innerHTML = `<i class="fas fa-utensils"></i> ${t('suhoor')} (${t('Fajr', 'prayerNames')})`;
+
+    const modalLabelIftar = document.getElementById('modalLabelIftar');
+    if (modalLabelIftar) modalLabelIftar.innerHTML = `<i class="fas fa-glass-water"></i> ${t('iftar')} (${t('Maghrib', 'prayerNames')})`;
 
     fetchRamadanData();
 }
@@ -64,7 +105,7 @@ async function fetchRamadanData() {
 
         assignedHijriYear = targetHijriYear;
         const titleEl = document.querySelector('.ramadan-title');
-        if (titleEl) titleEl.textContent = `Ramadhan ${assignedHijriYear}`;
+        if (titleEl) titleEl.textContent = `${t('ramadhan')} ${assignedHijriYear}`;
 
         // 2. Fetch Ramadan Month Data
         const ramadanUrl = `https://api.aladhan.com/v1/hijriCalendarByCity/${targetHijriYear}/9?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=${method}`;
@@ -152,7 +193,7 @@ function updateTodayCard(data) {
         if (iftarEl) iftarEl.textContent = formatTimeStr(todayData.timings.Maghrib);
 
         if (cardTitle) {
-            cardTitle.textContent = `Ramadan Day ${todayData.date.hijri.day}`;
+            cardTitle.textContent = t('ramadanDay').replace('{days}', todayData.date.hijri.day);
         }
     } else {
         // Not Ramadan or data not matching
@@ -168,14 +209,14 @@ function updateTodayCard(data) {
                 const diffTime = firstDayDate - today;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                if (cardTitle) cardTitle.textContent = `${diffDays} Days until Ramadan`;
+                if (cardTitle) cardTitle.textContent = t('daysUntilRamadan').replace('{days}', diffDays);
 
                 // Show 1st day times as requested
                 if (suhoorEl) suhoorEl.textContent = formatTimeStr(data[0].timings.Fajr);
                 if (iftarEl) iftarEl.textContent = formatTimeStr(data[0].timings.Maghrib);
             } else {
                 // Likely After Ramadan
-                if (cardTitle) cardTitle.textContent = "Ramadan Ended";
+                if (cardTitle) cardTitle.textContent = t('ramadanEnded');
                 if (suhoorEl) suhoorEl.textContent = "--:--";
                 if (iftarEl) iftarEl.textContent = "--:--";
             }
@@ -194,7 +235,7 @@ function openDayModal(dayData, element) {
     const gregDate = dayData.date.gregorian.date;
 
     // Update Modal Content
-    document.getElementById('modalTitle').textContent = `Ramadhan ${hijriDay} (${gregDate})`;
+    document.getElementById('modalTitle').textContent = `${t('ramadhan')} ${hijriDay} (${gregDate})`;
     document.getElementById('modalSuhoor').textContent = formatTimeStr(dayData.timings.Fajr);
     document.getElementById('modalIftar').textContent = formatTimeStr(dayData.timings.Maghrib);
 
@@ -216,7 +257,7 @@ function openDayModal(dayData, element) {
     trackBtn.style.background = isTracked ? 'var(--accent-color)' : 'rgba(255,255,255,0.1)';
     trackBtn.style.color = 'white';
     trackBtn.style.border = '1px solid var(--border-color)';
-    trackBtn.innerHTML = isTracked ? '<i class="fas fa-check"></i> Fasting Completed' : 'Mark as Completed';
+    trackBtn.innerHTML = isTracked ? `<i class="fas fa-check"></i> ${t('fastingCompleted')}` : t('markAsCompleted');
 
     trackBtn.onclick = () => {
         toggleDayTracking(hijriDay, element, trackBtn);
@@ -236,16 +277,46 @@ function toggleDayTracking(hijriDay, dayElement, btn) {
         trackedDays = trackedDays.filter(d => d !== hijriDay);
         dayElement.classList.remove('completed');
         btn.style.background = 'rgba(255,255,255,0.1)';
-        btn.innerHTML = 'Mark as Completed';
+        btn.innerHTML = t('markAsCompleted');
     } else {
         // Track
         trackedDays.push(hijriDay);
         dayElement.classList.add('completed');
         btn.style.background = 'var(--accent-color)';
-        btn.innerHTML = '<i class="fas fa-check"></i> Fasting Completed';
+        btn.innerHTML = `<i class="fas fa-check"></i> ${t('fastingCompleted')}`;
     }
 
     localStorage.setItem(`ramadanTracker_${assignedHijriYear}`, JSON.stringify(trackedDays));
+}
+
+function toggleRamadanFullscreen() {
+  isRamadanFullscreen = !isRamadanFullscreen;
+
+  if (isRamadanFullscreen) {
+    // Enter fullscreen
+    try {
+      ipcRenderer.invoke('resize-window', 850, 600);
+      document.body.classList.add('fullscreen');
+      const container = document.querySelector('.ramadan-container');
+      if (container) {
+        container.classList.add('fullscreen');
+      }
+    } catch (error) {
+      console.error('Error in fullscreen mode:', error);
+    }
+  } else {
+    // Exit fullscreen
+    try {
+      ipcRenderer.invoke('resize-window', 320, 555);
+      document.body.classList.remove('fullscreen');
+      const container = document.querySelector('.ramadan-container');
+      if (container) {
+        container.classList.remove('fullscreen');
+      }
+    } catch (error) {
+      console.error('Error exiting fullscreen mode:', error);
+    }
+  }
 }
 
 // Remove the (EST) part for cleaner display if present

@@ -1,11 +1,11 @@
 {
   "city": "Tunis",
   "country": "Tunisia",
-  "theme": "navy",
-  "language": "en",
+  "theme": "green",
+  "language": "ar",
   "position": {
-    "x": 1180,
-    "y": 247
+    "x": 342,
+    "y": 155
   },
   "adhanEnabledByPrayer": {
     "Fajr": true,
