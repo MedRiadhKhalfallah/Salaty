@@ -16,8 +16,7 @@
   align-items: center;
   margin-bottom: 20px;
   flex-shrink: 0;
-  /* Ensure header is not draggable via this class, letting drag-area handle top drag if needed.
-     Or if we want this specific area to be draggable: -webkit-app-region: drag; */
+  -webkit-app-region: drag;
 }
 
 /* Ensure buttons in header are always clickable even if header is draggable */
@@ -31,6 +30,7 @@
   color: var(--text-primary);
   font-weight: 600;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  user-select: none;
 }
 
 .ramadan-content {
@@ -185,7 +185,7 @@
 
 /* Modal Styling Improvements */
 .cal-modal-content {
-  background: rgba(20, 30, 48, 0.95);
+  background: var(--bg-surface);
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);

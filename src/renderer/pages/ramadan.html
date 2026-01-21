@@ -22,25 +22,29 @@
           <i class="fas fa-arrow-left"></i>
         </button>
         <h2 class="ramadan-title">Ramadhan</h2>
-        <!-- Empty div for spacing balance -->
-        <div style="width: 32px;"></div>
+        <!-- Controls -->
+        <div class="ramadan-controls">
+          <button class="control-btn fullscreen-btn" id="ramadanFullscreenBtn" aria-label="Toggle Fullscreen">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
       </div>
 
       <div class="ramadan-content">
         <!-- Today's Overview -->
         <div class="fasting-card" id="todayCard">
-            <h3>Today's Fasting</h3>
+            <h3 id="todayFastingTitle">Today's Fasting</h3>
             <div id="fastingTimes">
                 <div style="display: flex; justify-content: space-around; align-items: center; text-align: center;">
                    <div>
                        <i class="fas fa-moon" style="color: #a5b1c2; font-size: 1.2rem; margin-bottom: 5px;"></i>
-                       <div style="font-size: 0.9rem; color: var(--text-secondary);">Suhoor</div>
+                       <div id="labelTodaySuhoor" style="font-size: 0.9rem; color: var(--text-secondary);">Suhoor</div>
                        <div style="font-size: 1.2rem; font-weight: bold;" id="todaySuhoor">--:--</div>
                    </div>
                    <div style="height: 40px; width: 1px; background: var(--border-color);"></div>
                    <div>
                        <i class="fas fa-sun" style="color: #f7b731; font-size: 1.2rem; margin-bottom: 5px;"></i>
-                       <div style="font-size: 0.9rem; color: var(--text-secondary);">Iftar</div>
+                       <div id="labelTodayIftar" style="font-size: 0.9rem; color: var(--text-secondary);">Iftar</div>
                        <div style="font-size: 1.2rem; font-weight: bold;" id="todayIftar">--:--</div>
                    </div>
                </div>
@@ -48,7 +52,7 @@
         </div>
 
         <div class="fasting-card">
-            <h3>Fasting Tracker</h3>
+            <h3 id="trackerTitle">Fasting Tracker</h3>
             <div class="tracker-grid" id="trackerGrid">
                 <!-- Days will be injected here via JS -->
                  <div class="day-tracker">
@@ -67,14 +71,14 @@
             <div class="cal-modal-title" id="modalTitle">Ramadhan Day X</div>
 
             <div class="prayer-time-row">
-                <div class="prayer-time-label">
+                <div class="prayer-time-label" id="modalLabelSuhoor">
                     <i class="fas fa-utensils"></i> Suhoor (Fajr)
                 </div>
                 <div class="prayer-time-value" id="modalSuhoor">--:--</div>
             </div>
 
             <div class="prayer-time-row">
-                <div class="prayer-time-label">
+                <div class="prayer-time-label" id="modalLabelIftar">
                     <i class="fas fa-glass-water"></i> Iftar (Maghrib)
                 </div>
                 <div class="prayer-time-value" id="modalIftar">--:--</div>
