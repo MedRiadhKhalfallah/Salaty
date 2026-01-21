@@ -52,6 +52,7 @@
   },
   "dependencies": {
     "leaflet": "^1.9.4",
+    "salaty-qibla-map": "file:salaty-qibla-map",
     "tom-select": "^2.4.3"
   }
 }
