@@ -2,6 +2,7 @@ const TomSelect = require('tom-select').default;
 const { ipcRenderer } = require('electron');
 
 async function initSelectLocation() {
+  let detectedLocationTarget = null;
   let savedSettings = {};
   try {
     savedSettings = await ipcRenderer.invoke('get-settings') || {};
@@ -81,7 +82,11 @@ async function initSelectLocation() {
     if (value) {
       // Si un pays est sélectionné, on lance le chargement
       let defaultCity = null;
-      if (savedSettings.country && value === savedSettings.country) {
+
+      if (detectedLocationTarget && detectedLocationTarget.country === value) {
+        defaultCity = detectedLocationTarget.city;
+        detectedLocationTarget = null;
+      } else if (savedSettings.country && value === savedSettings.country) {
         defaultCity = savedSettings.city;
       } else if (value === 'Tunisia') {
         defaultCity = 'Tunis';
@@ -89,6 +94,30 @@ async function initSelectLocation() {
       loadCities(value, defaultCity);
     }
   });
+
+  // Auto Detect Button
+  const detectBtn = document.getElementById('detectLocationBtn');
+  if (detectBtn) {
+    detectBtn.addEventListener('click', async () => {
+      detectBtn.classList.add('loading');
+      try {
+        const res = await fetch('http://ip-api.com/json');
+        const data = await res.json();
+
+        if (data && data.status === 'success') {
+          detectedLocationTarget = {
+            country: data.country,
+            city: data.city
+          };
+          countrySelect.setValue(data.country);
+        }
+      } catch (error) {
+        console.error('Location detection error:', error);
+      } finally {
+        detectBtn.classList.remove('loading');
+      }
+    });
+  }
 }
 
 module.exports = { initSelectLocation };
