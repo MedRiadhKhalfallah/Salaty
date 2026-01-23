@@ -1,4 +1,5 @@
 const { t } = require('./translations');
+const { applyTheme } = require('./theme');
 
 let ramadanDateCache = null;
 
@@ -21,6 +22,7 @@ async function updateRamadanCountdown(prayerData) {
     // Si c'est le Ramadan (Mois 9)
     if (currentHijriMonth === 9) {
         countdownEl.textContent = t('ramadanMubarak');
+        applyTheme('ramadan');
         return;
     }
 

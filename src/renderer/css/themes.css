@@ -166,7 +166,65 @@
   --border-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Theme Options in Settings */
+/* Ramadan Theme */
+.theme-ramadan {
+  /* Base verte profonde */
+  background-color: #1b5e20;
+
+  background-image:
+    /* Images SVG : Lanternes et Canon */
+    url('../../assets/images/fanoos.svg'),
+    url('../../assets/images/fanoos.svg'),
+    url('../../assets/images/cannon.svg'),
+
+    /* Effet de lueur (Lampes) */
+    radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.15) 0%, transparent 20%),
+    radial-gradient(circle at 80% 15%, rgba(255, 215, 0, 0.15) 0%, transparent 20%),
+    /* Motif géométrique style moucharabieh très subtil */
+    repeating-linear-gradient(45deg, rgba(255, 215, 0, 0.03) 0px, rgba(255, 215, 0, 0.03) 1px, transparent 1px, transparent 20px),
+    repeating-linear-gradient(-45deg, rgba(255, 215, 0, 0.03) 0px, rgba(255, 215, 0, 0.03) 1px, transparent 1px, transparent 20px),
+    /* Dégradé de fond Vert Profond */
+    linear-gradient(135deg, #0a3d13 0%, #1b5e20 50%, #2e7d32 100%);
+
+  background-position:
+    top -5px right 40px,    /* Lanterne droite */
+    top -10px left 20px,    /* Lanterne gauche (plus petite) */
+    bottom 10px right 10px, /* Canon */
+    0 0, 0 0, 0 0, 0 0, 0 0; /* Autres calques couvrent tout */
+
+  background-repeat:
+    no-repeat,
+    no-repeat,
+    no-repeat,
+    no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+
+  background-size:
+    80px auto,   /* Taille Lanterne droite */
+    60px auto,   /* Taille Lanterne gauche */
+    140px auto,  /* Taille Canon */
+    100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+
+  /* Accents Dorés */
+  --accent-color: #ffd700;
+  --accent-rgb: 255, 215, 0;
+
+  /* Texte sur fond sombre */
+  --text-primary: #ffffff;
+  --text-secondary: #e8f5e9; /* Vert très clair */
+
+  /* Couleurs de fond des composants (Vert Profond) */
+  --bg-primary: #0a3d13;
+  --bg-secondary: #1b5e20;
+  --bg-surface: rgba(10, 61, 19, 0.85);
+
+  /* Bordures dorées subtiles */
+  --border-color: rgba(255, 215, 0, 0.25);
+}
+
+.theme-ramadan-option {
+    background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #ffd700 100%);
+    border: 1px solid rgba(255, 215, 0, 0.5);
+}
 .theme-options {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -247,3 +305,4 @@
 .theme-royal-option { background: linear-gradient(145deg, #0d47a1, #1565c0); }
 .theme-indigo-option { background: linear-gradient(145deg, #1a237e, #283593); }
 .theme-classic-option { background: linear-gradient(145deg, #212121, #424242); }
+.theme-ramadan-option { background: linear-gradient(145deg, #1a1a2e, #ffd700); }

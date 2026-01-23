@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 150">
+  <!-- Chaîne -->
+  <line x1="50" y1="0" x2="50" y2="20" stroke="#ffd700" stroke-width="2"/>
+
+  <!-- Anneau -->
+  <circle cx="50" cy="25" r="5" fill="none" stroke="#ffd700" stroke-width="2"/>
+
+  <!-- Toit de la lanterne -->
+  <path d="M30 50 L50 30 L70 50" fill="#ffd700" opacity="0.8"/>
+  <rect x="35" y="50" width="30" height="5" fill="#ffd700"/>
+
+  <!-- Corps de la lanterne -->
+  <path d="M35 55 L25 80 L35 110 L65 110 L75 80 L65 55 Z" fill="rgba(255, 215, 0, 0.2)" stroke="#ffd700" stroke-width="2"/>
+
+  <!-- Intérieur (Lumière) -->
+  <circle cx="50" cy="85" r="10" fill="#ffeb3b" opacity="0.6">
+    <animate attributeName="opacity" values="0.6;0.9;0.6" dur="3s" repeatCount="indefinite" />
+  </circle>
+
+  <!-- Base -->
+  <rect x="40" y="110" width="20" height="5" fill="#ffd700"/>
+  <path d="M42 115 L50 125 L58 115 Z" fill="#ffd700"/>
+</svg>
