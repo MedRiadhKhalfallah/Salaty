@@ -21,7 +21,7 @@ async function initQiblaPage() {
                  toggleQiblaFullscreen();
              }
              ipcRenderer.invoke('resize-window', 320, 555);
-             ipcRenderer.invoke('go-back');
+            ipcRenderer.invoke('navigate-to', 'features');
         });
     }
 
