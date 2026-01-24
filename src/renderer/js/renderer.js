@@ -77,6 +77,89 @@ function setupWindowControls() {
       ipcRenderer.invoke('close-window');
     });
   }
+
+  // Setup update handlers
+  setupUpdateHandlers();
+}
+
+function setupUpdateHandlers() {
+    const modal = document.getElementById('updateModal');
+    if (!modal) return; // Only if modal exists on this page
+
+    const titleCtx = document.getElementById('updateTitle');
+    const messageCtx = document.getElementById('updateMessage');
+    const updateBtn = document.getElementById('updateActionBtn');
+    const cancelBtn = document.getElementById('updateCancelBtn');
+    const progressBar = document.getElementById('updateProgress');
+    const progressBarFill = document.getElementById('updateProgressBar');
+    const progressText = document.getElementById('updateProgressText');
+
+    let updateInfo = null;
+
+    // Reset UI state
+    function resetUI() {
+        modal.classList.remove('show');
+        progressBar.classList.add('hidden');
+        if (updateBtn) {
+            updateBtn.textContent = 'Télécharger';
+            updateBtn.disabled = false;
+        }
+        if (cancelBtn) cancelBtn.style.display = 'block';
+    }
+
+    // Close modal action
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            modal.classList.remove('show');
+        });
+    }
+
+    // Main update action
+    if (updateBtn) {
+        updateBtn.addEventListener('click', () => {
+            if (updateBtn.textContent === 'Télécharger') {
+                // Start download
+                ipcRenderer.send('start-download');
+                updateBtn.disabled = true;
+                if (cancelBtn) cancelBtn.style.display = 'none'; // Prevent cancelling during download
+                progressBar.classList.remove('hidden');
+            } else {
+                // Install and restart
+                ipcRenderer.send('install-update');
+            }
+        });
+    }
+
+    // Listeners from Main Process
+    ipcRenderer.on('update-available', (event, info) => {
+        updateInfo = info;
+        if (titleCtx) titleCtx.textContent = 'Mise à jour disponible';
+        if (messageCtx) messageCtx.textContent = `Version ${info.version} disponible.`;
+        if (updateBtn) updateBtn.textContent = 'Télécharger';
+        if (cancelBtn) cancelBtn.style.display = 'block';
+        if (progressBar) progressBar.classList.add('hidden');
+
+        modal.classList.add('show');
+    });
+
+    ipcRenderer.on('download-progress', (event, progressObj) => {
+        if (progressBar) progressBar.classList.remove('hidden');
+        const percentage = Math.round(progressObj.percent);
+        if (progressBarFill) progressBarFill.style.width = percentage + '%';
+        if (progressText) progressText.textContent = percentage + '%';
+    });
+
+    ipcRenderer.on('update-downloaded', (event, info) => {
+        if (titleCtx) titleCtx.textContent = 'Mise à jour prête';
+        if (messageCtx) messageCtx.textContent = 'Téléchargement terminé. Installer maintenant ?';
+        if (updateBtn) {
+            updateBtn.textContent = 'Installer';
+            updateBtn.disabled = false;
+        }
+        if (progressBar) progressBar.classList.add('hidden');
+
+        modal.classList.add('show');
+    });
 }
 
 // ==================== MAIN PAGE FUNCTIONS ====================

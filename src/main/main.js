@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, dialog } = require('electron');
+const { app, BrowserWindow, Tray, Menu, dialog, ipcMain } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const ipcHandlers = require('./ipc-handlers');
@@ -15,6 +15,7 @@ if (process.platform === 'win32') {
 
 let mainWindow;
 let tray = null;
+let isQuitting = false;
 
 function createWindow() {
   // Load settings
@@ -65,8 +66,10 @@ function createWindow() {
   });
 
   mainWindow.on('close', (event) => {
-    event.preventDefault();
-    mainWindow.hide();
+    if (!isQuitting) {
+      event.preventDefault();
+      mainWindow.hide();
+    }
   });
 
   // Ajout du Tray
@@ -82,6 +85,7 @@ function createWindow() {
       {
         label: 'Quitter',
         click: () => {
+          isQuitting = true;
           tray.destroy();
           app.quit();
         }
@@ -96,33 +100,35 @@ function createWindow() {
 
   // Setup IPC handlers
   ipcHandlers.setupHandlers(mainWindow);
+
+  // Update IPC Handlers
+  ipcMain.on('start-download', () => {
+    autoUpdater.downloadUpdate();
+  });
+
+  ipcMain.on('install-update', () => {
+    isQuitting = true;
+    autoUpdater.quitAndInstall(false, true);
+  });
 }
 
 // Update handling
 autoUpdater.on('update-available', (info) => {
-  dialog.showMessageBox({
-    type: 'info',
-    title: 'Mise à jour disponible',
-    message: `Une nouvelle version (${info.version}) est disponible. Voulez-vous la télécharger maintenant ?`,
-    buttons: ['Oui', 'Non']
-  }).then((result) => {
-    if (result.response === 0) {
-      autoUpdater.downloadUpdate();
-    }
-  });
+  if (mainWindow) {
+    mainWindow.webContents.send('update-available', info);
+  }
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('download-progress', progressObj);
+  }
 });
 
 autoUpdater.on('update-downloaded', (info) => {
-  dialog.showMessageBox({
-    type: 'question',
-    title: 'Mise à jour prête',
-    message: 'La mise à jour a été téléchargée. Voulez-vous redémarrer l\'application pour l\'installer maintenant ?',
-    buttons: ['Installer et redémarrer', 'Plus tard']
-  }).then((result) => {
-    if (result.response === 0) {
-      autoUpdater.quitAndInstall(false, true);
-    }
-  });
+  if (mainWindow) {
+    mainWindow.webContents.send('update-downloaded', info);
+  }
 });
 
 autoUpdater.on('error', (err) => {
