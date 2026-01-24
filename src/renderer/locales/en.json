@@ -99,7 +99,14 @@
     "markAsCompleted": "Mark as Completed",
     "fastingCompleted": "Fasting Completed",
     "todayFasting": "Today's Fasting",
-    "fastingTracker": "Fasting Tracker"
+    "fastingTracker": "Fasting Tracker",
+    "updateAvailable": "Update Available",
+    "newVersionAvailable": "Version {version} is available. Download now?",
+    "download": "Download",
+    "updateReady": "Update Ready",
+    "updateDownloaded": "Update downloaded. Install now?",
+    "install": "Install",
+    "later": "Later"
   },
   "themes": {
     "navy": "Navy",

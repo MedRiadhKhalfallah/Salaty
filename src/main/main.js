@@ -1,6 +1,12 @@
-const { app, BrowserWindow, Tray, Menu } = require('electron');
+const { app, BrowserWindow, Tray, Menu, dialog, ipcMain } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const ipcHandlers = require('./ipc-handlers');
+
+// Configure logging
+autoUpdater.logger = console;
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = true;
 
 // Set App User Model ID for Windows Notifications
 if (process.platform === 'win32') {
@@ -9,6 +15,7 @@ if (process.platform === 'win32') {
 
 let mainWindow;
 let tray = null;
+let isQuitting = false;
 
 function createWindow() {
   // Load settings
@@ -59,8 +66,10 @@ function createWindow() {
   });
 
   mainWindow.on('close', (event) => {
-    event.preventDefault();
-    mainWindow.hide();
+    if (!isQuitting) {
+      event.preventDefault();
+      mainWindow.hide();
+    }
   });
 
   // Ajout du Tray
@@ -76,6 +85,7 @@ function createWindow() {
       {
         label: 'Quitter',
         click: () => {
+          isQuitting = true;
           tray.destroy();
           app.quit();
         }
@@ -90,11 +100,56 @@ function createWindow() {
 
   // Setup IPC handlers
   ipcHandlers.setupHandlers(mainWindow);
+
+  // Update IPC Handlers
+  ipcMain.on('start-download', () => {
+    autoUpdater.downloadUpdate();
+  });
+
+  ipcMain.on('install-update', () => {
+    isQuitting = true;
+    autoUpdater.quitAndInstall(false, true);
+  });
 }
+
+// Update handling
+autoUpdater.on('update-available', (info) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('update-available', info);
+  }
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('download-progress', progressObj);
+  }
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('update-downloaded', info);
+  }
+});
+
+autoUpdater.on('error', (err) => {
+  console.error('Error in auto-updater', err);
+  // Optional: Notify user about error only if logging is enabled or critical
+});
 
 app.whenReady().then(() => {
   try {
     createWindow();
+    // Check for updates after window creation
+    // Adding a small delay to ensure window is ready
+    setTimeout(() => {
+        autoUpdater.checkForUpdates();
+    }, 3000);
+
+    // Check for updates every 12 hours
+    setInterval(() => {
+      autoUpdater.checkForUpdates();
+    }, 12 * 60 * 60 * 1000);
+
     // Démarrage automatique avec Windows
     app.setLoginItemSettings({
       openAtLogin: true,

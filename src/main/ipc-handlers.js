@@ -1,4 +1,4 @@
-const { ipcMain } = require('electron');
+const { ipcMain, app } = require('electron');
 const fs = require('fs');
 const path = require('path');
 
@@ -10,12 +10,27 @@ let settingsData = {
   position: { x: 100, y: 100 }
 };
 
+function getSettingsPath() {
+  return path.join(app.getPath('userData'), 'settings.json');
+}
+
 function loadSettings() {
   try {
-    const settingsPath = path.join(__dirname, '../../settings.json');
+    const settingsPath = getSettingsPath();
+    // Try loading from userData first (User preferences)
     if (fs.existsSync(settingsPath)) {
       const data = fs.readFileSync(settingsPath, 'utf8');
       settingsData = { ...settingsData, ...JSON.parse(data) };
+    } else {
+      // If not found in userData, try loading bundled default settings
+      // This handles the first run or migration
+      const bundledPath = path.join(__dirname, '../../settings.json');
+      if (fs.existsSync(bundledPath)) {
+         const data = fs.readFileSync(bundledPath, 'utf8');
+         settingsData = { ...settingsData, ...JSON.parse(data) };
+      }
+      // Save to userData immediately to ensure persistence for next time
+      saveSettings();
     }
   } catch (error) {
     console.error('Error loading settings:', error);
@@ -24,7 +39,7 @@ function loadSettings() {
 
 function saveSettings() {
   try {
-    const settingsPath = path.join(__dirname, '../../settings.json');
+    const settingsPath = getSettingsPath();
     fs.writeFileSync(settingsPath, JSON.stringify(settingsData, null, 2));
   } catch (error) {
     console.error('Error saving settings:', error);
