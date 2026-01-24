@@ -1,6 +1,6 @@
 {
   "name": "salaty",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Salaty Islamic Prayer Times Desktop App",
   "main": "src/main/main.js",
   "scripts": {
