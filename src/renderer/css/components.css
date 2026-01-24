@@ -486,13 +486,13 @@
 }
 
 .modal-content {
-    background-color: var(--card-bg, #1e293b);
+    background-color: var(--bg-secondary, #1e293b);
     padding: 24px;
     border-radius: 16px;
     width: 85%;
     max-width: 320px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
     top: 50%;
     position: absolute;
     left: 50%;
@@ -513,6 +513,7 @@
     font-size: 0.95rem;
     opacity: 0.9;
     line-height: 1.5;
+    color: var(--text-secondary, #e0e0e0);
 }
 
 .modal-buttons {
@@ -532,12 +533,12 @@
 }
 
 .modal-btn.primary {
-    background-color: var(--primary-color, #3b82f6);
-    color: white;
+    background-color: var(--accent-color, #3b82f6);
+    color: var(--text-primary, #fff);
 }
 
 .modal-btn.primary:hover {
-    background-color: var(--primary-hover, #2563eb);
+    filter: brightness(1.1);
 }
 
 .modal-btn.secondary {
@@ -569,7 +570,7 @@
 
 .progress-fill {
     height: 100%;
-    background-color: var(--primary-color, #3b82f6);
+    background-color: var(--accent-color, #3b82f6);
     width: 0%;
     transition: width 0.3s ease;
 }

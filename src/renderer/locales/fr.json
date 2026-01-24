@@ -99,7 +99,14 @@
     "markAsCompleted": "Marquer comme complet",
     "fastingCompleted": "Jeûne complet",
     "todayFasting": "Jeûne d'aujourd'hui",
-    "fastingTracker": "Suivi du Jeûne"
+    "fastingTracker": "Suivi du Jeûne",
+    "updateAvailable": "Mise à jour disponible",
+    "newVersionAvailable": "La version {version} est disponible. Télécharger ?",
+    "download": "Télécharger",
+    "updateReady": "Mise à jour prête",
+    "updateDownloaded": "Mise à jour téléchargée. Installer ?",
+    "install": "Installer",
+    "later": "Plus tard"
   },
   "themes": {
     "navy": "Bleu marine",
