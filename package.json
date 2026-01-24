@@ -1,6 +1,6 @@
 {
   "name": "salaty",
-  "version": "1.0.3",
+  "version": "1.0.0",
   "description": "Salaty Islamic Prayer Times Desktop App",
   "main": "src/main/main.js",
   "scripts": {
@@ -34,7 +34,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "MedRiadhKhalfallah",
+        "owner": "yassindaboussi",
         "repo": "Salaty"
       }
     ],

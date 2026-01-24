@@ -95,13 +95,14 @@ function setupUpdateHandlers() {
     const progressText = document.getElementById('updateProgressText');
 
     let updateInfo = null;
+    let isUpdateDownloaded = false;
 
     // Reset UI state
     function resetUI() {
         modal.classList.remove('show');
         progressBar.classList.add('hidden');
         if (updateBtn) {
-            updateBtn.textContent = 'Télécharger';
+            updateBtn.textContent = t('download');
             updateBtn.disabled = false;
         }
         if (cancelBtn) cancelBtn.style.display = 'block';
@@ -117,7 +118,7 @@ function setupUpdateHandlers() {
     // Main update action
     if (updateBtn) {
         updateBtn.addEventListener('click', () => {
-            if (updateBtn.textContent === 'Télécharger') {
+            if (!isUpdateDownloaded) {
                 // Start download
                 ipcRenderer.send('start-download');
                 updateBtn.disabled = true;
@@ -132,11 +133,15 @@ function setupUpdateHandlers() {
 
     // Listeners from Main Process
     ipcRenderer.on('update-available', (event, info) => {
+        isUpdateDownloaded = false;
         updateInfo = info;
-        if (titleCtx) titleCtx.textContent = 'Mise à jour disponible';
-        if (messageCtx) messageCtx.textContent = `Version ${info.version} disponible.`;
-        if (updateBtn) updateBtn.textContent = 'Télécharger';
-        if (cancelBtn) cancelBtn.style.display = 'block';
+        if (titleCtx) titleCtx.textContent = t('updateAvailable');
+        if (messageCtx) messageCtx.textContent = t('newVersionAvailable').replace('{version}', info.version);
+        if (updateBtn) updateBtn.textContent = t('download');
+        if (cancelBtn) {
+          cancelBtn.style.display = 'block';
+          cancelBtn.textContent = t('later');
+        }
         if (progressBar) progressBar.classList.add('hidden');
 
         modal.classList.add('show');
@@ -150,10 +155,11 @@ function setupUpdateHandlers() {
     });
 
     ipcRenderer.on('update-downloaded', (event, info) => {
-        if (titleCtx) titleCtx.textContent = 'Mise à jour prête';
-        if (messageCtx) messageCtx.textContent = 'Téléchargement terminé. Installer maintenant ?';
+        isUpdateDownloaded = true;
+        if (titleCtx) titleCtx.textContent = t('updateReady');
+        if (messageCtx) messageCtx.textContent = t('updateDownloaded');
         if (updateBtn) {
-            updateBtn.textContent = 'Installer';
+            updateBtn.textContent = t('install');
             updateBtn.disabled = false;
         }
         if (progressBar) progressBar.classList.add('hidden');
