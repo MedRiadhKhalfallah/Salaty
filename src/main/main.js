@@ -1,4 +1,5 @@
 const { app, BrowserWindow, Tray, Menu } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const ipcHandlers = require('./ipc-handlers');
 
@@ -95,6 +96,8 @@ function createWindow() {
 app.whenReady().then(() => {
   try {
     createWindow();
+    autoUpdater.checkForUpdatesAndNotify();
+
     // Démarrage automatique avec Windows
     app.setLoginItemSettings({
       openAtLogin: true,

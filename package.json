@@ -21,6 +21,7 @@
   "build": {
     "appId": "com.yassindaboussi.salaty",
     "productName": "Salaty Islamic Prayer Times",
+    "artifactName": "Salaty-Islamic-Prayer-Times-Setup.exe",
     "directories": {
       "output": "dist",
       "buildResources": "src/assets"
@@ -29,6 +30,13 @@
       "src/**/*",
       "package.json",
       "settings.json"
+    ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "MedRiadhKhalfallah",
+        "repo": "Salaty"
+      }
     ],
     "extraResources": [
       "src/assets/**"
@@ -51,6 +59,7 @@
     }
   },
   "dependencies": {
+    "electron-updater": "^6.7.3",
     "leaflet": "^1.9.4",
     "salaty-qibla-map": "file:salaty-qibla-map",
     "tom-select": "^2.4.3"
