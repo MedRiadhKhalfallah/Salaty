@@ -249,7 +249,7 @@
   -webkit-app-region: no-drag;
   pointer-events: auto;
   overflow-y: auto;
-  
+
   /* Add padding to the right to create space for scrollbar */
   padding-right: 4px;
   margin-right: 4px;
@@ -286,4 +286,51 @@
 /* Additional: Ensure scrollbar doesn't overlap with content */
 .settings-container {
   padding-right: 8px; /* Add some padding to the container */
+}
+
+/* Auto Detect Button */
+.detect-location-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  width: 100%;
+  font-weight: 500;
+}
+
+.detect-location-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+  transform: translateY(-1px);
+}
+
+.detect-location-btn:active {
+  transform: translateY(0);
+}
+
+.detect-location-btn i {
+  font-size: 14px;
+}
+
+.detect-location-btn.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.detect-location-btn.loading i {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

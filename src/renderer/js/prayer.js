@@ -197,12 +197,46 @@ function updateCurrentAndNextPrayer() {
         if (prayerChanged) {
             updatePrayerUI();
             if (!isFirstLoad) {
-                notifyPrayer(currentPrayer);
+                checkAndPlayAdhan(currentPrayer, currentSeconds);
             }
             isFirstLoad = false;
         }
     } catch (error) {
         console.error('Error in updateCurrentAndNextPrayer:', error);
+    }
+}
+
+/**
+ * Vérifie si l'Adhan doit être joué ou ignoré (bypass) en fonction du temps écoulé.
+ *
+ * Cette fonction résout le problème où l'Adhan se lance avec retard (ex: 1h après)
+ * lorsque l'ordinateur sort de veille.
+ *
+ * Fonctionnement :
+ * 1. Elle calcule la différence entre l'heure actuelle (sortie de veille) et l'heure de la prière.
+ * 2. Si ce délai dépasse une tolérance (15 minutes), l'Adhan est ignoré.
+ * 3. Sinon, l'Adhan est joué normalement.
+ *
+ * @param {object} prayer - L'objet prière courant.
+ * @param {number} currentSeconds - L'heure actuelle en secondes.
+ */
+function checkAndPlayAdhan(prayer, currentSeconds) {
+    const prayerSecondsRaw = getSecondsFromTime(prayer.time);
+    let diff = currentSeconds - prayerSecondsRaw;
+
+    // Gestion du cas minuit (wraparound)
+    // Si diff est très négatif (ex: -12h), c'est qu'on a passé minuit
+    if (diff < -43200) {
+        diff += 86400;
+    }
+
+    // Tolérance de 15 minutes (900 secondes)
+    const ADHAN_TOLERANCE = 900;
+
+    if (diff >= 0 && diff <= ADHAN_TOLERANCE) {
+        notifyPrayer(prayer);
+    } else {
+        console.log(`Adhan ignoré pour ${prayer.name} : heure passée de ${diff}s (> tolérance ${ADHAN_TOLERANCE}s)`);
     }
 }
 

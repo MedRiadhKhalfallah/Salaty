@@ -1,16 +1,16 @@
 {
-  "city": "Tunis",
-  "country": "Tunisia",
+  "city": "Trois-Rivières",
+  "country": "Canada",
   "theme": "green",
   "language": "en",
   "position": {
-    "x": 175,
-    "y": 117
+    "x": 516,
+    "y": 183
   },
   "adhanEnabledByPrayer": {
     "Fajr": true,
     "Dhuhr": true,
-    "Asr": false,
+    "Asr": true,
     "Maghrib": true,
     "Isha": true
   }

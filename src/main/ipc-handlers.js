@@ -69,7 +69,7 @@ function setupHandlers(mainWindow) {
   ipcMain.handle('resize-window', (event, width, height) => {
     if (mainWindow) {
       mainWindow.setSize(width, height, true);
-      mainWindow.center();
+      // mainWindow.center(); // Removed to keep window position
       return { width, height };
     }
     return { width: 320, height: 555 };

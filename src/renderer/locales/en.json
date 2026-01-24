@@ -18,6 +18,7 @@
     "settings": "Settings",
     "quran": "Quran",
     "city": "City",
+    "detectLocation": "Auto Detect Location",
     "country": "Country",
     "theme": "Theme",
     "language": "Language",

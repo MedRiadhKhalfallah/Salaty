@@ -44,7 +44,8 @@ function updateSettings() {
         'languageLabel': 'language',
         'cityHint': 'cityHint',
         'countryHint': 'countryHint',
-        'footerText': 'madeWith'
+        'footerText': 'madeWith',
+        'detectLocationLabel': 'detectLocation'
     };
 
     for (const [id, key] of Object.entries(elements)) {
