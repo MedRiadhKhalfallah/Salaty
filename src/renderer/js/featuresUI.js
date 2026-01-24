@@ -119,6 +119,12 @@ function setupFeatureCards() {
   if (ramadhanCard) {
     ramadhanCard.addEventListener('click', openRamadhan);
   }
+
+  // Qibla card
+  const qiblaCard = document.querySelector('[data-feature="qibla"]');
+  if (qiblaCard) {
+    qiblaCard.addEventListener('click', openQibla);
+  }
 }
 
 function openQuran() {
@@ -146,6 +152,15 @@ function openRamadhan() {
   }
   ipcRenderer.invoke('resize-window', 320, 555);
   ipcRenderer.invoke('navigate-to', 'ramadan');
+}
+
+function openQibla() {
+  console.log('Opening Qibla...');
+  if (isFeaturesFullscreen) {
+    toggleFeaturesFullscreen(); // Exit fullscreen first
+  }
+  ipcRenderer.invoke('resize-window', 320, 555);
+  ipcRenderer.invoke('navigate-to', 'qibla');
 }
 
 function toggleFeaturesFullscreen() {

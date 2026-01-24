@@ -15,8 +15,8 @@
   "author": "Yassin Daboussi",
   "license": "MIT",
   "devDependencies": {
-  "electron": "38.2.2",
-  "electron-builder": "24.13.3"
+    "electron": "38.2.2",
+    "electron-builder": "24.13.3"
   },
   "build": {
     "appId": "com.yassindaboussi.salaty",
@@ -51,6 +51,8 @@
     }
   },
   "dependencies": {
+    "leaflet": "^1.9.4",
+    "salaty-qibla-map": "file:salaty-qibla-map",
     "tom-select": "^2.4.3"
   }
 }
