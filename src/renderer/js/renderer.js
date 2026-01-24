@@ -10,6 +10,7 @@ const { state } = require('../js/globalStore');
 const { initSettingsPage } = require('../js/settings');
 const { initQiblaPage } = require('../js/qibla');
 const { applyTheme } = require('../js/theme');
+const { initAthkarAlertsSystem } = require('../js/athkarAlerts');
 
 // ==================== INITIALIZATION ====================
 async function initializeApp() {
@@ -25,6 +26,9 @@ async function initializeApp() {
       // Apply theme and language
       applyTheme(theme);
       applyLanguageDirection();
+
+      // Initialize Athkar Alerts System
+      initAthkarAlertsSystem();
     }
 
     // Check which page we're on and initialize accordingly

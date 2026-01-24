@@ -32,6 +32,7 @@ function initSettingsPage() {
     updateSettings();
     initThemeOptions();
     initLanguageOptions();
+    initAthkarAlerts();
 }
 
 function updateSettings() {
@@ -45,7 +46,11 @@ function updateSettings() {
         'cityHint': 'cityHint',
         'countryHint': 'countryHint',
         'footerText': 'madeWith',
-        'detectLocationLabel': 'detectLocation'
+        'detectLocationLabel': 'detectLocation',
+        'athkarAlertsLabel': 'athkarAlerts',
+        'enableAthkarAlertsLabel': 'enableAthkarAlerts',
+        'athkarIntervalLabel': 'athkarInterval',
+        'minutesLabel': 'minutes'
     };
 
     for (const [id, key] of Object.entries(elements)) {
@@ -156,9 +161,39 @@ function initLanguageOptions() {
     });
 }
 
+function initAthkarAlerts() {
+    const toggle = document.getElementById('athkarAlertsToggle');
+    const intervalInput = document.getElementById('athkarIntervalInput');
+    const intervalContainer = document.getElementById('athkarIntervalContainer');
+
+    if (toggle && intervalInput) {
+        toggle.checked = state.settings.athkarAlertEnabled || false;
+        intervalInput.value = state.settings.athkarAlertInterval || 30;
+
+        const updateState = () => {
+            if (toggle.checked) {
+                intervalContainer.style.opacity = '1';
+                intervalContainer.style.pointerEvents = 'auto';
+                intervalInput.disabled = false;
+            } else {
+                intervalContainer.style.opacity = '0.5';
+                intervalContainer.style.pointerEvents = 'none';
+                intervalInput.disabled = true;
+            }
+        };
+
+        // Initial state
+        updateState();
+
+        toggle.addEventListener('change', updateState);
+    }
+}
+
 async function saveSettings() {
     const cityInput = document.getElementById('cityInput');
     const countryInput = document.getElementById('countryInput');
+    const athkarAlertsToggle = document.getElementById('athkarAlertsToggle');
+    const athkarIntervalInput = document.getElementById('athkarIntervalInput');
 
     const city = cityInput ? cityInput.value.trim() : '';
     const country = countryInput ? countryInput.value.trim() : '';
@@ -174,6 +209,16 @@ async function saveSettings() {
         state.settings.city = city;
         state.settings.country = country;
         state.settings.theme = selectedTheme;
+
+        if (athkarAlertsToggle) {
+            state.settings.athkarAlertEnabled = athkarAlertsToggle.checked;
+        }
+
+        if (athkarIntervalInput) {
+            let interval = parseInt(athkarIntervalInput.value);
+            if (isNaN(interval) || interval < 1) interval = 30;
+            state.settings.athkarAlertInterval = interval;
+        }
 
         await ipcRenderer.invoke('save-settings', state.settings);
 
