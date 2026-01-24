@@ -1,7 +1,12 @@
-const { app, BrowserWindow, Tray, Menu } = require('electron');
+const { app, BrowserWindow, Tray, Menu, dialog } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const ipcHandlers = require('./ipc-handlers');
+
+// Configure logging
+autoUpdater.logger = console;
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = true;
 
 // Set App User Model ID for Windows Notifications
 if (process.platform === 'win32') {
@@ -93,10 +98,51 @@ function createWindow() {
   ipcHandlers.setupHandlers(mainWindow);
 }
 
+// Update handling
+autoUpdater.on('update-available', (info) => {
+  dialog.showMessageBox({
+    type: 'info',
+    title: 'Mise à jour disponible',
+    message: `Une nouvelle version (${info.version}) est disponible. Voulez-vous la télécharger maintenant ?`,
+    buttons: ['Oui', 'Non']
+  }).then((result) => {
+    if (result.response === 0) {
+      autoUpdater.downloadUpdate();
+    }
+  });
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  dialog.showMessageBox({
+    type: 'question',
+    title: 'Mise à jour prête',
+    message: 'La mise à jour a été téléchargée. Voulez-vous redémarrer l\'application pour l\'installer maintenant ?',
+    buttons: ['Installer et redémarrer', 'Plus tard']
+  }).then((result) => {
+    if (result.response === 0) {
+      autoUpdater.quitAndInstall(false, true);
+    }
+  });
+});
+
+autoUpdater.on('error', (err) => {
+  console.error('Error in auto-updater', err);
+  // Optional: Notify user about error only if logging is enabled or critical
+});
+
 app.whenReady().then(() => {
   try {
     createWindow();
-    autoUpdater.checkForUpdatesAndNotify();
+    // Check for updates after window creation
+    // Adding a small delay to ensure window is ready
+    setTimeout(() => {
+        autoUpdater.checkForUpdates();
+    }, 3000);
+
+    // Check for updates every 12 hours
+    setInterval(() => {
+      autoUpdater.checkForUpdates();
+    }, 12 * 60 * 60 * 1000);
 
     // Démarrage automatique avec Windows
     app.setLoginItemSettings({
