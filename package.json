@@ -21,6 +21,7 @@
   "build": {
     "appId": "com.yassindaboussi.salaty",
     "productName": "Salaty Islamic Prayer Times",
+    "artifactName": "Salaty-Islamic-Prayer-Times-Setup.exe",
     "directories": {
       "output": "dist",
       "buildResources": "src/assets"
