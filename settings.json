@@ -1,11 +1,11 @@
 {
   "city": "Trois-Rivières",
   "country": "Canada",
-  "theme": "green",
+  "theme": "ramadan",
   "language": "en",
   "position": {
-    "x": 516,
-    "y": 183
+    "x": 505,
+    "y": 251
   },
   "adhanEnabledByPrayer": {
     "Fajr": true,

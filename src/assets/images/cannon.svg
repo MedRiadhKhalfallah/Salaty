@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100">
+  <!-- Roues -->
+  <circle cx="60" cy="80" r="15" fill="none" stroke="#ffd700" stroke-width="3"/>
+  <circle cx="60" cy="80" r="5" fill="#ffd700"/>
+  <line x1="60" y1="65" x2="60" y2="95" stroke="#ffd700" stroke-width="2"/>
+  <line x1="45" y1="80" x2="75" y2="80" stroke="#ffd700" stroke-width="2"/>
+
+  <!-- Corps du canon -->
+  <path d="M50 75 L140 50 L145 65 L55 85 Z" fill="#ffd700" opacity="0.9"/>
+  <rect x="40" y="70" width="20" height="15" fill="#ffd700" rx="2"/>
+
+  <!-- Bout du canon -->
+  <ellipse cx="142" cy="57" rx="5" ry="10" fill="#ccac00" transform="rotate(-15 142 57)"/>
+
+  <!-- Socle/Partie arrière -->
+  <path d="M30 95 L80 95" stroke="#ffd700" stroke-width="3"/>
+</svg>
