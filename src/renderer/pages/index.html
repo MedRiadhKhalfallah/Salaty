@@ -52,7 +52,7 @@
     <div class="prayer-cards-container" id="prayerCards">
       <div class="loading" id="loadingText">Loading prayer times...</div>
     </div>
-RIadh
+
     <button class="control-btn adhan-stop-btn adhan-stop-btn-wide adhan-stop-btn-hidden" id="adhanStopBtn">
       <i class="fas fa-volume-mute adhan-stop-icon"></i>
       <span class="adhan-stop-text" id="adhanStopText"></span>
@@ -60,6 +60,24 @@ RIadh
 
     <div class="prayer-times" id="prayerTimes">
       <div id="prayerList"></div>
+    </div>
+  </div>
+
+  <!-- Update Modal -->
+  <div id="updateModal" class="modal">
+    <div class="modal-content">
+      <h3 id="updateTitle">Mise à jour disponible</h3>
+      <p id="updateMessage">Une nouvelle version est disponible.</p>
+      <div class="modal-buttons">
+        <button id="updateActionBtn" class="modal-btn primary">Télécharger</button>
+        <button id="updateCancelBtn" class="modal-btn secondary">Plus tard</button>
+      </div>
+      <div id="updateProgress" class="update-progress hidden">
+        <div class="progress-bar">
+          <div class="progress-fill" id="updateProgressBar"></div>
+        </div>
+        <span id="updateProgressText">0%</span>
+      </div>
     </div>
   </div>
 
