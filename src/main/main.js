@@ -2,6 +2,11 @@ const { app, BrowserWindow, Tray, Menu } = require('electron');
 const path = require('path');
 const ipcHandlers = require('./ipc-handlers');
 
+// Set App User Model ID for Windows Notifications
+if (process.platform === 'win32') {
+  app.setAppUserModelId('Salaty');
+}
+
 let mainWindow;
 let tray = null;
 

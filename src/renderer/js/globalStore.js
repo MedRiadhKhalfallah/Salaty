@@ -9,7 +9,14 @@ const prayerIcons = {
 };
 
 const state = {
-    settings: { theme: 'navy', city: '', country: '', language: 'en' }
+    settings: {
+        theme: 'navy',
+        city: '',
+        country: '',
+        language: 'en',
+        athkarAlertEnabled: false,
+        athkarAlertInterval: 30
+    }
 };
 
 module.exports = {

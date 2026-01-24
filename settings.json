@@ -2,10 +2,10 @@
   "city": "Trois-Rivières",
   "country": "Canada",
   "theme": "ramadan",
-  "language": "en",
+  "language": "fr",
   "position": {
-    "x": 505,
-    "y": 251
+    "x": 190,
+    "y": 108
   },
   "adhanEnabledByPrayer": {
     "Fajr": true,
@@ -13,5 +13,7 @@
     "Asr": true,
     "Maghrib": true,
     "Isha": true
-  }
+  },
+  "athkarAlertEnabled": false,
+  "athkarAlertInterval": 30
 }
