@@ -11,7 +11,7 @@ function initQuranPage() {
   const backBtn = document.getElementById('backBtn');
   if (backBtn) {
     backBtn.addEventListener('click', () => {
-      ipcRenderer.invoke('resize-window', 320, 575);
+      ipcRenderer.invoke('resize-window', 320, 555);
       ipcRenderer.invoke('navigate-to', 'features');
     });
   }

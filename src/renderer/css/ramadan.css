@@ -33,175 +33,10 @@
   user-select: none;
 }
 
-/* Control buttons container */
-.ramadan-controls {
-  display: flex;
-  gap: 6px;
-  z-index: 102;
-  flex-shrink: 0;
-}
-
-/* Fullscreen Button */
-.fullscreen-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  -webkit-app-region: no-drag;
-}
-
-.fullscreen-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: var(--accent-color);
-}
-
-.fullscreen-btn i {
-  color: var(--text-primary);
-  font-size: 12px;
-}
-
-/* Back Button */
-.back-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  -webkit-app-region: no-drag;
-}
-
-.back-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: var(--accent-color);
-}
-
-.back-btn i {
-  color: var(--text-primary);
-  font-size: 14px;
-}
-
-/* ARABIC (RTL) LAYOUT */
-/* Order: back button on LEFT, title in center, fullscreen on RIGHT */
-[dir="rtl"] .ramadan-header,
-[lang="ar"] .ramadan-header,
-[lang="fa"] .ramadan-header,
-[lang="ur"] .ramadan-header,
-[lang="he"] .ramadan-header {
-  direction: ltr !important; /* Force LTR layout for proper ordering */
-}
-
-/* Back button on LEFT side */
-[dir="rtl"] .back-btn,
-[lang="ar"] .back-btn,
-[lang="fa"] .back-btn,
-[lang="ur"] .back-btn,
-[lang="he"] .back-btn {
-  order: 1; /* First item on the left */
-  transform: none; /* Remove arrow flip */
-  margin-right: auto; /* Push to left */
-}
-
-/* Title in center */
-[dir="rtl"] .ramadan-title,
-[lang="ar"] .ramadan-title,
-[lang="fa"] .ramadan-title,
-[lang="ur"] .ramadan-title,
-[lang="he"] .ramadan-title {
-  order: 2; /* Middle */
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 0;
-  pointer-events: none;
-  width: auto;
-  white-space: nowrap;
-}
-
-/* Controls container on RIGHT side */
-[dir="rtl"] .ramadan-controls,
-[lang="ar"] .ramadan-controls,
-[lang="fa"] .ramadan-controls,
-[lang="ur"] .ramadan-controls,
-[lang="he"] .ramadan-controls {
-  order: 3; /* Last on the right */
-  margin-left: auto; /* Push to right */
-}
-
-/* OTHER LANGUAGES (LTR) LAYOUT */
-[dir="ltr"] .ramadan-header:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .ramadan-header,
-[lang="fr"] .ramadan-header,
-[lang="es"] .ramadan-header,
-[lang="de"] .ramadan-header,
-[lang="ru"] .ramadan-header,
-[lang="zh"] .ramadan-header,
-[lang="ja"] .ramadan-header {
-  direction: ltr !important;
-}
-
-/* Back button on LEFT side */
-[dir="ltr"] .back-btn:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .back-btn,
-[lang="fr"] .back-btn,
-[lang="es"] .back-btn,
-[lang="de"] .back-btn,
-[lang="ru"] .back-btn,
-[lang="zh"] .back-btn,
-[lang="ja"] .back-btn {
-  order: 1; /* First on left */
-  margin-right: auto;
-}
-
-/* Title in center */
-[dir="ltr"] .ramadan-title:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .ramadan-title,
-[lang="fr"] .ramadan-title,
-[lang="es"] .ramadan-title,
-[lang="de"] .ramadan-title,
-[lang="ru"] .ramadan-title,
-[lang="zh"] .ramadan-title,
-[lang="ja"] .ramadan-title {
-  order: 2; /* Middle */
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 0;
-  pointer-events: none;
-  width: auto;
-  white-space: nowrap;
-}
-
-/* Controls container on RIGHT side */
-[dir="ltr"] .ramadan-controls:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .ramadan-controls,
-[lang="fr"] .ramadan-controls,
-[lang="es"] .ramadan-controls,
-[lang="de"] .ramadan-controls,
-[lang="ru"] .ramadan-controls,
-[lang="zh"] .ramadan-controls,
-[lang="ja"] .ramadan-controls {
-  order: 3; /* Last on right */
-  margin-left: auto;
-}
-
 .ramadan-content {
   flex: 1;
   overflow-y: auto;
-  padding-right: 5px; /* Scrollbar space on RIGHT */
-  padding-left: 0;
+  padding-right: 5px; /* For scrollbar space */
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -209,34 +44,9 @@
   -webkit-app-region: no-drag;
 }
 
-/* FORCE SCROLLBAR TO ALWAYS BE ON RIGHT SIDE FOR ALL LANGUAGES */
-.ramadan-content {
-  direction: ltr !important; /* This keeps scrollbar on right */
-}
-
-/* For Arabic text inside content */
-[dir="rtl"] .ramadan-content .fasting-card,
-[lang="ar"] .ramadan-content .fasting-card,
-[lang="fa"] .ramadan-content .fasting-card,
-[lang="ur"] .ramadan-content .fasting-card,
-[lang="he"] .ramadan-content .fasting-card {
-  direction: rtl !important; /* Arabic text remains RTL */
-}
-
-/* For Arabic headings */
-[dir="rtl"] .fasting-card h3,
-[lang="ar"] .fasting-card h3,
-[lang="fa"] .fasting-card h3,
-[lang="ur"] .fasting-card h3,
-[lang="he"] .fasting-card h3 {
-  text-align: right;
-}
-
-/* Custom Scrollbar - ALWAYS ON RIGHT */
+/* Custom Scrollbar */
 .ramadan-content::-webkit-scrollbar {
   width: 6px;
-  right: 0 !important;
-  left: auto !important;
 }
 
 .ramadan-content::-webkit-scrollbar-track {
@@ -247,12 +57,6 @@
 .ramadan-content::-webkit-scrollbar-thumb {
   background: var(--accent-color);
   border-radius: 3px;
-}
-
-/* Firefox scrollbar */
-.ramadan-content {
-  scrollbar-width: thin;
-  scrollbar-color: var(--accent-color) var(--bg-surface);
 }
 
 .fasting-card {

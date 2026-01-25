@@ -55,7 +55,7 @@
   unicode-bidi: embed;
 }
 
-/* Prayer Item RTL Adjustments - MATCHING LTR SPACING */
+/* Prayer Item RTL Adjustments */
 [dir="rtl"] .prayer-item {
   direction: rtl;
   display: flex;
@@ -64,17 +64,8 @@
 }
 
 [dir="rtl"] .prayer-item i {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 6px;
-  margin-left: 10px; /* Changed from margin-right to margin-left for RTL */
-  margin-right: 0; /* Reset right margin */
-  color: #fff;
-  font-size: 14px;
+  margin-right: 0;
+  margin-left: 0;
   order: 1;
   flex-shrink: 0;
 }
@@ -83,11 +74,8 @@
   text-align: right;
   order: 2;
   flex-grow: 1;
-  margin-left: 10px; /* Same as LTR but on opposite side */
+  margin-right: 10px;
   direction: rtl;
-  font-size: 14px;
-  font-weight: 500;
-  color: #fff;
 }
 
 [dir="rtl"] .prayer-item .prayer-time {
@@ -95,33 +83,6 @@
   order: 3;
   direction: ltr;
   flex-shrink: 0;
-  margin-left: 4px; /* Same as LTR margin-right */
-  font-size: 13px;
-  font-weight: 600;
-  color: #fff;
-}
-
-/* ADJUSTMENT: Move Adhan toggle button to be right after prayer time */
-[dir="rtl"] .prayer-item .adhan-toggle-btn {
-  order: 4;
-  margin-left: 4px; /* Same spacing as between prayer name and time */
-  margin-right: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(5px);
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
 }
 
 /* Current Prayer Indicator RTL */

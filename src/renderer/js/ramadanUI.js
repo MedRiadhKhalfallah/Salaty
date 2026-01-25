@@ -17,7 +17,7 @@ function initRamadanPage() {
 
 
         newBackBtn.addEventListener('click', () => {
-             ipcRenderer.invoke('resize-window', 320, 575);
+             ipcRenderer.invoke('resize-window', 320, 555);
              ipcRenderer.invoke('navigate-to', 'features');
         });
     }
@@ -307,7 +307,7 @@ function toggleRamadanFullscreen() {
   } else {
     // Exit fullscreen
     try {
-      ipcRenderer.invoke('resize-window', 320, 575);
+      ipcRenderer.invoke('resize-window', 320, 555);
       document.body.classList.remove('fullscreen');
       const container = document.querySelector('.ramadan-container');
       if (container) {

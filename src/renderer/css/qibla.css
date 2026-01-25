@@ -22,177 +22,21 @@
 }
 
 .qibla-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0;
-  color: white !important; /* Force white color */
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-}
-
-/* Control buttons container */
-.qibla-controls {
-  display: flex;
-  gap: 6px;
-  z-index: 102;
-  flex-shrink: 0;
-}
-
-/* Fullscreen Button */
-.fullscreen-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  -webkit-app-region: no-drag;
-}
-
-.fullscreen-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: var(--accent-color);
-}
-
-.fullscreen-btn i {
-  color: white;
-  font-size: 12px;
-}
-
-/* Back Button */
-.back-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  -webkit-app-region: no-drag;
-}
-
-.back-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: var(--accent-color);
-}
-
-.back-btn i {
-  color: white;
-  font-size: 14px;
-}
-
-/* ARABIC (RTL) LAYOUT */
-/* Order: back button on LEFT, title in center, fullscreen on RIGHT */
-[dir="rtl"] .qibla-header,
-[lang="ar"] .qibla-header,
-[lang="fa"] .qibla-header,
-[lang="ur"] .qibla-header,
-[lang="he"] .qibla-header {
-  direction: ltr !important; /* Force LTR layout for proper ordering */
-}
-
-/* Back button on LEFT side */
-[dir="rtl"] .back-btn,
-[lang="ar"] .back-btn,
-[lang="fa"] .back-btn,
-[lang="ur"] .back-btn,
-[lang="he"] .back-btn {
-  order: 1; /* First item on the left */
-  transform: none; /* Remove arrow flip */
-  margin-right: auto; /* Push to left */
-}
-
-/* Title in center */
-[dir="rtl"] .qibla-title,
-[lang="ar"] .qibla-title,
-[lang="fa"] .qibla-title,
-[lang="ur"] .qibla-title,
-[lang="he"] .qibla-title {
-  order: 2; /* Middle */
-  left: 50%;
-  transform: translateX(-50%);
-  color: white !important;
-}
-
-/* Controls container on RIGHT side */
-[dir="rtl"] .qibla-controls,
-[lang="ar"] .qibla-controls,
-[lang="fa"] .qibla-controls,
-[lang="ur"] .qibla-controls,
-[lang="he"] .qibla-controls {
-  order: 3; /* Last on the right */
-  margin-left: auto; /* Push to right */
-}
-
-/* OTHER LANGUAGES (LTR) LAYOUT */
-[dir="ltr"] .qibla-header:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .qibla-header,
-[lang="fr"] .qibla-header,
-[lang="es"] .qibla-header,
-[lang="de"] .qibla-header,
-[lang="ru"] .qibla-header,
-[lang="zh"] .qibla-header,
-[lang="ja"] .qibla-header {
-  direction: ltr !important;
-}
-
-/* Back button on LEFT side */
-[dir="ltr"] .back-btn:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .back-btn,
-[lang="fr"] .back-btn,
-[lang="es"] .back-btn,
-[lang="de"] .back-btn,
-[lang="ru"] .back-btn,
-[lang="zh"] .back-btn,
-[lang="ja"] .back-btn {
-  order: 1; /* First on left */
-  margin-right: auto;
-}
-
-/* Title in center */
-[dir="ltr"] .qibla-title:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .qibla-title,
-[lang="fr"] .qibla-title,
-[lang="es"] .qibla-title,
-[lang="de"] .qibla-title,
-[lang="ru"] .qibla-title,
-[lang="zh"] .qibla-title,
-[lang="ja"] .qibla-title {
-  order: 2; /* Middle */
-  left: 50%;
-  transform: translateX(-50%);
-  color: white !important;
-}
-
-/* Controls container on RIGHT side */
-[dir="ltr"] .qibla-controls:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .qibla-controls,
-[lang="fr"] .qibla-controls,
-[lang="es"] .qibla-controls,
-[lang="de"] .qibla-controls,
-[lang="ru"] .qibla-controls,
-[lang="zh"] .qibla-controls,
-[lang="ja"] .qibla-controls {
-  order: 3; /* Last on right */
-  margin-left: auto;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-color);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
 }
 
 /* Instruction Bar */
 .qibla-instruction-bar {
     background: rgba(var(--accent-color-rgb), 0.15);
     border: 1px solid rgba(var(--accent-color-rgb), 0.3);
-    color: white !important; /* Force white text */
+    color: var(--text-color);
     padding: 8px 12px;
     border-radius: 8px;
     font-size: 0.85rem;
@@ -204,7 +48,7 @@
 }
 
 .qibla-instruction-bar i {
-    color: white;
+    color: var(--accent-color);
     font-size: 0.9rem;
 }
 
@@ -239,7 +83,7 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     font-size: 0.85rem;
     font-weight: 500;
-    color: white;
+    color: var(--text-color);
     border: 1px solid var(--border-color);
 }
 
@@ -274,7 +118,6 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 0;
-    color: white;
 }
 
 /* Zoom Button - Bottom Right */
@@ -306,4 +149,30 @@
 
 .zoom-btn:active {
     transform: scale(0.95);
+}
+
+/* Back Button */
+.back-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent-color);
+}
+
+.back-btn i {
+  color: var(--text-color);
+  font-size: 14px;
 }

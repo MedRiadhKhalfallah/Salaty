@@ -72,6 +72,66 @@
   order: 3;
 }
 
+/* Arabic: Reset button on LEFT side */
+[dir="rtl"] .athkar-controls,
+[lang="ar"] .athkar-controls,
+[lang="fa"] .athkar-controls,
+[lang="ur"] .athkar-controls,
+[lang="he"] .athkar-controls {
+  order: 1; /* Reset on LEFT (first in order) */
+}
+
+/* Other languages: Reset button on RIGHT side */
+[dir="ltr"] .athkar-controls:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
+[lang="en"] .athkar-controls,
+[lang="fr"] .athkar-controls,
+[lang="es"] .athkar-controls,
+[lang="de"] .athkar-controls,
+[lang="ru"] .athkar-controls,
+[lang="zh"] .athkar-controls,
+[lang="ja"] .athkar-controls {
+  order: 3; /* Reset on RIGHT (last in order) */
+}
+
+/* Arabic: Back button on RIGHT side */
+[dir="rtl"] .back-btn,
+[lang="ar"] .back-btn,
+[lang="fa"] .back-btn,
+[lang="ur"] .back-btn,
+[lang="he"] .back-btn {
+  order: 3; /* Back on RIGHT (last in order) */
+  transform: rotate(180deg); /* Flip arrow direction for RTL */
+}
+
+/* Other languages: Back button on LEFT side */
+[dir="ltr"] .back-btn:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
+[lang="en"] .back-btn,
+[lang="fr"] .back-btn,
+[lang="es"] .back-btn,
+[lang="de"] .back-btn,
+[lang="ru"] .back-btn,
+[lang="zh"] .back-btn,
+[lang="ja"] .back-btn {
+  order: 1; /* Back on LEFT (first in order) */
+}
+
+/* Title order - Always in middle */
+[dir="rtl"] .athkar-title,
+[dir="ltr"] .athkar-title,
+[lang="ar"] .athkar-title,
+[lang="en"] .athkar-title,
+[lang="fr"] .athkar-title,
+[lang="es"] .athkar-title,
+[lang="de"] .athkar-title,
+[lang="ru"] .athkar-title,
+[lang="zh"] .athkar-title,
+[lang="ja"] .athkar-title,
+[lang="fa"] .athkar-title,
+[lang="ur"] .athkar-title,
+[lang="he"] .athkar-title {
+  order: 2; /* Always in middle */
+}
+
 /* Reset All Button */
 .reset-all-btn {
   background: rgba(255, 107, 107, 0.15);
@@ -119,144 +179,6 @@
 .fullscreen-btn i {
   color: var(--text-primary);
   font-size: 12px;
-}
-
-/* ARABIC (RTL) LAYOUT */
-/* Order: back button ---- title ------ agrandir ------ reset */
-[dir="rtl"] .athkar-header,
-[lang="ar"] .athkar-header,
-[lang="fa"] .athkar-header,
-[lang="ur"] .athkar-header,
-[lang="he"] .athkar-header {
-  direction: ltr !important; /* Force LTR layout for proper ordering */
-}
-
-/* Back button on LEFT side (first) */
-[dir="rtl"] .back-btn,
-[lang="ar"] .back-btn,
-[lang="fa"] .back-btn,
-[lang="ur"] .back-btn,
-[lang="he"] .back-btn {
-  order: 1; /* First item on the left */
-  transform: none; /* Remove flip for Arabic */
-  margin-right: auto; /* Push to left */
-}
-
-/* Title in center (absolute positioning handles this) */
-[dir="rtl"] .athkar-title,
-[lang="ar"] .athkar-title,
-[lang="fa"] .athkar-title,
-[lang="ur"] .athkar-title,
-[lang="he"] .athkar-title {
-  order: 2; /* Middle */
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-/* Controls container on RIGHT side */
-[dir="rtl"] .athkar-controls,
-[lang="ar"] .athkar-controls,
-[lang="fa"] .athkar-controls,
-[lang="ur"] .athkar-controls,
-[lang="he"] .athkar-controls {
-  order: 3; /* Last on the right */
-  margin-left: auto; /* Push to right */
-  flex-direction: row-reverse; /* Reverse order inside controls */
-}
-
-/* Fullscreen button comes BEFORE reset button */
-[dir="rtl"] .fullscreen-btn,
-[lang="ar"] .fullscreen-btn,
-[lang="fa"] .fullscreen-btn,
-[lang="ur"] .fullscreen-btn,
-[lang="he"] .fullscreen-btn {
-  order: 1; /* First in controls container (rightmost) */
-}
-
-/* Reset button comes AFTER fullscreen button */
-[dir="rtl"] .reset-all-btn,
-[lang="ar"] .reset-all-btn,
-[lang="fa"] .reset-all-btn,
-[lang="ur"] .reset-all-btn,
-[lang="he"] .reset-all-btn {
-  order: 2; /* Second in controls container (left of fullscreen) */
-}
-
-/* OTHER LANGUAGES (LTR) LAYOUT */
-/* Order: back button ---- title ------ reset ------ agrandir */
-[dir="ltr"] .athkar-header:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .athkar-header,
-[lang="fr"] .athkar-header,
-[lang="es"] .athkar-header,
-[lang="de"] .athkar-header,
-[lang="ru"] .athkar-header,
-[lang="zh"] .athkar-header,
-[lang="ja"] .athkar-header {
-  direction: ltr !important;
-}
-
-/* Back button on LEFT side */
-[dir="ltr"] .back-btn:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .back-btn,
-[lang="fr"] .back-btn,
-[lang="es"] .back-btn,
-[lang="de"] .back-btn,
-[lang="ru"] .back-btn,
-[lang="zh"] .back-btn,
-[lang="ja"] .back-btn {
-  order: 1; /* First on left */
-  margin-right: auto;
-}
-
-/* Title in center */
-[dir="ltr"] .athkar-title:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .athkar-title,
-[lang="fr"] .athkar-title,
-[lang="es"] .athkar-title,
-[lang="de"] .athkar-title,
-[lang="ru"] .athkar-title,
-[lang="zh"] .athkar-title,
-[lang="ja"] .athkar-title {
-  order: 2; /* Middle */
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-/* Controls container on RIGHT side */
-[dir="ltr"] .athkar-controls:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .athkar-controls,
-[lang="fr"] .athkar-controls,
-[lang="es"] .athkar-controls,
-[lang="de"] .athkar-controls,
-[lang="ru"] .athkar-controls,
-[lang="zh"] .athkar-controls,
-[lang="ja"] .athkar-controls {
-  order: 3; /* Last on right */
-  margin-left: auto;
-  flex-direction: row; /* Normal order for LTR */
-}
-
-/* Reset button comes BEFORE fullscreen button in LTR */
-[dir="ltr"] .reset-all-btn:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .reset-all-btn,
-[lang="fr"] .reset-all-btn,
-[lang="es"] .reset-all-btn,
-[lang="de"] .reset-all-btn,
-[lang="ru"] .reset-all-btn,
-[lang="zh"] .reset-all-btn,
-[lang="ja"] .reset-all-btn {
-  order: 1; /* First in controls (leftmost) */
-}
-
-[dir="ltr"] .fullscreen-btn:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .fullscreen-btn,
-[lang="fr"] .fullscreen-btn,
-[lang="es"] .fullscreen-btn,
-[lang="de"] .fullscreen-btn,
-[lang="ru"] .fullscreen-btn,
-[lang="zh"] .fullscreen-btn,
-[lang="ja"] .fullscreen-btn {
-  order: 2; /* Second in controls (rightmost) */
 }
 
 /* Category Navigation Grid - Fix scrolling */

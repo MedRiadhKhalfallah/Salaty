@@ -77,6 +77,95 @@ function setupWindowControls() {
       ipcRenderer.invoke('close-window');
     });
   }
+
+  // Setup update handlers
+  setupUpdateHandlers();
+}
+
+function setupUpdateHandlers() {
+    const modal = document.getElementById('updateModal');
+    if (!modal) return; // Only if modal exists on this page
+
+    const titleCtx = document.getElementById('updateTitle');
+    const messageCtx = document.getElementById('updateMessage');
+    const updateBtn = document.getElementById('updateActionBtn');
+    const cancelBtn = document.getElementById('updateCancelBtn');
+    const progressBar = document.getElementById('updateProgress');
+    const progressBarFill = document.getElementById('updateProgressBar');
+    const progressText = document.getElementById('updateProgressText');
+
+    let updateInfo = null;
+    let isUpdateDownloaded = false;
+
+    // Reset UI state
+    function resetUI() {
+        modal.classList.remove('show');
+        progressBar.classList.add('hidden');
+        if (updateBtn) {
+            updateBtn.textContent = t('download');
+            updateBtn.disabled = false;
+        }
+        if (cancelBtn) cancelBtn.style.display = 'block';
+    }
+
+    // Close modal action
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            modal.classList.remove('show');
+        });
+    }
+
+    // Main update action
+    if (updateBtn) {
+        updateBtn.addEventListener('click', () => {
+            if (!isUpdateDownloaded) {
+                // Start download
+                ipcRenderer.send('start-download');
+                updateBtn.disabled = true;
+                if (cancelBtn) cancelBtn.style.display = 'none'; // Prevent cancelling during download
+                progressBar.classList.remove('hidden');
+            } else {
+                // Install and restart
+                ipcRenderer.send('install-update');
+            }
+        });
+    }
+
+    // Listeners from Main Process
+    ipcRenderer.on('update-available', (event, info) => {
+        isUpdateDownloaded = false;
+        updateInfo = info;
+        if (titleCtx) titleCtx.textContent = t('updateAvailable');
+        if (messageCtx) messageCtx.textContent = t('newVersionAvailable').replace('{version}', info.version);
+        if (updateBtn) updateBtn.textContent = t('download');
+        if (cancelBtn) {
+          cancelBtn.style.display = 'block';
+          cancelBtn.textContent = t('later');
+        }
+        if (progressBar) progressBar.classList.add('hidden');
+
+        modal.classList.add('show');
+    });
+
+    ipcRenderer.on('download-progress', (event, progressObj) => {
+        if (progressBar) progressBar.classList.remove('hidden');
+        const percentage = Math.round(progressObj.percent);
+        if (progressBarFill) progressBarFill.style.width = percentage + '%';
+        if (progressText) progressText.textContent = percentage + '%';
+    });
+
+    ipcRenderer.on('update-downloaded', (event, info) => {
+        isUpdateDownloaded = true;
+        if (titleCtx) titleCtx.textContent = t('updateReady');
+        if (messageCtx) messageCtx.textContent = t('updateDownloaded');
+        if (updateBtn) {
+            updateBtn.textContent = t('install');
+            updateBtn.disabled = false;
+        }
+        if (progressBar) progressBar.classList.add('hidden');
+
+        modal.classList.add('show');
+    });
 }
 
 // ==================== MAIN PAGE FUNCTIONS ====================
@@ -93,7 +182,7 @@ function initMainPage() {
 
   if (featuresBtn) {
     featuresBtn.addEventListener('click', () => {
-      ipcRenderer.invoke('resize-window', 320, 575);
+      ipcRenderer.invoke('resize-window', 320, 555);
       ipcRenderer.invoke('navigate-to', 'features');
     });
   }
