@@ -182,7 +182,7 @@ function initMainPage() {
 
   if (featuresBtn) {
     featuresBtn.addEventListener('click', () => {
-      ipcRenderer.invoke('resize-window', 320, 555);
+      ipcRenderer.invoke('resize-window', 320, 575);
       ipcRenderer.invoke('navigate-to', 'features');
     });
   }

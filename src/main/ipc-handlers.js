@@ -87,7 +87,7 @@ function setupHandlers(mainWindow) {
       // mainWindow.center(); // Removed to keep window position
       return { width, height };
     }
-    return { width: 320, height: 555 };
+    return { width: 320, height: 575 };
   });
 
   ipcMain.handle('get-window-size', () => {
@@ -95,7 +95,7 @@ function setupHandlers(mainWindow) {
       const size = mainWindow.getSize();
       return { width: size[0], height: size[1] };
     }
-    return { width: 320, height: 555 };
+    return { width: 320, height: 575 };
   });
 
   ipcMain.handle('navigate-to', (event, page) => {

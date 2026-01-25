@@ -20,7 +20,7 @@ async function initQiblaPage() {
              if (isQiblaFullscreen) {
                  toggleQiblaFullscreen();
              }
-             ipcRenderer.invoke('resize-window', 320, 555);
+             ipcRenderer.invoke('resize-window', 320, 575);
             ipcRenderer.invoke('navigate-to', 'features');
         });
     }
@@ -141,7 +141,7 @@ function toggleQiblaFullscreen() {
         if (icon) icon.className = 'fas fa-compress';
         if (btn) btn.setAttribute('aria-label', t('exitFullscreen') || 'Exit Fullscreen');
     } else {
-        ipcRenderer.invoke('resize-window', 320, 555);
+        ipcRenderer.invoke('resize-window', 320, 575);
         document.body.classList.remove('fullscreen');
         if (icon) icon.className = 'fas fa-expand';
         if (btn) btn.setAttribute('aria-label', t('enterFullscreen') || 'Enter Fullscreen');
