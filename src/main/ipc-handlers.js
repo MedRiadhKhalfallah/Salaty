@@ -1,4 +1,4 @@
-const { ipcMain, app } = require('electron');
+const { ipcMain } = require('electron');
 const fs = require('fs');
 const path = require('path');
 
@@ -10,27 +10,12 @@ let settingsData = {
   position: { x: 100, y: 100 }
 };
 
-function getSettingsPath() {
-  return path.join(app.getPath('userData'), 'settings.json');
-}
-
 function loadSettings() {
   try {
-    const settingsPath = getSettingsPath();
-    // Try loading from userData first (User preferences)
+    const settingsPath = path.join(__dirname, '../../settings.json');
     if (fs.existsSync(settingsPath)) {
       const data = fs.readFileSync(settingsPath, 'utf8');
       settingsData = { ...settingsData, ...JSON.parse(data) };
-    } else {
-      // If not found in userData, try loading bundled default settings
-      // This handles the first run or migration
-      const bundledPath = path.join(__dirname, '../../settings.json');
-      if (fs.existsSync(bundledPath)) {
-         const data = fs.readFileSync(bundledPath, 'utf8');
-         settingsData = { ...settingsData, ...JSON.parse(data) };
-      }
-      // Save to userData immediately to ensure persistence for next time
-      saveSettings();
     }
   } catch (error) {
     console.error('Error loading settings:', error);
@@ -39,7 +24,7 @@ function loadSettings() {
 
 function saveSettings() {
   try {
-    const settingsPath = getSettingsPath();
+    const settingsPath = path.join(__dirname, '../../settings.json');
     fs.writeFileSync(settingsPath, JSON.stringify(settingsData, null, 2));
   } catch (error) {
     console.error('Error saving settings:', error);
@@ -87,7 +72,7 @@ function setupHandlers(mainWindow) {
       // mainWindow.center(); // Removed to keep window position
       return { width, height };
     }
-    return { width: 320, height: 555 };
+    return { width: 320, height: 575 };
   });
 
   ipcMain.handle('get-window-size', () => {
@@ -95,7 +80,7 @@ function setupHandlers(mainWindow) {
       const size = mainWindow.getSize();
       return { width: size[0], height: size[1] };
     }
-    return { width: 320, height: 555 };
+    return { width: 320, height: 575 };
   });
 
   ipcMain.handle('navigate-to', (event, page) => {

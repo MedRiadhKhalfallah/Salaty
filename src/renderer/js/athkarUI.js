@@ -21,7 +21,7 @@ function initAthkarPage() {
         console.log('Exiting fullscreen before navigating back');
         toggleAthkarFullscreen(); // Exit fullscreen first
       }
-      ipcRenderer.invoke('resize-window', 320, 555);
+      ipcRenderer.invoke('resize-window', 320, 575);
       ipcRenderer.invoke('navigate-to', 'features');
     });
   }
@@ -548,7 +548,7 @@ function toggleAthkarFullscreen() {
     // Exit fullscreen
     console.log('Exiting fullscreen mode');
     try {
-      ipcRenderer.invoke('resize-window', 320, 555).then(() => {
+      ipcRenderer.invoke('resize-window', 320, 575).then(() => {
         console.log('Window resized to normal');
       }).catch(err => {
         console.error('Error resizing window:', err);

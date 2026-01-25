@@ -99,14 +99,7 @@
     "markAsCompleted": "إتمام الصيام",
     "fastingCompleted": "تم الصيام",
     "todayFasting": "صيام اليوم",
-    "fastingTracker": "تتبع الصيام",
-    "updateAvailable": "تحديث متوفر",
-    "newVersionAvailable": "الإصدار {version} متوفر. هل تريد التحميل؟",
-    "download": "تحميل",
-    "updateReady": "التحديث جاهز",
-    "updateDownloaded": "تم تحميل التحديث. هل تريد التثبيت الآن؟",
-    "install": "تثبيت",
-    "later": "لاحقاً"
+    "fastingTracker": "تتبع الصيام"
   },
   "themes": {
     "navy": "أزرق داكن",
