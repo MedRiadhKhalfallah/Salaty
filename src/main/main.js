@@ -26,7 +26,7 @@ function createWindow() {
 
   mainWindow = new BrowserWindow({
     width: 320,
-    height: 555,
+    height: 575,
     frame: false,
     transparent: true,
     resizable: true,
@@ -43,7 +43,7 @@ function createWindow() {
       allowRunningInsecureContent: true
     },
     minWidth: 320,
-    minHeight: 555,
+    minHeight: 575,
     show: false
   });
 

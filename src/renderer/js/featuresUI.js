@@ -16,7 +16,7 @@ function initFeaturesPage() {
       if (isFeaturesFullscreen) {
         toggleFeaturesFullscreen(); // Exit fullscreen first
       }
-      ipcRenderer.invoke('resize-window', 320, 555);
+      ipcRenderer.invoke('resize-window', 320, 575);
       ipcRenderer.invoke('go-back');
     });
   }
@@ -141,7 +141,7 @@ function openAthkar() {
   if (isFeaturesFullscreen) {
     toggleFeaturesFullscreen(); // Exit fullscreen first
   }
-  ipcRenderer.invoke('resize-window', 320, 555);
+  ipcRenderer.invoke('resize-window', 320, 575);
   ipcRenderer.invoke('navigate-to', 'athkar');
 }
 
@@ -150,7 +150,7 @@ function openRamadhan() {
   if (isFeaturesFullscreen) {
     toggleFeaturesFullscreen(); // Exit fullscreen first
   }
-  ipcRenderer.invoke('resize-window', 320, 555);
+  ipcRenderer.invoke('resize-window', 320, 575);
   ipcRenderer.invoke('navigate-to', 'ramadan');
 }
 
@@ -159,7 +159,7 @@ function openQibla() {
   if (isFeaturesFullscreen) {
     toggleFeaturesFullscreen(); // Exit fullscreen first
   }
-  ipcRenderer.invoke('resize-window', 320, 555);
+  ipcRenderer.invoke('resize-window', 320, 575);
   ipcRenderer.invoke('navigate-to', 'qibla');
 }
 
@@ -173,7 +173,7 @@ function toggleFeaturesFullscreen() {
     document.querySelector('.features-container').classList.add('fullscreen');
   } else {
     // Exit fullscreen
-    ipcRenderer.invoke('resize-window', 320, 555);
+    ipcRenderer.invoke('resize-window', 320, 575);
     document.body.classList.remove('fullscreen');
     document.querySelector('.features-container').classList.remove('fullscreen');
   }
