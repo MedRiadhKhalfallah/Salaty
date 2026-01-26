@@ -15,13 +15,19 @@ function showAdhanStopBtn(show) {
     }
 }
 
-function notifyPrayer(prayer) {
+function notifyPrayer(prayer, mode = true) {
     const prayerName = t(prayer.key, 'prayerNames');
     new Notification('Salaty', {
         body: `${t('currentPrayer')}: ${prayerName}`,
         icon: path.join(__dirname, '../../assets/icons/app_icon.png'), // Correction du chemin
         silent: true
     });
+
+    // Si mode silencieux, on s'arrête là (pas de son)
+    if (mode === 'silent') {
+        return;
+    }
+
     if (adhanAudio && !adhanAudio.paused) {
         adhanAudio.pause();
         adhanAudio.currentTime = 0;

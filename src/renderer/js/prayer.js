@@ -115,9 +115,7 @@ function updatePrayerUI() {
         loadingEl.textContent = t('loadingPrayerTimes');
     }
 
-    const adhanBtnLabel = adhanEnabled ? t('disableAdhan') : t('enableAdhan');
-    const adhanBtnIcon = adhanEnabled ? 'volume-up' : 'volume-mute';
-    const adhanToggleBtn = `<button class="adhan-toggle-btn" id="adhanToggleBtn" title="${adhanBtnLabel}"><i class="fas fa-${adhanBtnIcon}"></i> ${adhanBtnLabel}</button>`;
+
 
 
     // Correction : charger l'état adhanEnabled depuis les settings
@@ -138,16 +136,32 @@ function updatePrayerUI() {
         const time = prayerData.timings[key];
         const icon = prayerIcons[key] || 'clock';
         const isCurrent = key === currentActivePrayer;
-        const adhanOn = adhanEnabledByPrayer[key] !== false;
-        const adhanBtnIcon = adhanOn ? 'volume-up' : 'volume-mute';
-        const adhanBtnLabel = adhanOn ? t('disableAdhan') : t('enableAdhan');
+
+        // Gestion des 3 états : true (sonore), 'silent' (silencieux), false (désactivé)
+        let adhanState = adhanEnabledByPrayer[key];
+        if (adhanState === undefined) adhanState = true; // Par défaut actif
+
+        let adhanBtnIcon, adhanBtnTitle;
+
+        if (adhanState === true) {
+            adhanBtnIcon = 'volume-up';
+            adhanBtnTitle = `${t('soundAdhan')} - ${t('disableAdhan')}`; // Ex: Mode Sonore - Désactiver...
+        } else if (adhanState === 'silent') {
+            adhanBtnIcon = 'bell';
+            adhanBtnTitle = `${t('silentAdhan')} - ${t('disableAdhan')}`;
+        } else {
+            adhanBtnIcon = 'volume-mute';
+            adhanBtnTitle = `${t('disableAdhan')} - ${t('enableAdhan')}`;
+        }
 
         return `
       <div class="prayer-item ${isCurrent ? 'current-prayer' : ''}" data-prayer="${key}">
         <i class="fas fa-${icon}"></i>
         <span class="prayer-name">${name}</span>
         <span class="prayer-time">${time} ${isCurrent ? `<span class="current-indicator">${t('now')}</span>` : ''}</span>
-        <button class="adhan-toggle-btn" data-prayer="${key}" title="${adhanBtnLabel}"><i class="fas fa-${adhanBtnIcon} adhan-toggle-icon"></i></button>
+        <button class="adhan-toggle-btn" data-prayer="${key}" title="${adhanBtnTitle}">
+            <i class="fas fa-${adhanBtnIcon} adhan-toggle-icon"></i>
+        </button>
       </div>
     `;
     }).join('');
@@ -234,14 +248,32 @@ function checkAndPlayAdhan(prayer, currentSeconds) {
     const ADHAN_TOLERANCE = 900;
 
     if (diff >= 0 && diff <= ADHAN_TOLERANCE) {
-        notifyPrayer(prayer);
+        // Passer l'état de l'adhan à notifyPrayer
+        let adhanState = adhanEnabledByPrayer[prayer.key];
+        if (adhanState === undefined) adhanState = true;
+
+        if (adhanState !== false) {
+             notifyPrayer(prayer, adhanState); // adhanState est true ou 'silent'
+        }
     } else {
         console.log(`Adhan ignoré pour ${prayer.name} : heure passée de ${diff}s (> tolérance ${ADHAN_TOLERANCE}s)`);
     }
 }
 
 function toggleAdhanForPrayer(prayerKey) {
-    adhanEnabledByPrayer[prayerKey] = !adhanEnabledByPrayer[prayerKey];
+    const currentState = adhanEnabledByPrayer[prayerKey];
+    let nextState;
+
+    // Cycle : true (Sound) -> 'silent' (Silent) -> false (Off) -> true ...
+    if (currentState === true || currentState === undefined) {
+        nextState = 'silent';
+    } else if (currentState === 'silent') {
+        nextState = false;
+    } else {
+        nextState = true;
+    }
+
+    adhanEnabledByPrayer[prayerKey] = nextState;
     state.settings.adhanEnabledByPrayer = adhanEnabledByPrayer;
     ipcRenderer.invoke('save-settings', state.settings);
     updatePrayerUI();

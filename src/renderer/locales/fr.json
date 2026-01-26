@@ -106,7 +106,11 @@
     "updateReady": "Mise à jour prête",
     "updateDownloaded": "Mise à jour téléchargée. Installer ?",
     "install": "Installer",
-    "later": "Plus tard"
+    "later": "Plus tard",
+    "enableAdhan": "Activer l'Adhan",
+    "disableAdhan": "Désactiver l'Adhan",
+    "silentAdhan": "Mode Silencieux",
+    "soundAdhan": "Mode Sonore"
   },
   "themes": {
     "navy": "Bleu marine",

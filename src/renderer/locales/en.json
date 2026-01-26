@@ -106,7 +106,11 @@
     "updateReady": "Update Ready",
     "updateDownloaded": "Update downloaded. Install now?",
     "install": "Install",
-    "later": "Later"
+    "later": "Later",
+    "enableAdhan": "Enable Adhan",
+    "disableAdhan": "Disable Adhan",
+    "silentAdhan": "Silent Mode (Notification only)",
+    "soundAdhan": "Sound Mode (Adhan + Notification)"
   },
   "themes": {
     "navy": "Navy",
