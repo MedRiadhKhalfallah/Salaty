@@ -17,6 +17,11 @@ let mainWindow;
 let tray = null;
 let isQuitting = false;
 
+// Permettre à l'application de se fermer lors d'un arrêt système ou d'une désinstallation
+app.on('before-quit', () => {
+  isQuitting = true;
+});
+
 function createWindow() {
   // Load settings
   ipcHandlers.loadSettings();
@@ -87,6 +92,7 @@ function createWindow() {
         click: () => {
           isQuitting = true;
           tray.destroy();
+          tray = null;
           app.quit();
         }
       }
@@ -136,30 +142,45 @@ autoUpdater.on('error', (err) => {
   // Optional: Notify user about error only if logging is enabled or critical
 });
 
-app.whenReady().then(() => {
-  try {
-    createWindow();
-    // Check for updates after window creation
-    // Adding a small delay to ensure window is ready
-    setTimeout(() => {
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.show();
+      mainWindow.focus();
+    }
+  });
+
+  app.whenReady().then(() => {
+    try {
+      createWindow();
+      // Check for updates after window creation
+      // Adding a small delay to ensure window is ready
+      setTimeout(() => {
+          autoUpdater.checkForUpdates();
+      }, 3000);
+
+      // Check for updates every 12 hours
+      setInterval(() => {
         autoUpdater.checkForUpdates();
-    }, 3000);
+      }, 12 * 60 * 60 * 1000);
 
-    // Check for updates every 12 hours
-    setInterval(() => {
-      autoUpdater.checkForUpdates();
-    }, 12 * 60 * 60 * 1000);
-
-    // Démarrage automatique avec Windows
-    app.setLoginItemSettings({
-      openAtLogin: true,
-      path: process.execPath,
-      args: []
-    });
-  } catch (error) {
-    console.error('Error creating window:', error);
-  }
-});
+      // Démarrage automatique avec Windows
+      app.setLoginItemSettings({
+        openAtLogin: true,
+        path: process.execPath,
+        args: []
+      });
+    } catch (error) {
+      console.error('Error creating window:', error);
+    }
+  });
+}
 
 app.on('window-all-closed', () => {
   // Ne quitte pas l'app si le tray existe
