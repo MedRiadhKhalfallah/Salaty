@@ -125,6 +125,12 @@ function setupFeatureCards() {
   if (qiblaCard) {
     qiblaCard.addEventListener('click', openQibla);
   }
+
+  const asmaCard = document.querySelector('[data-feature="asma"]');
+  if (asmaCard) {
+    asmaCard.addEventListener('click', openAsma);
+  }
+
 }
 
 function openQuran() {
@@ -161,6 +167,15 @@ function openQibla() {
   }
   ipcRenderer.invoke('resize-window', 320, 575);
   ipcRenderer.invoke('navigate-to', 'qibla');
+}
+
+function openAsma() {
+  console.log('Opening Asma Allah...');
+  if (isFeaturesFullscreen) {
+    toggleFeaturesFullscreen(); // Exit fullscreen first
+  }
+  ipcRenderer.invoke('resize-window', 320, 575);
+  ipcRenderer.invoke('navigate-to', 'asma');
 }
 
 function toggleFeaturesFullscreen() {

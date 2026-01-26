@@ -106,7 +106,8 @@
     "updateReady": "التحديث جاهز",
     "updateDownloaded": "تم تحميل التحديث. هل تريد التثبيت الآن؟",
     "install": "تثبيت",
-    "later": "لاحقاً"
+    "later": "لاحقاً",
+    "beautifulNames": "أسماء الله الحسنى"
   },
   "themes": {
     "navy": "أزرق داكن",
