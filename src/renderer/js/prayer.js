@@ -10,6 +10,7 @@ const { updateRamadanCountdown } = require('../js/ramadan');
 
 let prayerData = null;
 let currentActivePrayer = null;
+let lastPreAdhanNotificationPrayer = null;
 let isFirstLoad = true;
 let adhanEnabled = true;
 let adhanEnabledByPrayer = {};
@@ -189,6 +190,19 @@ function updateCurrentAndNextPrayer() {
         const { currentPrayer, nextPrayer, timeRemaining: remaining } = getCurrentAndNextPrayer(prayerData, translations, lang, currentSeconds);
         if (!nextPrayer || !currentPrayer) return;
         let timeRemaining = remaining;
+
+        // Notification X minutes avant
+        const preAdhanMinutes = state.settings.preAdhanMinutes || 5;
+        const preAdhanSeconds = preAdhanMinutes * 60;
+        const preAdhanEnabled = state.settings.preAdhanNotificationEnabled !== false; // Default true
+
+        if (preAdhanEnabled && nextPrayer && timeRemaining <= preAdhanSeconds && timeRemaining > 0) {
+            if (lastPreAdhanNotificationPrayer !== nextPrayer.key) {
+                showToast(t('adhanInXmin').replace('{prayer}', nextPrayer.name).replace('{minutes}', preAdhanMinutes), 'info');
+                lastPreAdhanNotificationPrayer = nextPrayer.key;
+            }
+        }
+
         const prayerChanged = currentActivePrayer !== currentPrayer.key;
         currentActivePrayer = currentPrayer.key;
         const prayerCardsContainer = document.getElementById('prayerCards');

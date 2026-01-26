@@ -3,6 +3,7 @@ const { t } = require('../js/translations');
 const path = require('path');
 
 let adhanAudio = null;
+let fadeInterval = null;
 
 function showAdhanStopBtn(show) {
     const btn = document.getElementById('adhanStopBtn');
@@ -28,25 +29,64 @@ function notifyPrayer(prayer, mode = true) {
         return;
     }
 
+    if (fadeInterval) {
+        clearInterval(fadeInterval);
+        fadeInterval = null;
+    }
+
     if (adhanAudio && !adhanAudio.paused) {
         adhanAudio.pause();
         adhanAudio.currentTime = 0;
     }
     const soundPath = path.join(__dirname, '../../assets/adhan.mp3'); // Correction du chemin
     adhanAudio = new Audio(soundPath);
+    adhanAudio.volume = 0; // Commencer avec le volume à 0 pour le fade-in
+
     adhanAudio.play().then(() => {
         showAdhanStopBtn(true);
+
+        // Effet de fade-in sur 5 secondes
+        const step = 0.02; // Augmenter de 2%
+        const intervalTime = 100; // Toutes les 100ms
+        // Durée totale = (1 / 0.02) * 100ms = 5000ms = 5 secondes
+
+        fadeInterval = setInterval(() => {
+            if (!adhanAudio) {
+                clearInterval(fadeInterval);
+                return;
+            }
+            if (adhanAudio.paused) {
+                clearInterval(fadeInterval);
+                return;
+            }
+
+            let newVol = adhanAudio.volume + step;
+            if (newVol >= 1.0) {
+                newVol = 1.0;
+                clearInterval(fadeInterval);
+            }
+            adhanAudio.volume = newVol;
+        }, intervalTime);
+
     }).catch(error => {
         console.warn('Could not play adhan sound:', error);
     });
     if (adhanAudio) {
         adhanAudio.onended = () => {
             showAdhanStopBtn(false);
+            if (fadeInterval) {
+                clearInterval(fadeInterval);
+                fadeInterval = null;
+            }
         };
     }
 }
 
 function stopAdhan() {
+    if (fadeInterval) {
+        clearInterval(fadeInterval);
+        fadeInterval = null;
+    }
     if (adhanAudio) {
         adhanAudio.pause();
         adhanAudio.currentTime = 0;

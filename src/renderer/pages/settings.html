@@ -104,7 +104,29 @@
           </div>
         </div>
 
-        <button class="save-btn" id="saveBtn">Save</button>
+        <div class="setting-group">
+            <label class="setting-label" id="preAdhanNotificationLabel">Pre-Adhan Notification</label>
+
+            <div class="setting-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px;">
+                <span id="enablePreAdhanNotificationLabel" style="color: var(--text-secondary); font-size: 0.95rem;">Enable Notification</span>
+                <label class="switch">
+                   <input type="checkbox" id="preAdhanNotificationToggle">
+                   <span class="slider round"></span>
+                </label>
+             </div>
+
+            <div class="location-input" id="preAdhanMinutesContainer" style="opacity: 0.5; transition: opacity 0.3s ease;">
+                <label class="setting-label" id="preAdhanMinutesLabel" for="preAdhanMinutesInput" style="font-size: 0.9rem; margin-bottom: 8px; display: block;">Minutes before Adhan</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="number" id="preAdhanMinutesInput" class="setting-input" min="1" max="60" value="5" style="padding: 8px 12px; width: 100px; border-radius: 8px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: var(--text-primary);">
+                    <span id="minutesLabel2" style="color: var(--text-secondary);">min</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-actions">
+          <button class="save-btn" id="saveBtn">Save Changes</button>
+        </div>
 
         <div class="version-info">
           <div class="footer-text" id="footerText">
