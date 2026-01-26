@@ -9,6 +9,7 @@ const { loadPrayerTimes, updateCurrentAndNextPrayer } = require('../js/prayer');
 const { state } = require('../js/globalStore');
 const { initSettingsPage } = require('../js/settings');
 const { initQiblaPage } = require('../js/qibla');
+const { initAsmaPage } = require('../js/asmaUI');
 const { applyTheme } = require('../js/theme');
 const { initAthkarAlertsSystem } = require('../js/athkarAlerts');
 
@@ -51,6 +52,9 @@ async function initializeApp() {
     } else if (path.includes('qibla.html')) {
       console.log('Initializing Qibla page from renderer.js');
       initQiblaPage();
+    } else if (path.includes('asma.html')) {
+      console.log('Initializing Asmallah page from renderer.js');
+      initAsmaPage();
     }
 
     // Setup window controls (common to all pages)
