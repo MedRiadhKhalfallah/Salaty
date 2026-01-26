@@ -107,7 +107,8 @@
     "updateDownloaded": "Mise à jour téléchargée. Installer ?",
     "install": "Installer",
     "later": "Plus tard",
-    "beautifulNames": "Les Beaux Noms d'Allah"
+    "beautifulNames": "Les Beaux Noms d'Allah",
+    "loadingAsma": "Chargement des Noms..."
   },
   "themes": {
     "navy": "Bleu marine",

@@ -107,7 +107,8 @@
     "updateDownloaded": "Update downloaded. Install now?",
     "install": "Install",
     "later": "Later",
-    "beautifulNames": "The Beautiful Names of Allah"
+    "beautifulNames": "The Beautiful Names of Allah",
+    "loadingAsma": "Loading Names..."
   },
   "themes": {
     "navy": "Navy",

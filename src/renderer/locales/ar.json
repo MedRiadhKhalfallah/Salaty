@@ -107,7 +107,8 @@
     "updateDownloaded": "تم تحميل التحديث. هل تريد التثبيت الآن؟",
     "install": "تثبيت",
     "later": "لاحقاً",
-    "beautifulNames": "أسماء الله الحسنى"
+    "beautifulNames": "أسماء الله الحسنى",
+    "loadingAsma": "جاري تحميل الأسماء..."
   },
   "themes": {
     "navy": "أزرق داكن",

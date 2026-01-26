@@ -49,7 +49,7 @@ function initAsmaPage() {
 function updateAsmaUI() {
   const asmaTitle = document.getElementById('asmaTitle');
   const asmaFooterText = document.getElementById('asmaFooterText');
-  const loadingText = document.getElementById('loadingText');
+  const loadingText = document.getElementById('loadingTextAsma');
   const fullscreenBtn = document.getElementById('asmaFullscreenBtn');
 
   if (asmaTitle) asmaTitle.textContent = t('asmaAllah');
