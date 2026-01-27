@@ -33,6 +33,38 @@ function initSettingsPage() {
     initThemeOptions();
     initLanguageOptions();
     initAthkarAlerts();
+    initPreAdhanNotification();
+}
+
+function initPreAdhanNotification() {
+    const toggle = document.getElementById('preAdhanNotificationToggle');
+    const minutesInput = document.getElementById('preAdhanMinutesInput');
+    const container = document.getElementById('preAdhanMinutesContainer');
+
+    if (toggle && minutesInput) {
+        // Init values from state
+        toggle.checked = state.settings.preAdhanNotificationEnabled !== false; // Default true
+        minutesInput.value = state.settings.preAdhanMinutes || 5;
+
+        // Function to update UI state
+        const updateUI = () => {
+            if (toggle.checked) {
+                container.style.opacity = '1';
+                container.style.pointerEvents = 'auto';
+                minutesInput.disabled = false;
+            } else {
+                container.style.opacity = '0.5';
+                container.style.pointerEvents = 'none';
+                minutesInput.disabled = true;
+            }
+        };
+
+        // Initial update
+        updateUI();
+
+        // Listen for changes
+        toggle.addEventListener('change', updateUI);
+    }
 }
 
 function updateSettings() {
@@ -50,7 +82,11 @@ function updateSettings() {
         'athkarAlertsLabel': 'athkarAlerts',
         'enableAthkarAlertsLabel': 'enableAthkarAlerts',
         'athkarIntervalLabel': 'athkarInterval',
-        'minutesLabel': 'minutes'
+        'minutesLabel': 'minutes',
+        'minutesLabel2': 'minutes',
+        'preAdhanNotificationLabel': 'preAdhanNotification',
+        'enablePreAdhanNotificationLabel': 'enablePreAdhanNotification',
+        'preAdhanMinutesLabel': 'minutesBeforeAdhan'
     };
 
     for (const [id, key] of Object.entries(elements)) {
@@ -218,6 +254,19 @@ async function saveSettings() {
             let interval = parseInt(athkarIntervalInput.value);
             if (isNaN(interval) || interval < 1) interval = 30;
             state.settings.athkarAlertInterval = interval;
+        }
+
+        const preAdhanToggle = document.getElementById('preAdhanNotificationToggle');
+        const preAdhanInput = document.getElementById('preAdhanMinutesInput');
+
+        if (preAdhanToggle) {
+            state.settings.preAdhanNotificationEnabled = preAdhanToggle.checked;
+        }
+
+        if (preAdhanInput) {
+            let minutes = parseInt(preAdhanInput.value);
+            if (isNaN(minutes) || minutes < 1) minutes = 5;
+            state.settings.preAdhanMinutes = minutes;
         }
 
         await ipcRenderer.invoke('save-settings', state.settings);

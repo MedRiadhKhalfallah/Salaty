@@ -7,12 +7,16 @@
     "start": "electron .",
     "dev": "electron . --enable-logging",
     "build": "electron-builder",
+    "build:linux": "electron-builder --linux",
     "dist": "electron-builder --publish=never",
     "clean": "rm -rf dist",
     "lint": "eslint src/",
     "format": "prettier --write \"src/**/*.{js,html,css}\""
   },
-  "author": "Yassin Daboussi",
+  "author": {
+    "name": "Yassin Daboussi",
+    "email": "dev@salaty.app"
+  },
   "license": "MIT",
   "devDependencies": {
     "electron": "38.2.2",
@@ -21,7 +25,6 @@
   "build": {
     "appId": "com.yassindaboussi.salaty",
     "productName": "Salaty Islamic Prayer Times",
-    "artifactName": "Salaty-Islamic-Prayer-Times-Setup.exe",
     "directories": {
       "output": "dist",
       "buildResources": "src/assets"
@@ -43,15 +46,21 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "src/assets/icons/app_icon.ico"
+      "icon": "src/assets/icons/app_icon.ico",
+      "artifactName": "Salaty-Islamic-Prayer-Times-Setup.exe"
     },
     "mac": {
       "target": "dmg",
       "icon": "src/assets/icons/icon.icns"
     },
     "linux": {
-      "target": "AppImage",
-      "icon": "src/assets/icons/icon.png"
+      "target": [
+        "tar.gz"
+      ],
+      "icon": "src/assets/icons/app_icon.png",
+      "category": "Utility",
+      "maintainer": "Yassin Daboussi <dev@salaty.app>",
+      "artifactName": "${productName}-linux-${arch}.${ext}"
     },
     "nsis": {
       "oneClick": false,

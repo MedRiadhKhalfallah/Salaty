@@ -15,7 +15,9 @@ const state = {
         country: '',
         language: 'en',
         athkarAlertEnabled: false,
-        athkarAlertInterval: 30
+        athkarAlertInterval: 30,
+        preAdhanMinutes: 5,
+        preAdhanNotificationEnabled: true
     }
 };
 

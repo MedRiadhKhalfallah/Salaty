@@ -12,7 +12,7 @@
     justify-content: center;
     text-align: center;
     gap: 4px;
-    background: inherit;
+    background: var(--bg-surface);
 }
 
 .adhan-stop-btn-wide .adhan-stop-icon {
