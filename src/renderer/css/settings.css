@@ -158,10 +158,12 @@ input:checked + .slider:before {
   border-radius: 6px;
   padding: 6px 16px;
   height: 36px;
+  width: 100%;
+  max-width: 400px; /* Limit width on larger screens */
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 6px;
+  margin: 6px auto 0; /* Center horizontally with top margin */
   transition: all 0.2s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
