@@ -45,10 +45,10 @@ function notifyPrayer(prayer, mode = true) {
     adhanAudio.play().then(() => {
         showAdhanStopBtn(true);
 
-        // Effet de fade-in sur 5 secondes
-        const step = 0.02; // Augmenter de 2%
+        // Effet de fade-in sur 60 secondes
+        const step = 0.0015; // Augmenter de ~0.15%
         const intervalTime = 100; // Toutes les 100ms
-        // Durée totale = (1 / 0.02) * 100ms = 5000ms = 5 secondes
+        // Durée totale = (1 / 0.0015) * 100ms ≈ 66000ms ≈ 66 secondes
 
         fadeInterval = setInterval(() => {
             if (!adhanAudio) {
