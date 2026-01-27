@@ -1,37 +1,45 @@
 const { ipcRenderer } = require('electron');
 const { state } = require('./globalStore');
 const { t } = require('./translations');
+const screenSizeManager = require('./screenSize');
 
 let ramadanData = [];
 let assignedHijriYear = null;
-let isRamadanFullscreen = false;
 
 function initRamadanPage() {
     console.log('Initializing Ramadan page...');
 
+    // SET INITIAL SCREEN SIZE
+    const useBigScreen = screenSizeManager.isBigScreen();
+    console.log('Initial screen size preference:', useBigScreen ? 'big' : 'small');
+    
+    if (useBigScreen) {
+        document.body.setAttribute('data-screen-size', 'big');
+        document.body.classList.add('big-screen');
+        document.querySelector('.ramadan-container')?.classList.add('big-screen');
+    } else {
+        document.body.setAttribute('data-screen-size', 'small');
+        document.body.classList.add('small-screen');
+        document.querySelector('.ramadan-container')?.classList.add('small-screen');
+    }
+
     // Back Button
     const backBtn = document.getElementById('backBtn');
     if (backBtn) {
-        const newBackBtn = backBtn.cloneNode(true);
-        backBtn.replaceWith(newBackBtn);
-
-        newBackBtn.addEventListener('click', () => {
-             ipcRenderer.invoke('resize-window', 320, 575);
-             ipcRenderer.invoke('navigate-to', 'features');
+        backBtn.addEventListener('click', () => {
+            const currentSize = getCurrentWindowSize();
+            ipcRenderer.invoke('resize-window', currentSize.width, currentSize.height);
+            ipcRenderer.invoke('navigate-to', 'features');
         });
     }
 
-    // Fullscreen Button
-    const fullscreenBtn = document.getElementById('ramadanFullscreenBtn');
-    if (fullscreenBtn) {
-        // Remove existing listener to avoid duplicates if re-initialized
-        fullscreenBtn.replaceWith(fullscreenBtn.cloneNode(true));
-        const newFullscreenBtn = document.getElementById('ramadanFullscreenBtn');
-
-        newFullscreenBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Stop event bubbling
-            console.log('Fullscreen button clicked');
-            toggleRamadanFullscreen();
+    // Screen Size Toggle Button (formerly fullscreen button)
+    const screenSizeBtn = document.getElementById('ramadanFullscreenBtn');
+    if (screenSizeBtn) {
+        screenSizeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            console.log('Screen size button clicked');
+            toggleRamadanScreenSize();
         });
     }
 
@@ -73,7 +81,40 @@ function initRamadanPage() {
     const modalLabelIftar = document.getElementById('modalLabelIftar');
     if (modalLabelIftar) modalLabelIftar.innerHTML = `<i class="fas fa-glass-water"></i> ${t('iftar')} (${t('Maghrib', 'prayerNames')})`;
 
+    // Update UI for screen size button
+    updateRamadanUI();
+
     fetchRamadanData();
+}
+
+function getCurrentWindowSize() {
+    const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
+    return isBigScreen ? { width: 850, height: 600 } : { width: 320, height: 575 };
+}
+
+function updateRamadanUI() {
+    const screenSizeBtn = document.getElementById('ramadanFullscreenBtn');
+    
+    if (screenSizeBtn) {
+        const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
+        console.log('updateRamadanUI: Current screen size is', isBigScreen ? 'BIG' : 'SMALL');
+        
+        if (isBigScreen) {
+            // Currently big → button should say "Small Screen"
+            screenSizeBtn.setAttribute('aria-label', t('switchToSmallScreen') || 'Switch to Small Screen');
+            const icon = screenSizeBtn.querySelector('i');
+            if (icon) {
+                icon.className = 'fas fa-compress';
+            }
+        } else {
+            // Currently small → button should say "Big Screen"
+            screenSizeBtn.setAttribute('aria-label', t('switchToBigScreen') || 'Switch to Big Screen');
+            const icon = screenSizeBtn.querySelector('i');
+            if (icon) {
+                icon.className = 'fas fa-expand';
+            }
+        }
+    }
 }
 
 async function fetchRamadanData() {
@@ -252,7 +293,6 @@ function openDayModal(dayData, element) {
     document.getElementById('modalIftar').textContent = formatTimeStr(dayData.timings.Maghrib);
 
     // Track button logic
-    // We remove any existing track button to avoid duplicates/listeners issues
     const existingTrackBtn = document.getElementById('trackBtn');
     if (existingTrackBtn) existingTrackBtn.remove();
 
@@ -261,7 +301,7 @@ function openDayModal(dayData, element) {
 
     const trackBtn = document.createElement('button');
     trackBtn.id = 'trackBtn';
-    trackBtn.className = 'control-btn'; // Reuse main CSS
+    trackBtn.className = 'control-btn';
     trackBtn.style.marginTop = '15px';
     trackBtn.style.width = '100%';
     trackBtn.style.padding = '10px';
@@ -301,34 +341,29 @@ function toggleDayTracking(hijriDay, dayElement, btn) {
     localStorage.setItem(`ramadanTracker_${assignedHijriYear}`, JSON.stringify(trackedDays));
 }
 
-function toggleRamadanFullscreen() {
-  isRamadanFullscreen = !isRamadanFullscreen;
+function toggleRamadanScreenSize() {
+    const isCurrentlyBig = document.body.getAttribute('data-screen-size') === 'big';
+    console.log('toggleRamadanScreenSize: Switching FROM', isCurrentlyBig ? 'BIG to SMALL' : 'SMALL to BIG');
+    
+    if (isCurrentlyBig) {
+        // Switch FROM big TO small screen
+        ipcRenderer.invoke('resize-window', 320, 575);
+        document.body.setAttribute('data-screen-size', 'small');
+        document.body.classList.remove('big-screen');
+        document.body.classList.add('small-screen');
+        document.querySelector('.ramadan-container')?.classList.remove('big-screen');
+        document.querySelector('.ramadan-container')?.classList.add('small-screen');
+    } else {
+        // Switch FROM small TO big screen
+        ipcRenderer.invoke('resize-window', 850, 600);
+        document.body.setAttribute('data-screen-size', 'big');
+        document.body.classList.remove('small-screen');
+        document.body.classList.add('big-screen');
+        document.querySelector('.ramadan-container')?.classList.remove('small-screen');
+        document.querySelector('.ramadan-container')?.classList.add('big-screen');
+    }
 
-  if (isRamadanFullscreen) {
-    // Enter fullscreen
-    try {
-      ipcRenderer.invoke('resize-window', 850, 600);
-      document.body.classList.add('fullscreen');
-      const container = document.querySelector('.ramadan-container');
-      if (container) {
-        container.classList.add('fullscreen');
-      }
-    } catch (error) {
-      console.error('Error in fullscreen mode:', error);
-    }
-  } else {
-    // Exit fullscreen
-    try {
-      ipcRenderer.invoke('resize-window', 320, 575);
-      document.body.classList.remove('fullscreen');
-      const container = document.querySelector('.ramadan-container');
-      if (container) {
-        container.classList.remove('fullscreen');
-      }
-    } catch (error) {
-      console.error('Error exiting fullscreen mode:', error);
-    }
-  }
+    updateRamadanUI();
 }
 
 // Remove the (EST) part for cleaner display if present

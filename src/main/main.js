@@ -29,9 +29,14 @@ function createWindow() {
   // Get settings after loading
   const settings = ipcHandlers.getSettingsData();
 
+   // Determine initial window size based on settings
+    const useBigScreen = settings.bigScreen || false;
+    const initialWidth = useBigScreen ? 850 : 320;
+    const initialHeight = useBigScreen ? 600 : 575;
+
   mainWindow = new BrowserWindow({
-    width: 320,
-    height: 575,
+    width: initialWidth,
+    height: initialHeight,
     frame: false,
     transparent: true,
     resizable: true,

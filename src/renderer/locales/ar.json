@@ -116,7 +116,11 @@
     "silentAdhan": "الوضع الصامت (تنبيه فقط)",
     "soundAdhan": "الوضع الصوتي (أذان + تنبيه)",
     "beautifulNames": "أسماء الله الحسنى",
-    "loadingAsma": "جاري تحميل الأسماء..."
+    "loadingAsma": "جاري تحميل الأسماء...",
+    "screenSizeSettingLabel": "حجم الشاشة",
+    "screenSizeDescription": "شاشة صغيرة: 320×575 | شاشة كبيرة: 850×600",
+    "bigScreen": "شاشة كبيرة",
+    "smallScreen": "شاشة صغيرة"
   },
   "themes": {
     "navy": "أزرق داكن",

@@ -12,6 +12,8 @@ const { initQiblaPage } = require('../js/qibla');
 const { initAsmaPage } = require('../js/asmaUI');
 const { applyTheme } = require('../js/theme');
 const { initAthkarAlertsSystem } = require('../js/athkarAlerts');
+const screenSizeManager = require('../js/screenSize');
+
 
 // ==================== INITIALIZATION ====================
 async function initializeApp() {
@@ -27,6 +29,9 @@ async function initializeApp() {
       // Apply theme and language
       applyTheme(theme);
       applyLanguageDirection();
+
+      // Apply screen size preference
+      await screenSizeManager.applyScreenSize();
 
       // Initialize Athkar Alerts System
       initAthkarAlertsSystem();
@@ -179,16 +184,21 @@ function initMainPage() {
   const featuresBtn = document.getElementById('mainFeaturesBtn');
 
   if (settingsBtn) {
-    settingsBtn.addEventListener('click', () => {
-      ipcRenderer.invoke('navigate-to', 'settings');
-    });
+        settingsBtn.addEventListener('click', async () => {
+            // Use screen size preference for settings page
+            const size = screenSizeManager.getWindowSize();
+            await ipcRenderer.invoke('resize-window', size.width, size.height);
+            ipcRenderer.invoke('navigate-to', 'settings');
+        });
   }
 
   if (featuresBtn) {
-    featuresBtn.addEventListener('click', () => {
-      ipcRenderer.invoke('resize-window', 320, 575);
-      ipcRenderer.invoke('navigate-to', 'features');
-    });
+        featuresBtn.addEventListener('click', async () => {
+            // Use screen size preference for features page
+            const size = screenSizeManager.getWindowSize();
+            await ipcRenderer.invoke('resize-window', size.width, size.height);
+            ipcRenderer.invoke('navigate-to', 'features');
+        });
   }
 
   // Initialize loading text

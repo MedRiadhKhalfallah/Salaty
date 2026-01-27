@@ -1,15 +1,28 @@
 const { ipcRenderer } = require('electron');
 const { t } = require('./translations');
+const screenSizeManager = require('./screenSize');
 
 let athkarData = null;
 let currentCategory = null;
 let athkarState = {};
-let isAthkarFullscreen = false;
 
 // ==================== ATHKAR PAGE FUNCTIONS ====================
 function initAthkarPage() {
   console.log('Initializing Athkar page...');
-  console.log('isAthkarFullscreen initial:', isAthkarFullscreen);
+  
+  // SET INITIAL SCREEN SIZE
+  const useBigScreen = screenSizeManager.isBigScreen();
+  console.log('Initial screen size preference:', useBigScreen ? 'big' : 'small');
+  
+  if (useBigScreen) {
+    document.body.setAttribute('data-screen-size', 'big');
+    document.body.classList.add('big-screen');
+    document.querySelector('.athkar-container')?.classList.add('big-screen');
+  } else {
+    document.body.setAttribute('data-screen-size', 'small');
+    document.body.classList.add('small-screen');
+    document.querySelector('.athkar-container')?.classList.add('small-screen');
+  }
   
   // Setup back button
   const backBtn = document.getElementById('backBtn');
@@ -17,31 +30,21 @@ function initAthkarPage() {
     console.log('Back button found');
     backBtn.addEventListener('click', () => {
       console.log('Back button clicked');
-      if (isAthkarFullscreen) {
-        console.log('Exiting fullscreen before navigating back');
-        toggleAthkarFullscreen(); // Exit fullscreen first
-      }
-      ipcRenderer.invoke('resize-window', 320, 575);
+      const currentSize = getCurrentWindowSize();
+      ipcRenderer.invoke('resize-window', currentSize.width, currentSize.height);
       ipcRenderer.invoke('navigate-to', 'features');
     });
   }
 
-  // Setup fullscreen button - CORRECTION ICI
-  const fullscreenBtn = document.getElementById('athkarFullscreenBtn');
-  console.log('Fullscreen button element:', fullscreenBtn);
+  // Setup screen size toggle button (formerly fullscreen button)
+  const screenSizeBtn = document.getElementById('athkarFullscreenBtn');
+  console.log('Screen size button element:', screenSizeBtn);
   
-  if (fullscreenBtn) {
-    console.log('Fullscreen button found, adding event listener');
-    fullscreenBtn.addEventListener('click', toggleAthkarFullscreen);
-    
-    // Test direct pour vérifier si l'événement est attaché
-    fullscreenBtn.addEventListener('click', () => {
-      console.log('Fullscreen button clicked directly');
-    });
+  if (screenSizeBtn) {
+    console.log('Screen size button found, adding event listener');
+    screenSizeBtn.addEventListener('click', toggleAthkarScreenSize);
   } else {
-    console.error('Fullscreen button NOT FOUND! Check HTML ID');
-    // Vérifier les éléments dans le DOM
-    console.log('All buttons in DOM:', document.querySelectorAll('button'));
+    console.error('Screen size button NOT FOUND! Check HTML ID');
   }
 
   // Setup reset all button
@@ -51,7 +54,7 @@ function initAthkarPage() {
     resetAllBtn.addEventListener('click', showResetConfirm);
   }
 
-  // Update UI text - this will use the current language from translations module
+  // Update UI text
   updateAthkarUI();
 
   // Load athkar data
@@ -60,18 +63,22 @@ function initAthkarPage() {
   // Load saved state
   loadAthkarState();
   
-  // Log pour vérifier que la fonction est bien appelée
   console.log('initAthkarPage completed');
 }
 
+function getCurrentWindowSize() {
+  const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
+  return isBigScreen ? { width: 850, height: 600 } : { width: 320, height: 575 };
+}
+
 function updateAthkarUI() {
-  console.log('Updating Athkar UI, isAthkarFullscreen:', isAthkarFullscreen);
+  console.log('Updating Athkar UI');
   
   const athkarTitle = document.getElementById('athkarTitle');
   const athkarFooterText = document.getElementById('athkarFooterText');
   const loadingText = document.getElementById('loadingText');
   const resetAllBtn = document.getElementById('resetAllBtn');
-  const fullscreenBtn = document.getElementById('athkarFullscreenBtn');
+  const screenSizeBtn = document.getElementById('athkarFullscreenBtn');
 
   if (athkarTitle) athkarTitle.textContent = t('athkar');
   if (athkarFooterText) athkarFooterText.textContent = t('remembrancesFromSunnah');
@@ -81,13 +88,24 @@ function updateAthkarUI() {
     resetAllBtn.setAttribute('aria-label', t('resetAll'));
   }
 
-  if (fullscreenBtn) {
-    console.log('Updating fullscreen button, current state:', isAthkarFullscreen);
-    fullscreenBtn.setAttribute('aria-label', isAthkarFullscreen ? t('exitFullscreen') : t('enterFullscreen'));
-    const icon = fullscreenBtn.querySelector('i');
-    if (icon) {
-      console.log('Updating icon, new class:', isAthkarFullscreen ? 'fas fa-compress' : 'fas fa-expand');
-      icon.className = isAthkarFullscreen ? 'fas fa-compress' : 'fas fa-expand';
+  if (screenSizeBtn) {
+    const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
+    console.log('Updating screen size button, current state:', isBigScreen ? 'BIG' : 'SMALL');
+    
+    if (isBigScreen) {
+      // Currently big → button should say "Small Screen"
+      screenSizeBtn.setAttribute('aria-label', t('switchToSmallScreen') || 'Switch to Small Screen');
+      const icon = screenSizeBtn.querySelector('i');
+      if (icon) {
+        icon.className = 'fas fa-compress';
+      }
+    } else {
+      // Currently small → button should say "Big Screen"
+      screenSizeBtn.setAttribute('aria-label', t('switchToBigScreen') || 'Switch to Big Screen');
+      const icon = screenSizeBtn.querySelector('i');
+      if (icon) {
+        icon.className = 'fas fa-expand';
+      }
     }
   }
 }
@@ -518,56 +536,29 @@ function showSuccessToast(message, isError = false) {
   }, 2000);
 }
 
-function toggleAthkarFullscreen() {
-  console.log('toggleAthkarFullscreen called, current state:', isAthkarFullscreen);
-  console.log('ipcRenderer available:', !!ipcRenderer);
+function toggleAthkarScreenSize() {
+  const isCurrentlyBig = document.body.getAttribute('data-screen-size') === 'big';
+  console.log('toggleAthkarScreenSize: Switching FROM', isCurrentlyBig ? 'BIG to SMALL' : 'SMALL to BIG');
   
-  isAthkarFullscreen = !isAthkarFullscreen;
-
-  console.log('New fullscreen state:', isAthkarFullscreen);
-
-  if (isAthkarFullscreen) {
-    // Enter fullscreen
-    console.log('Entering fullscreen mode');
-    try {
-      ipcRenderer.invoke('resize-window', 850, 600).then(() => {
-        console.log('Window resized to fullscreen');
-      }).catch(err => {
-        console.error('Error resizing window:', err);
-      });
-      document.body.classList.add('fullscreen');
-      const container = document.querySelector('.athkar-container');
-      if (container) {
-        container.classList.add('fullscreen');
-        console.log('Added fullscreen class to container');
-      }
-    } catch (error) {
-      console.error('Error in fullscreen mode:', error);
-    }
+  if (isCurrentlyBig) {
+    // Switch FROM big TO small screen
+    ipcRenderer.invoke('resize-window', 320, 575);
+    document.body.setAttribute('data-screen-size', 'small');
+    document.body.classList.remove('big-screen');
+    document.body.classList.add('small-screen');
+    document.querySelector('.athkar-container')?.classList.remove('big-screen');
+    document.querySelector('.athkar-container')?.classList.add('small-screen');
   } else {
-    // Exit fullscreen
-    console.log('Exiting fullscreen mode');
-    try {
-      ipcRenderer.invoke('resize-window', 320, 575).then(() => {
-        console.log('Window resized to normal');
-      }).catch(err => {
-        console.error('Error resizing window:', err);
-      });
-      document.body.classList.remove('fullscreen');
-      const container = document.querySelector('.athkar-container');
-      if (container) {
-        container.classList.remove('fullscreen');
-        console.log('Removed fullscreen class from container');
-      }
-    } catch (error) {
-      console.error('Error exiting fullscreen mode:', error);
-    }
+    // Switch FROM small TO big screen
+    ipcRenderer.invoke('resize-window', 850, 600);
+    document.body.setAttribute('data-screen-size', 'big');
+    document.body.classList.remove('small-screen');
+    document.body.classList.add('big-screen');
+    document.querySelector('.athkar-container')?.classList.remove('small-screen');
+    document.querySelector('.athkar-container')?.classList.add('big-screen');
   }
 
-  // Mettre à jour l'interface utilisateur
   updateAthkarUI();
-  
-  // Forcer un re-render pour s'assurer que les changements sont visibles
   setTimeout(() => {
     if (currentCategory) {
       renderAthkarList();

@@ -116,7 +116,11 @@
     "silentAdhan": "Mode Silencieux",
     "soundAdhan": "Mode Sonore",
     "beautifulNames": "Les Beaux Noms d'Allah",
-    "loadingAsma": "Chargement des Noms..."
+    "loadingAsma": "Chargement des Noms...",
+    "screenSizeSettingLabel": "Taille de l'écran",
+    "screenSizeDescription": "Petit écran: 320×575 | Grand écran: 850×600",
+    "bigScreen": "Grand Écran",
+    "smallScreen": "Petit Écran"
   },
   "themes": {
     "navy": "Bleu marine",
