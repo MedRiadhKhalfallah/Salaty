@@ -13,8 +13,6 @@ function initAthkarAlertsSystem() {
 
     if (state.settings.athkarAlertEnabled) {
         initAlertTimer();
-    } else {
-        console.log('Athkar alerts are disabled');
     }
 }
 
