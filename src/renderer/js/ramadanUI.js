@@ -15,7 +15,6 @@ function initRamadanPage() {
         const newBackBtn = backBtn.cloneNode(true);
         backBtn.replaceWith(newBackBtn);
 
-
         newBackBtn.addEventListener('click', () => {
              ipcRenderer.invoke('resize-window', 320, 575);
              ipcRenderer.invoke('navigate-to', 'features');
@@ -132,11 +131,24 @@ function renderCalendar(data) {
 
     const trackedDays = JSON.parse(localStorage.getItem(`ramadanTracker_${assignedHijriYear}`) || '[]');
 
+    const lang = state.settings.language || 'en';
+    const monthFormatter = new Intl.DateTimeFormat(
+        lang === 'ar' ? 'ar-TN' : lang,
+        { month: 'short' }
+    );
+
     data.forEach((dayData, index) => {
         const hijriDay = dayData.date.hijri.day;
         const gregorianDate = dayData.date.gregorian.date; // DD-MM-YYYY
-        const [gDay, gMonth] = gregorianDate.split('-');
-        const monthName = new Date(dayData.date.gregorian.date.split('-').reverse().join('-')).toLocaleString('default', { month: 'short' });
+        const [gDay, gMonth, gYear] = gregorianDate.split('-').map(Number);
+
+        const jsDate = new Date(gYear, gMonth - 1, gDay);
+        let monthName = monthFormatter.format(jsDate).trim();
+
+        // Clean up trailing dot/period if any (some locales add it)
+        if (lang === 'ar') {
+            monthName = monthName.replace(/[.\s]+$/, '');
+        }
 
         const el = document.createElement('div');
         el.className = 'day-tracker';

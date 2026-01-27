@@ -114,7 +114,9 @@
     "enableAdhan": "Enable Adhan",
     "disableAdhan": "Disable Adhan",
     "silentAdhan": "Silent Mode (Notification only)",
-    "soundAdhan": "Sound Mode (Adhan + Notification)"
+    "soundAdhan": "Sound Mode (Adhan + Notification)",
+    "beautifulNames": "The Beautiful Names of Allah",
+    "loadingAsma": "Loading Names..."
   },
   "themes": {
     "navy": "Navy",

@@ -114,7 +114,9 @@
     "enableAdhan": "Activer l'Adhan",
     "disableAdhan": "Désactiver l'Adhan",
     "silentAdhan": "Mode Silencieux",
-    "soundAdhan": "Mode Sonore"
+    "soundAdhan": "Mode Sonore",
+    "beautifulNames": "Les Beaux Noms d'Allah",
+    "loadingAsma": "Chargement des Noms..."
   },
   "themes": {
     "navy": "Bleu marine",

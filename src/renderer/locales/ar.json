@@ -114,7 +114,9 @@
     "enableAdhan": "تفعيل الأذان",
     "disableAdhan": "تعطيل الأذان",
     "silentAdhan": "الوضع الصامت (تنبيه فقط)",
-    "soundAdhan": "الوضع الصوتي (أذان + تنبيه)"
+    "soundAdhan": "الوضع الصوتي (أذان + تنبيه)",
+    "beautifulNames": "أسماء الله الحسنى",
+    "loadingAsma": "جاري تحميل الأسماء..."
   },
   "themes": {
     "navy": "أزرق داكن",
