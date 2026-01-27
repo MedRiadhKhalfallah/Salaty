@@ -1,5 +1,6 @@
 const { ipcRenderer } = require('electron');
 const { t } = require('./translations');
+const screenSizeManager = require('./screenSize'); 
 
 let isFeaturesFullscreen = false;
 
@@ -16,7 +17,11 @@ function initFeaturesPage() {
       if (isFeaturesFullscreen) {
         toggleFeaturesFullscreen(); // Exit fullscreen first
       }
-      ipcRenderer.invoke('resize-window', 320, 575);
+      
+      // Use screen size preference for main page
+      const size = screenSizeManager.getWindowSize();
+      ipcRenderer.invoke('resize-window', size.width, size.height);
+      
       ipcRenderer.invoke('go-back');
     });
   }
@@ -147,7 +152,11 @@ function openAthkar() {
   if (isFeaturesFullscreen) {
     toggleFeaturesFullscreen(); // Exit fullscreen first
   }
-  ipcRenderer.invoke('resize-window', 320, 575);
+  
+  // Use the screen size preference
+  const size = screenSizeManager.getWindowSize();
+  ipcRenderer.invoke('resize-window', size.width, size.height);
+  
   ipcRenderer.invoke('navigate-to', 'athkar');
 }
 
@@ -156,7 +165,11 @@ function openRamadhan() {
   if (isFeaturesFullscreen) {
     toggleFeaturesFullscreen(); // Exit fullscreen first
   }
-  ipcRenderer.invoke('resize-window', 320, 575);
+  
+  // Use the screen size preference
+  const size = screenSizeManager.getWindowSize();
+  ipcRenderer.invoke('resize-window', size.width, size.height);
+  
   ipcRenderer.invoke('navigate-to', 'ramadan');
 }
 
@@ -165,7 +178,11 @@ function openQibla() {
   if (isFeaturesFullscreen) {
     toggleFeaturesFullscreen(); // Exit fullscreen first
   }
-  ipcRenderer.invoke('resize-window', 320, 575);
+  
+  // Use the screen size preference
+  const size = screenSizeManager.getWindowSize();
+  ipcRenderer.invoke('resize-window', size.width, size.height);
+  
   ipcRenderer.invoke('navigate-to', 'qibla');
 }
 
@@ -174,7 +191,11 @@ function openAsma() {
   if (isFeaturesFullscreen) {
     toggleFeaturesFullscreen(); // Exit fullscreen first
   }
-  ipcRenderer.invoke('resize-window', 320, 575);
+  
+  // Use the screen size preference
+  const size = screenSizeManager.getWindowSize();
+  ipcRenderer.invoke('resize-window', size.width, size.height);
+  
   ipcRenderer.invoke('navigate-to', 'asma');
 }
 
@@ -182,13 +203,15 @@ function toggleFeaturesFullscreen() {
   isFeaturesFullscreen = !isFeaturesFullscreen;
 
   if (isFeaturesFullscreen) {
-    // Enter fullscreen
+    // Enter fullscreen - use 850×600 (big screen size)
     ipcRenderer.invoke('resize-window', 850, 600);
     document.body.classList.add('fullscreen');
     document.querySelector('.features-container').classList.add('fullscreen');
   } else {
-    // Exit fullscreen
-    ipcRenderer.invoke('resize-window', 320, 575);
+    // Exit fullscreen - use the screen size preference
+    const size = screenSizeManager.getWindowSize();
+    ipcRenderer.invoke('resize-window', size.width, size.height);
+    
     document.body.classList.remove('fullscreen');
     document.querySelector('.features-container').classList.remove('fullscreen');
   }

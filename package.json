@@ -71,7 +71,7 @@
   "dependencies": {
     "electron-updater": "^6.7.3",
     "leaflet": "^1.9.4",
-    "salaty-qibla-map": "^1.0.0",
+    "salaty-qibla-map": "^1.0.2",
     "tom-select": "^2.4.3"
   }
 }

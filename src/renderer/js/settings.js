@@ -5,6 +5,7 @@ const { setLanguage, t, applyLanguageDirection } = require('./translations');
 const { state } = require('./globalStore');
 const { showToast } = require('./toast');
 const { applyTheme } = require('./theme');
+const screenSizeManager = require('./screenSize');
 
 let pendingTheme = 'navy';
 
@@ -34,6 +35,7 @@ function initSettingsPage() {
     initLanguageOptions();
     initAthkarAlerts();
     initPreAdhanNotification();
+    initScreenSizeSetting();
 }
 
 function initPreAdhanNotification() {
@@ -75,6 +77,8 @@ function updateSettings() {
         'countryLabel': 'country',
         'themeLabel': 'theme',
         'languageLabel': 'language',
+        'screenSizeSettingLabel': 'screenSizeSettingLabel',
+        'screenSizeDescription': 'screenSizeDescription',
         'cityHint': 'cityHint',
         'countryHint': 'countryHint',
         'footerText': 'madeWith',
@@ -99,6 +103,9 @@ function updateSettings() {
             }
         }
     }
+
+    // Update screen size label
+    updateScreenSizeLabel();
 
     // Update placeholders
     const cityInput = document.getElementById('cityInput');
@@ -225,11 +232,41 @@ function initAthkarAlerts() {
     }
 }
 
+function initScreenSizeSetting() {
+    const screenSizeToggle = document.getElementById('screenSizeToggle');
+    const screenSizeLabel = document.getElementById('screenSizeLabel');
+    
+    if (screenSizeToggle && screenSizeLabel) {
+        // Set initial value from settings
+        screenSizeToggle.checked = state.settings.bigScreen || false;
+        
+        // Update label text based on current state
+        updateScreenSizeLabel();
+        
+        // Listen for changes
+        screenSizeToggle.addEventListener('change', () => {
+            state.settings.bigScreen = screenSizeToggle.checked;
+            updateScreenSizeLabel();
+        });
+    }
+}
+
+function updateScreenSizeLabel() {
+    const screenSizeToggle = document.getElementById('screenSizeToggle');
+    const screenSizeLabel = document.getElementById('screenSizeLabel');
+    
+    if (screenSizeLabel && screenSizeToggle) {
+        screenSizeLabel.textContent = screenSizeToggle.checked ? 
+            t('bigScreen') : t('smallScreen');
+    }
+}
+
 async function saveSettings() {
     const cityInput = document.getElementById('cityInput');
     const countryInput = document.getElementById('countryInput');
     const athkarAlertsToggle = document.getElementById('athkarAlertsToggle');
     const athkarIntervalInput = document.getElementById('athkarIntervalInput');
+    const screenSizeToggle = document.getElementById('screenSizeToggle');
 
     const city = cityInput ? cityInput.value.trim() : '';
     const country = countryInput ? countryInput.value.trim() : '';
@@ -245,6 +282,12 @@ async function saveSettings() {
         state.settings.city = city;
         state.settings.country = country;
         state.settings.theme = selectedTheme;
+
+        // Save screen size preference
+        if (screenSizeToggle) {
+            state.settings.bigScreen = screenSizeToggle.checked;
+        }
+
 
         if (athkarAlertsToggle) {
             state.settings.athkarAlertEnabled = athkarAlertsToggle.checked;
@@ -270,6 +313,9 @@ async function saveSettings() {
         }
 
         await ipcRenderer.invoke('save-settings', state.settings);
+
+        // Apply screen size changes immediately
+        await screenSizeManager.applyScreenSize();
 
         showToast(t('settingsSaved'), 'success');
 
