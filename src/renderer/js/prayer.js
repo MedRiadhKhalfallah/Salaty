@@ -200,7 +200,7 @@ function updateCurrentAndNextPrayer() {
         if (preAdhanEnabled && nextPrayer && timeRemaining <= preAdhanSeconds && timeRemaining > 0) {
             if (lastPreAdhanNotificationPrayer !== nextPrayer.key) {
                 // Remplacer showToast par une notification Windows
-                const notificationTitle = 'Salaty';
+                const notificationTitle = 'Salaty Time';
                 const notificationBody = t('adhanInXmin').replace('{prayer}', nextPrayer.name).replace('{minutes}', preAdhanMinutes);
 
                 new Notification(notificationTitle, {
