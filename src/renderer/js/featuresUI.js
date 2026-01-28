@@ -161,8 +161,7 @@ function setupFeatureCards() {
 
 function openQuran() {
   console.log('Opening Quran...');
-  const size = screenSizeManager.getWindowSize();
-  ipcRenderer.invoke('resize-window', size.width, size.height);
+  ipcRenderer.invoke('resize-window', 850, 600);
   ipcRenderer.invoke('navigate-to', 'quran');
 }
 
