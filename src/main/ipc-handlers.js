@@ -7,7 +7,8 @@ let settingsData = {
   country: 'Tunisia',
   theme: 'navy',
   language: 'en',
-  position: { x: 100, y: 100 }
+  position: { x: 100, y: 100 },
+  bigScreen: true
 };
 
 function getSettingsPath() {
