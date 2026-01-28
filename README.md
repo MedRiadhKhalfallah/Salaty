@@ -104,7 +104,7 @@ A comprehensive, beautiful, lightweight **Electron.js** desktop application that
 ### 📖 **Islamic Features Suite**
 | Holy Quran Reader | Athkar Counter | Qibla Finder |
 |:-----------------:|:--------------:|:------------:|
-| <img src="https://github.com/user-attachments/assets/95c8f7d0-6fa5-4d66-a857-527f573555d1" width="280"/> | <img src="https://github.com/user-attachments/assets/b3fd74b9-3edf-4326-969b-7eeac5e6009d" width="280"/> | <img src="https://github.com/user-attachments/assets/95c8f7d0-6fa5-4d66-a857-527f573555d1" width="280"/> |
+| <img src="https://github.com/user-attachments/assets/5fa956fa-89c6-456f-911c-f6033ec1a3d2" width="280"/> | <img src="https://github.com/user-attachments/assets/847c1486-b23e-42d1-95a5-de7bee27a610" width="280"/> | <img src="https://github.com/user-attachments/assets/0b24c087-9856-48d4-b7b4-47bd907b1576" width="280"/> |
 
 ### 🌙 **Ramadhan & Special Features**
 | Ramadhan Tracker | 99 Names of Allah | Features Hub |
