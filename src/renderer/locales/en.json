@@ -18,6 +18,7 @@
     "settings": "Settings",
     "quran": "Quran",
     "city": "City",
+    "location": "Location",
     "detectLocation": "Auto Detect Location",
     "country": "Country",
     "theme": "Theme",
@@ -118,9 +119,9 @@
     "beautifulNames": "The Beautiful Names of Allah",
     "loadingAsma": "Loading Names...",
     "screenSizeSettingLabel": "Screen Size",
-    "screenSizeDescription": "Small screen: 320×575 | Big screen: 850×600",
     "bigScreen": "Big Screen",
-    "smallScreen": "Small Screen"
+    "smallScreen": "Small Screen",
+    "notification": "Notification"
   },
   "themes": {
     "navy": "Navy",
@@ -133,6 +134,7 @@
     "ocean": "Ocean",
     "royal": "Royal",
     "indigo": "Indigo",
-    "classic": "Classic"
+    "classic": "Classic",
+    "ramadan": "Ramadan"
   }
 }

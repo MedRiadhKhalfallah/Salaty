@@ -2,11 +2,22 @@ const { ipcRenderer } = require('electron');
 const { t } = require('./translations');
 const screenSizeManager = require('./screenSize'); 
 
-let isFeaturesFullscreen = false;
-
-// ==================== FEATURES PAGE FUNCTIONS ====================
 function initFeaturesPage() {
   console.log('Initializing Features page...');
+
+  // SET INITIAL SCREEN SIZE
+  const useBigScreen = screenSizeManager.isBigScreen();
+  console.log('Initial screen size preference:', useBigScreen ? 'big' : 'small');
+  
+  if (useBigScreen) {
+    document.body.setAttribute('data-screen-size', 'big');
+    document.body.classList.add('big-screen');
+    document.querySelector('.features-container')?.classList.add('big-screen');
+  } else {
+    document.body.setAttribute('data-screen-size', 'small');
+    document.body.classList.add('small-screen');
+    document.querySelector('.features-container')?.classList.add('small-screen');
+  }
 
   // Setup back button
   const backBtn = document.getElementById('backBtn');
@@ -14,22 +25,16 @@ function initFeaturesPage() {
     console.log('Back button found');
     backBtn.addEventListener('click', () => {
       console.log('Back button clicked');
-      if (isFeaturesFullscreen) {
-        toggleFeaturesFullscreen(); // Exit fullscreen first
-      }
-      
-      // Use screen size preference for main page
-      const size = screenSizeManager.getWindowSize();
-      ipcRenderer.invoke('resize-window', size.width, size.height);
-      
+      const currentSize = getCurrentWindowSize();
+      ipcRenderer.invoke('resize-window', currentSize.width, currentSize.height);
       ipcRenderer.invoke('go-back');
     });
   }
 
-  // Setup fullscreen button
-  const fullscreenBtn = document.getElementById('featuresFullscreenBtn');
-  if (fullscreenBtn) {
-    fullscreenBtn.addEventListener('click', toggleFeaturesFullscreen);
+  // Setup screen size toggle button (formerly fullscreen button)
+  const screenSizeBtn = document.getElementById('featuresFullscreenBtn');
+  if (screenSizeBtn) {
+    screenSizeBtn.addEventListener('click', toggleFeaturesScreenSize);
   }
 
   // Update UI text
@@ -37,6 +42,11 @@ function initFeaturesPage() {
 
   // Setup feature card clicks
   setupFeatureCards();
+}
+
+function getCurrentWindowSize() {
+  const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
+  return isBigScreen ? { width: 850, height: 600 } : { width: 320, height: 575 };
 }
 
 function updateFeaturesUI() {
@@ -66,8 +76,8 @@ function updateFeaturesUI() {
   // Coming soon badges
   const comingSoonBadges = document.querySelectorAll('.coming-soon-badge');
 
-  // Fullscreen button
-  const fullscreenBtn = document.getElementById('featuresFullscreenBtn');
+  // Screen size button
+  const screenSizeBtn = document.getElementById('featuresFullscreenBtn');
 
   if (featuresTitle) featuresTitle.textContent = t('islamicFeatures');
   if (featuresFooterText) featuresFooterText.textContent = t('moreFeaturesComingSoon');
@@ -94,12 +104,24 @@ function updateFeaturesUI() {
     badge.textContent = t('comingSoon');
   });
 
-  // Update fullscreen button
-  if (fullscreenBtn) {
-    fullscreenBtn.setAttribute('aria-label', isFeaturesFullscreen ? t('exitFullscreen') : t('enterFullscreen'));
-    const icon = fullscreenBtn.querySelector('i');
-    if (icon) {
-      icon.className = isFeaturesFullscreen ? 'fas fa-compress' : 'fas fa-expand';
+  // Update screen size button
+  if (screenSizeBtn) {
+    const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
+    
+    if (isBigScreen) {
+      // Currently big → button should say "Small Screen"
+      screenSizeBtn.setAttribute('aria-label', t('switchToSmallScreen') || 'Switch to Small Screen');
+      const icon = screenSizeBtn.querySelector('i');
+      if (icon) {
+        icon.className = 'fas fa-compress';
+      }
+    } else {
+      // Currently small → button should say "Big Screen"
+      screenSizeBtn.setAttribute('aria-label', t('switchToBigScreen') || 'Switch to Big Screen');
+      const icon = screenSizeBtn.querySelector('i');
+      if (icon) {
+        icon.className = 'fas fa-expand';
+      }
     }
   }
 }
@@ -135,85 +157,63 @@ function setupFeatureCards() {
   if (asmaCard) {
     asmaCard.addEventListener('click', openAsma);
   }
-
 }
 
 function openQuran() {
   console.log('Opening Quran...');
-  if (isFeaturesFullscreen) {
-    toggleFeaturesFullscreen(); // Exit fullscreen first
-  }
-  ipcRenderer.invoke('resize-window', 850, 600);
+  const size = screenSizeManager.getWindowSize();
+  ipcRenderer.invoke('resize-window', size.width, size.height);
   ipcRenderer.invoke('navigate-to', 'quran');
 }
 
 function openAthkar() {
   console.log('Opening Athkar...');
-  if (isFeaturesFullscreen) {
-    toggleFeaturesFullscreen(); // Exit fullscreen first
-  }
-  
-  // Use the screen size preference
   const size = screenSizeManager.getWindowSize();
   ipcRenderer.invoke('resize-window', size.width, size.height);
-  
   ipcRenderer.invoke('navigate-to', 'athkar');
 }
 
 function openRamadhan() {
   console.log('Opening Ramadhan...');
-  if (isFeaturesFullscreen) {
-    toggleFeaturesFullscreen(); // Exit fullscreen first
-  }
-  
-  // Use the screen size preference
   const size = screenSizeManager.getWindowSize();
   ipcRenderer.invoke('resize-window', size.width, size.height);
-  
   ipcRenderer.invoke('navigate-to', 'ramadan');
 }
 
 function openQibla() {
   console.log('Opening Qibla...');
-  if (isFeaturesFullscreen) {
-    toggleFeaturesFullscreen(); // Exit fullscreen first
-  }
-  
-  // Use the screen size preference
   const size = screenSizeManager.getWindowSize();
   ipcRenderer.invoke('resize-window', size.width, size.height);
-  
   ipcRenderer.invoke('navigate-to', 'qibla');
 }
 
 function openAsma() {
   console.log('Opening Asma Allah...');
-  if (isFeaturesFullscreen) {
-    toggleFeaturesFullscreen(); // Exit fullscreen first
-  }
-  
-  // Use the screen size preference
   const size = screenSizeManager.getWindowSize();
   ipcRenderer.invoke('resize-window', size.width, size.height);
-  
   ipcRenderer.invoke('navigate-to', 'asma');
 }
 
-function toggleFeaturesFullscreen() {
-  isFeaturesFullscreen = !isFeaturesFullscreen;
-
-  if (isFeaturesFullscreen) {
-    // Enter fullscreen - use 850×600 (big screen size)
-    ipcRenderer.invoke('resize-window', 850, 600);
-    document.body.classList.add('fullscreen');
-    document.querySelector('.features-container').classList.add('fullscreen');
+function toggleFeaturesScreenSize() {
+  const isCurrentlyBig = document.body.getAttribute('data-screen-size') === 'big';
+  console.log('toggleFeaturesScreenSize: Switching FROM', isCurrentlyBig ? 'BIG to SMALL' : 'SMALL to BIG');
+  
+  if (isCurrentlyBig) {
+    // Switch FROM big TO small screen
+    ipcRenderer.invoke('resize-window', 320, 575);
+    document.body.setAttribute('data-screen-size', 'small');
+    document.body.classList.remove('big-screen');
+    document.body.classList.add('small-screen');
+    document.querySelector('.features-container')?.classList.remove('big-screen');
+    document.querySelector('.features-container')?.classList.add('small-screen');
   } else {
-    // Exit fullscreen - use the screen size preference
-    const size = screenSizeManager.getWindowSize();
-    ipcRenderer.invoke('resize-window', size.width, size.height);
-    
-    document.body.classList.remove('fullscreen');
-    document.querySelector('.features-container').classList.remove('fullscreen');
+    // Switch FROM small TO big screen
+    ipcRenderer.invoke('resize-window', 850, 600);
+    document.body.setAttribute('data-screen-size', 'big');
+    document.body.classList.remove('small-screen');
+    document.body.classList.add('big-screen');
+    document.querySelector('.features-container')?.classList.remove('small-screen');
+    document.querySelector('.features-container')?.classList.add('big-screen');
   }
 
   updateFeaturesUI();

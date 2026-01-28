@@ -26,74 +26,58 @@ function initSettingsPage() {
         saveBtn.addEventListener('click', saveSettings);
     }
 
-    // Initialize UI
     // Sync pendingTheme with current theme
     pendingTheme = state.settings.theme || 'navy';
 
-    updateSettings();
-    initThemeOptions();
-    initLanguageOptions();
+    // Initialize all components
+    updateAllText();
+    initThemeSelection();
+    initLanguageSelection();
     initAthkarAlerts();
     initPreAdhanNotification();
     initScreenSizeSetting();
 }
 
-function initPreAdhanNotification() {
-    const toggle = document.getElementById('preAdhanNotificationToggle');
-    const minutesInput = document.getElementById('preAdhanMinutesInput');
-    const container = document.getElementById('preAdhanMinutesContainer');
-
-    if (toggle && minutesInput) {
-        // Init values from state
-        toggle.checked = state.settings.preAdhanNotificationEnabled !== false; // Default true
-        minutesInput.value = state.settings.preAdhanMinutes || 5;
-
-        // Function to update UI state
-        const updateUI = () => {
-            if (toggle.checked) {
-                container.style.opacity = '1';
-                container.style.pointerEvents = 'auto';
-                minutesInput.disabled = false;
-            } else {
-                container.style.opacity = '0.5';
-                container.style.pointerEvents = 'none';
-                minutesInput.disabled = true;
-            }
-        };
-
-        // Initial update
-        updateUI();
-
-        // Listen for changes
-        toggle.addEventListener('change', updateUI);
-    }
-}
-
-function updateSettings() {
-    // Update all text elements
-    const elements = {
+/**
+ * Update all text elements with translations
+ */
+function updateAllText() {
+    const textElements = {
+        // Header
         'settingsTitle': 'settings',
-        'cityLabel': 'city',
+        
+        // Location Section
+        'locationSectionTitle': 'location',
         'countryLabel': 'country',
+        'cityLabel': 'city',
+        'detectLocationLabel': 'detectLocation',
+        
+        // Appearance Section
+        'appearanceSectionTitle': 'theme',
         'themeLabel': 'theme',
         'languageLabel': 'language',
         'screenSizeSettingLabel': 'screenSizeSettingLabel',
-        'screenSizeDescription': 'screenSizeDescription',
-        'cityHint': 'cityHint',
-        'countryHint': 'countryHint',
-        'footerText': 'madeWith',
-        'detectLocationLabel': 'detectLocation',
+        'smallScreenLabel': 'smallScreen',
+        'bigScreenLabel': 'bigScreen',
+        
+        // Notifications Section
+        'notificationsSectionTitle': 'notification',
         'athkarAlertsLabel': 'athkarAlerts',
         'enableAthkarAlertsLabel': 'enableAthkarAlerts',
         'athkarIntervalLabel': 'athkarInterval',
         'minutesLabel': 'minutes',
-        'minutesLabel2': 'minutes',
         'preAdhanNotificationLabel': 'preAdhanNotification',
         'enablePreAdhanNotificationLabel': 'enablePreAdhanNotification',
-        'preAdhanMinutesLabel': 'minutesBeforeAdhan'
+        'preAdhanMinutesLabel': 'minutesBeforeAdhan',
+        'minutesLabel2': 'minutes',
+
+        'saveBtn': 'save',
+        
+        // Footer
+        'footerText': 'madeWith'
     };
 
-    for (const [id, key] of Object.entries(elements)) {
+    for (const [id, key] of Object.entries(textElements)) {
         const element = document.getElementById(id);
         if (element) {
             if (id === 'footerText') {
@@ -104,170 +88,208 @@ function updateSettings() {
         }
     }
 
-    // Update screen size label
-    updateScreenSizeLabel();
-
-    // Update placeholders
-    const cityInput = document.getElementById('cityInput');
-    const countryInput = document.getElementById('countryInput');
-    const saveBtn = document.getElementById('saveBtn');
-
-    if (cityInput) {
-        cityInput.placeholder = t('cityPlaceholder');
-        cityInput.value = state.settings.city || '';
-    }
-    if (countryInput) {
-        countryInput.placeholder = t('countryPlaceholder');
-        countryInput.value = state.settings.country || '';
-    }
-    if (saveBtn) {
-        saveBtn.textContent = t('save');
-    }
+    // Update theme names
+    updateThemeNames();
 }
 
-function initThemeOptions() {
-    const themeOptionsContainer = document.getElementById('themeOptions');
-    if (!themeOptionsContainer) return;
+/**
+ * Initialize theme selection
+ */
+function initThemeSelection() {
+    const themeContainer = document.getElementById('themeOptions');
+    if (!themeContainer) return;
 
-    const themeOptions = themeOptionsContainer.querySelectorAll('.theme-option');
-    themeOptions.forEach(opt => {
-        const theme = opt.dataset.theme;
-        opt.textContent = t(theme, 'themes');
-
-        // Mark selected theme using state.settings.theme for initial view,
-        // but in settings page we interact with pendingTheme somewhat.
-        // Actually renderer.js code logic was:
-        // Mark selected theme based on `selectedTheme` which was state.settings.theme.
-        // When clicking, we update `pendingTheme` and update visual selection.
-
-        // Let's use state.settings.theme as the initial "selected" one.
-        // But wait, if I click an option, it becomes "selected" in UI.
-
-        // In renderer.js:
-        // if (theme === selectedTheme) { opt.classList.add('selected'); }
-        // selectedTheme was a global variable.
-
-        // Here we should probably check against pendingTheme if we want to reflect current selection in settings page
-        // or state.settings.theme if we want to reflect saved settings.
-        // Usually settings page reflects saved settings until you click, then it reflects pending.
-
-        // Since initThemeOptions is called on init, pendingTheme is set to state.settings.theme.
-
-        if (theme === pendingTheme) {
-            opt.classList.add('selected');
-        } else {
-            opt.classList.remove('selected');
+    const themeCards = themeContainer.querySelectorAll('.theme-card');
+    
+    themeCards.forEach(card => {
+        const theme = card.dataset.theme;
+        
+        // Update theme name
+        const nameElement = card.querySelector('.theme-name');
+        if (nameElement) {
+            nameElement.textContent = t(theme, 'themes');
         }
-
+        
+        // Mark selected theme
+        if (theme === pendingTheme) {
+            card.classList.add('selected');
+        } else {
+            card.classList.remove('selected');
+        }
+        
         // Add click handler
-        opt.addEventListener('click', () => {
+        card.addEventListener('click', () => {
             pendingTheme = theme;
-
+            
             // Update visual selection
-            themeOptions.forEach(o => o.classList.remove('selected'));
-            opt.classList.add('selected');
-
+            themeCards.forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            
             // Apply theme preview
             applyTheme(pendingTheme);
         });
     });
 }
 
-function initLanguageOptions() {
-    const languageOptionsContainer = document.getElementById('languageOptions');
-    if (!languageOptionsContainer) return;
-
-    const languageOptions = languageOptionsContainer.querySelectorAll('.language-option');
-    languageOptions.forEach(opt => {
-        // Mark selected language
-        if (opt.dataset.lang === state.settings.language) {
-            opt.classList.add('selected');
-        } else {
-            opt.classList.remove('selected');
+/**
+ * Update theme names with translations
+ */
+function updateThemeNames() {
+    const themeCards = document.querySelectorAll('.theme-card');
+    themeCards.forEach(card => {
+        const theme = card.dataset.theme;
+        const nameElement = card.querySelector('.theme-name');
+        if (nameElement && theme) {
+            nameElement.textContent = t(theme, 'themes');
         }
+    });
+}
 
+/**
+ * Initialize language selection
+ */
+function initLanguageSelection() {
+    const languageContainer = document.getElementById('languageOptions');
+    if (!languageContainer) return;
+
+    const languageCards = languageContainer.querySelectorAll('.language-card');
+    
+    languageCards.forEach(card => {
+        // Mark selected language
+        if (card.dataset.lang === state.settings.language) {
+            card.classList.add('selected');
+        } else {
+            card.classList.remove('selected');
+        }
+        
         // Add click handler
-        opt.addEventListener('click', () => {
-            const newLang = opt.dataset.lang;
+        card.addEventListener('click', () => {
+            const newLang = card.dataset.lang;
             state.settings.language = newLang;
             setLanguage(newLang);
-
+            
             // Update visual selection
-            languageOptions.forEach(o => o.classList.remove('selected'));
-            opt.classList.add('selected');
-
+            languageCards.forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            
             // Apply language direction and update UI
             applyLanguageDirection();
-            updateSettings();
-            initThemeOptions(); // Update theme labels in new language
+            updateAllText();
         });
     });
 }
 
+/**
+ * Initialize Screen Size card selection
+ */
+function initScreenSizeSetting() {
+    const sizeContainer = document.getElementById('screenSizeOptions');
+    if (!sizeContainer) return;
+
+    const sizeCards = sizeContainer.querySelectorAll('.size-card');
+    
+    // Set initial selection
+    sizeCards.forEach(card => {
+        const size = card.dataset.size;
+        if ((size === 'big' && state.settings.bigScreen) || 
+            (size === 'small' && !state.settings.bigScreen)) {
+            card.classList.add('selected');
+        } else {
+            card.classList.remove('selected');
+        }
+        
+        // Add click handler
+        card.addEventListener('click', () => {
+            const newSize = card.dataset.size;
+            state.settings.bigScreen = (newSize === 'big');
+            
+            // Update visual selection
+            sizeCards.forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+        });
+    });
+}
+
+/**
+ * Initialize Athkar Alerts toggle and settings
+ */
 function initAthkarAlerts() {
     const toggle = document.getElementById('athkarAlertsToggle');
     const intervalInput = document.getElementById('athkarIntervalInput');
-    const intervalContainer = document.getElementById('athkarIntervalContainer');
+    const container = document.getElementById('athkarIntervalContainer');
 
-    if (toggle && intervalInput) {
-        toggle.checked = state.settings.athkarAlertEnabled || false;
-        intervalInput.value = state.settings.athkarAlertInterval || 30;
+    if (!toggle || !intervalInput || !container) return;
 
-        const updateState = () => {
-            if (toggle.checked) {
-                intervalContainer.style.opacity = '1';
-                intervalContainer.style.pointerEvents = 'auto';
-                intervalInput.disabled = false;
-            } else {
-                intervalContainer.style.opacity = '0.5';
-                intervalContainer.style.pointerEvents = 'none';
-                intervalInput.disabled = true;
-            }
-        };
+    // Set initial values
+    toggle.checked = state.settings.athkarAlertEnabled || false;
+    intervalInput.value = state.settings.athkarAlertInterval || 30;
 
-        // Initial state
-        updateState();
+    // Update UI based on toggle state
+    const updateUI = () => {
+        if (toggle.checked) {
+            container.classList.add('active');
+            intervalInput.disabled = false;
+        } else {
+            container.classList.remove('active');
+            intervalInput.disabled = true;
+        }
+    };
 
-        toggle.addEventListener('change', updateState);
-    }
+    // Initial update
+    updateUI();
+
+    // Listen for changes
+    toggle.addEventListener('change', updateUI);
 }
 
-function initScreenSizeSetting() {
-    const screenSizeToggle = document.getElementById('screenSizeToggle');
-    const screenSizeLabel = document.getElementById('screenSizeLabel');
-    
-    if (screenSizeToggle && screenSizeLabel) {
-        // Set initial value from settings
-        screenSizeToggle.checked = state.settings.bigScreen || false;
-        
-        // Update label text based on current state
-        updateScreenSizeLabel();
-        
-        // Listen for changes
-        screenSizeToggle.addEventListener('change', () => {
-            state.settings.bigScreen = screenSizeToggle.checked;
-            updateScreenSizeLabel();
-        });
-    }
+/**
+ * Initialize Pre-Adhan Notification toggle and settings
+ */
+function initPreAdhanNotification() {
+    const toggle = document.getElementById('preAdhanNotificationToggle');
+    const minutesInput = document.getElementById('preAdhanMinutesInput');
+    const container = document.getElementById('preAdhanMinutesContainer');
+
+    if (!toggle || !minutesInput || !container) return;
+
+    // Set initial values (default to true)
+    toggle.checked = state.settings.preAdhanNotificationEnabled !== false;
+    minutesInput.value = state.settings.preAdhanMinutes || 5;
+
+    // Update UI based on toggle state
+    const updateUI = () => {
+        if (toggle.checked) {
+            container.classList.add('active');
+            minutesInput.disabled = false;
+        } else {
+            container.classList.remove('active');
+            minutesInput.disabled = true;
+        }
+    };
+
+    // Initial update
+    updateUI();
+
+    // Listen for changes
+    toggle.addEventListener('change', updateUI);
 }
 
-function updateScreenSizeLabel() {
-    const screenSizeToggle = document.getElementById('screenSizeToggle');
-    const screenSizeLabel = document.getElementById('screenSizeLabel');
-    
-    if (screenSizeLabel && screenSizeToggle) {
-        screenSizeLabel.textContent = screenSizeToggle.checked ? 
-            t('bigScreen') : t('smallScreen');
-    }
-}
-
+/**
+ * Save all settings
+ */
 async function saveSettings() {
     const cityInput = document.getElementById('cityInput');
     const countryInput = document.getElementById('countryInput');
     const athkarAlertsToggle = document.getElementById('athkarAlertsToggle');
     const athkarIntervalInput = document.getElementById('athkarIntervalInput');
-    const screenSizeToggle = document.getElementById('screenSizeToggle');
+    const preAdhanToggle = document.getElementById('preAdhanNotificationToggle');
+    const preAdhanInput = document.getElementById('preAdhanMinutesInput');
+    
+    // Get selected screen size from card
+    const selectedSizeCard = document.querySelector('.size-card.selected');
+    const selectedSize = selectedSizeCard ? selectedSizeCard.dataset.size : 'small';
 
+    // Validate location
     const city = cityInput ? cityInput.value.trim() : '';
     const country = countryInput ? countryInput.value.trim() : '';
 
@@ -277,18 +299,15 @@ async function saveSettings() {
     }
 
     try {
-        const selectedTheme = pendingTheme; // This was using global variable selectedTheme in renderer.js
-
+        // Update all settings
         state.settings.city = city;
         state.settings.country = country;
-        state.settings.theme = selectedTheme;
+        state.settings.theme = pendingTheme;
 
-        // Save screen size preference
-        if (screenSizeToggle) {
-            state.settings.bigScreen = screenSizeToggle.checked;
-        }
+        // Screen size - updated for card selection
+        state.settings.bigScreen = (selectedSize === 'big');
 
-
+        // Athkar alerts
         if (athkarAlertsToggle) {
             state.settings.athkarAlertEnabled = athkarAlertsToggle.checked;
         }
@@ -299,9 +318,7 @@ async function saveSettings() {
             state.settings.athkarAlertInterval = interval;
         }
 
-        const preAdhanToggle = document.getElementById('preAdhanNotificationToggle');
-        const preAdhanInput = document.getElementById('preAdhanMinutesInput');
-
+        // Pre-Adhan notification
         if (preAdhanToggle) {
             state.settings.preAdhanNotificationEnabled = preAdhanToggle.checked;
         }
@@ -312,11 +329,13 @@ async function saveSettings() {
             state.settings.preAdhanMinutes = minutes;
         }
 
+        // Save to storage
         await ipcRenderer.invoke('save-settings', state.settings);
 
         // Apply screen size changes immediately
         await screenSizeManager.applyScreenSize();
 
+        // Show success message
         showToast(t('settingsSaved'), 'success');
 
         // Go back to main screen after a short delay

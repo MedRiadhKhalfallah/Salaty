@@ -18,6 +18,7 @@
     "settings": "الإعدادات",
     "quran": "القرآن",
     "city": "المدينة",
+    "location": "الموقع",
     "detectLocation": "تحديد الموقع تلقائيا",
     "country": "البلد",
     "theme": "المظهر",
@@ -118,9 +119,9 @@
     "beautifulNames": "أسماء الله الحسنى",
     "loadingAsma": "جاري تحميل الأسماء...",
     "screenSizeSettingLabel": "حجم الشاشة",
-    "screenSizeDescription": "شاشة صغيرة: 320×575 | شاشة كبيرة: 850×600",
     "bigScreen": "شاشة كبيرة",
-    "smallScreen": "شاشة صغيرة"
+    "smallScreen": "شاشة صغيرة",
+    "notification": "إشعارات"
   },
   "themes": {
     "navy": "أزرق داكن",
@@ -133,6 +134,7 @@
     "ocean": "محيطي",
     "royal": "ملكي",
     "indigo": "نيلي",
-    "classic": "كلاسيكي"
+    "classic": "كلاسيكي",
+    "ramadan": "رمضان"
   }
 }
