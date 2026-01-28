@@ -14,6 +14,7 @@ function showAdhanStopBtn(show) {
             btn.classList.add('adhan-stop-btn-hidden');
         }
     }
+    setAdhanStopText();
 }
 
 function notifyPrayer(prayer, mode = true) {
