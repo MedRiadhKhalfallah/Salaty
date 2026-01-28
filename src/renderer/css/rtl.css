@@ -181,9 +181,9 @@
 }
 
 [dir="rtl"] .settings-title {
-  direction: rtl;
+  margin: 0 12px 0 auto;
   text-align: right;
-  margin: 0 auto 0 12px;
+  direction: rtl;
 }
 
 [dir="rtl"] .settings-content {
@@ -197,6 +197,147 @@
 }
 
 [dir="rtl"] .settings-content .footer-text {
+  direction: rtl;
+  text-align: center;
+}
+
+
+/* ========================================
+   SECTION HEADERS
+   ======================================== */
+
+[dir="rtl"] .section-header {
+  direction: rtl;
+}
+
+[dir="rtl"] .section-icon {
+  margin-right: 0;
+  margin-left: 10px;
+}
+
+[dir="rtl"] .section-title {
+  text-align: right;
+}
+
+/* ========================================
+   FORM FIELDS
+   ======================================== */
+
+[dir="rtl"] .field-label {
+  text-align: right;
+}
+
+[dir="rtl"] .field-input {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Keep Country and City inputs LTR */
+[dir="rtl"] #countryInput,
+[dir="rtl"] #cityInput {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* Input with Unit */
+[dir="rtl"] .input-with-unit {
+  flex-direction: row-reverse;
+}
+
+/* Field Hint */
+[dir="rtl"] .field-hint {
+  direction: rtl;
+  text-align: right;
+}
+
+/* ========================================
+   SUBSECTIONS
+   ======================================== */
+
+[dir="rtl"] .subsection-label {
+  text-align: right;
+}
+
+/* ========================================
+   THEME SELECTION
+   ======================================== */
+
+[dir="rtl"] .theme-name {
+  text-align: center;
+  direction: rtl;
+}
+
+/* ========================================
+   LANGUAGE SELECTION
+   ======================================== */
+
+[dir="rtl"] .language-card {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .language-card:hover {
+  transform: translateX(-4px);
+}
+
+[dir="rtl"] .language-info {
+  text-align: right;
+}
+
+[dir="rtl"] .language-card .lang-name {
+  text-align: right;
+}
+
+[dir="rtl"] .language-card .lang-native {
+  text-align: right;
+}
+
+/* ========================================
+   TOGGLE FIELDS
+   ======================================== */
+
+[dir="rtl"] .toggle-field {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .toggle-info {
+  text-align: right;
+}
+
+[dir="rtl"] .toggle-description {
+  text-align: right;
+}
+
+/* ========================================
+   DETECT BUTTON
+   ======================================== */
+
+[dir="rtl"] .detect-btn {
+  direction: rtl;
+}
+
+[dir="rtl"] .detect-btn i {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+/* ========================================
+   SAVE BUTTON
+   ======================================== */
+
+[dir="rtl"] .save-btn {
+  direction: rtl;
+}
+
+[dir="rtl"] .save-btn i {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+/* ========================================
+   FOOTER
+   ======================================== */
+
+[dir="rtl"] .footer-text {
   direction: rtl;
   text-align: center;
 }
