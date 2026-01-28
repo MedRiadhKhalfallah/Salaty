@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="https://github.com/user-attachments/assets/3be14f59-2663-42da-b370-93c8e796f0bb" alt="Salaty Time – Beautiful Islamic Prayer Times Desktop App" width="380"/>
-
 A comprehensive, beautiful, lightweight **Electron.js** desktop application that shows accurate Islamic prayer times with modern glassmorphism design, **12 stunning themes**, and a complete suite of Islamic features.
 
 **Made with love for the Muslim Ummah**
