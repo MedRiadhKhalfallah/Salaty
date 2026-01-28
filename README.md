@@ -99,7 +99,7 @@ A comprehensive, beautiful, lightweight **Electron.js** desktop application that
 ### ⚙️ **Customization & Settings**
 | Settings Panel | Theme Selection | Language Options |
 |:--------------:|:--------------:|:----------------:|
-| <img src="https://github.com/user-attachments/assets/677e38cc-5cee-4f8f-886b-9f089e64ae0d" width="280"/> | <img src="https://github.com/user-attachments/assets/677e38cc-5cee-4f8f-886b-9f089e64ae0d" width="280"/> | <img src="https://github.com/user-attachments/assets/677e38cc-5cee-4f8f-886b-9f089e64ae0d" width="280"/> |
+| <img src="https://github.com/user-attachments/assets/3c14a19d-df48-48b6-b232-437c324aa833" width="280"/> | <img src="https://github.com/user-attachments/assets/9e9b90d5-8008-4aaa-a567-a9f019292d5c" width="280"/> | <img src="https://github.com/user-attachments/assets/c0442e97-9758-4773-bd8e-3f2ffbf6ee1c" width="280"/> |
 
 ### 📖 **Islamic Features Suite**
 | Holy Quran Reader | Athkar Counter | Qibla Finder |
