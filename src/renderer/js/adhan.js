@@ -19,7 +19,7 @@ function showAdhanStopBtn(show) {
 
 function notifyPrayer(prayer, mode = true) {
     const prayerName = t(prayer.key, 'prayerNames');
-    new Notification('Salaty', {
+    new Notification('Salaty Time', {
         body: `${t('currentPrayer')}: ${prayerName}`,
         icon: path.join(__dirname, '../../assets/icons/app_icon.png'), // Correction du chemin
         silent: true

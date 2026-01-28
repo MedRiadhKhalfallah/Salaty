@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Athkar - Salaty</title>
+  <title>Athkar - Salaty Time</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../css/main.css">
   <link rel="stylesheet" href="../css/themes.css">
@@ -15,16 +15,16 @@
 <body>
   <div class="app-container theme-dark" id="app">
     <div class="drag-area"></div>
-    
+
     <div class="athkar-container">
       <div class="athkar-header">
         <!-- Back button position will be adjusted by CSS based on language -->
         <button class="back-btn" id="backBtn" aria-label="Back to Main">
           <i class="fas fa-arrow-left"></i>
         </button>
-        
+
         <h2 class="athkar-title" id="athkarTitle">Athkar</h2>
-        
+
         <!-- Controls -->
         <div class="athkar-controls">
           <button class="control-btn fullscreen-btn" id="athkarFullscreenBtn" aria-label="Toggle Fullscreen">
@@ -35,12 +35,12 @@
           </button>
         </div>
       </div>
-      
+
       <!-- Category Navigation -->
       <div class="category-nav" id="categoryNav">
         <!-- Categories will be dynamically loaded -->
       </div>
-      
+
       <!-- Athkar Content -->
       <div class="athkar-content" id="athkarContent">
         <div class="athkar-loading" id="athkarLoading">
@@ -49,12 +49,12 @@
             <span id="loadingText">Loading Athkar...</span>
           </div>
         </div>
-        
+
         <div class="athkar-list" id="athkarList">
           <!-- Athkar cards will be loaded here -->
         </div>
       </div>
-      
+
       <div class="athkar-footer">
         <div class="athkar-footer-text" id="athkarFooterText">
           Remembrances from the Sunnah

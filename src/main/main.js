@@ -10,7 +10,7 @@ autoUpdater.autoInstallOnAppQuit = true;
 
 // Set App User Model ID for Windows Notifications
 if (process.platform === 'win32') {
-  app.setAppUserModelId('Salaty');
+  app.setAppUserModelId('Salaty Time');
 }
 
 let mainWindow;
@@ -87,7 +87,7 @@ function createWindow() {
     tray = new Tray(path.join(__dirname, '../assets/icons/app_icon.ico'));
     const contextMenu = Menu.buildFromTemplate([
       {
-        label: 'Afficher Salaty',
+        label: 'Afficher Salaty Time',
         click: () => {
           mainWindow.show();
         }
@@ -102,7 +102,7 @@ function createWindow() {
         }
       }
     ]);
-    tray.setToolTip('Salaty');
+    tray.setToolTip('Salaty Time');
     tray.setContextMenu(contextMenu);
     tray.on('click', () => {
       mainWindow.show();

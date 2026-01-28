@@ -41,7 +41,7 @@ function showAthkarAlert() {
     };
 
     const spawnNotification = () => {
-        const notif = new Notification('Salaty - Athkar', notificationOptions);
+        const notif = new Notification('Salaty Time - Athkar', notificationOptions);
         // Auto close after 10 seconds
         setTimeout(() => notif.close(), 10000);
     };

@@ -1,7 +1,7 @@
 {
-  "name": "salaty",
+  "name": "salaty-time",
   "version": "1.0.0",
-  "description": "Salaty Islamic Prayer Times Desktop App",
+  "description": "Salaty Time Islamic Prayer Times Desktop App",
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
@@ -24,7 +24,7 @@
   },
   "build": {
     "appId": "com.yassindaboussi.salaty",
-    "productName": "Salaty Islamic Prayer Times",
+    "productName": "Salaty Time",
     "directories": {
       "output": "dist",
       "buildResources": "src/assets"
@@ -47,7 +47,7 @@
     "win": {
       "target": "nsis",
       "icon": "src/assets/icons/app_icon.ico",
-      "artifactName": "Salaty-Islamic-Prayer-Times-Setup.exe"
+      "artifactName": "Salaty-Time-Setup.exe"
     },
     "mac": {
       "target": "dmg",
