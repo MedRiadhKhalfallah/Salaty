@@ -109,7 +109,7 @@ A comprehensive, beautiful, lightweight **Electron.js** desktop application that
 ### 🌙 **Ramadhan & Special Features**
 | Ramadhan Tracker | 99 Names of Allah | Features Hub |
 |:----------------:|:-----------------:|:------------:|
-| <img src="https://github.com/user-attachments/assets/b3fd74b9-3edf-4326-969b-7eeac5e6009d" width="280"/> | <img src="https://github.com/user-attachments/assets/95c8f7d0-6fa5-4d66-a857-527f573555d1" width="280"/> | <img src="https://github.com/user-attachments/assets/677e38cc-5cee-4f8f-886b-9f089e64ae0d" width="280"/> |
+| <img src="https://github.com/user-attachments/assets/07b645f7-e90b-43b4-92f2-c14cf47c8a21" width="280"/> | <img src="https://github.com/user-attachments/assets/6d431d97-e9e2-42b9-9b78-e8610bdce132" width="280"/> | <img src="https://github.com/user-attachments/assets/c76807fc-301f-47ce-963a-299fb635b707" width="280"/> |
 
 *🎨 **12 Stunning Themes** - Each carefully crafted to enhance your spiritual experience*
 
