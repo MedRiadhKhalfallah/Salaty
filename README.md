@@ -90,10 +90,11 @@ A comprehensive, beautiful, lightweight **Electron.js** desktop application that
 
 ## 📸 **Gallery: Experience the Beauty of SalatyTime**
 
+
 ### 🕌 **Main Interface - Prayer Times at a Glance**
 | Navy Theme (Professional) | Royal Theme (Classic) | Ramadhan Theme (Spiritual) |
 |:-------------------------:|:---------------------:|:--------------------------:|
-| <img src="https://github.com/user-attachments/assets/95c8f7d0-6fa5-4d66-a857-527f573555d1" width="280"/> | <img src="https://github.com/user-attachments/assets/b3fd74b9-3edf-4326-969b-7eeac5e6009d" width="280"/> | <img src="https://github.com/user-attachments/assets/95c8f7d0-6fa5-4d66-a857-527f573555d1" width="280"/> |
+| <img src="https://github.com/user-attachments/assets/21a3f9b8-fe95-4836-9ab7-54056a42fd94" width="280"/> | <img src="https://github.com/user-attachments/assets/493825df-7382-4c4f-990b-99c73557c18d" width="280"/> | <img src="https://github.com/user-attachments/assets/40c74763-3811-4a44-bd14-c3f78d2fab92" width="280"/> |
 
 ### ⚙️ **Customization & Settings**
 | Settings Panel | Theme Selection | Language Options |
@@ -186,7 +187,7 @@ Uses Aladhan API for precise prayer times based on:
 
 **Architecture Highlights**
 
-- 🪟 **Frameless Window** – Custom title bar with minimize/close controls
+- ✨ **Frameless Window** – Custom title bar with minimize/close controls
 - 🔄 **Auto-refresh** – Updates prayer times hourly
 - 🛡️ **Error Handling** – Graceful network error management
 - 📱 **Responsive Design** – Adapts to different screen sizes
