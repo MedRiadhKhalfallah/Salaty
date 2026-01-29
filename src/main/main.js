@@ -1,12 +1,9 @@
-const { app, BrowserWindow, Tray, Menu, dialog, ipcMain } = require('electron');
-const { autoUpdater } = require('electron-updater');
+const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
 const path = require('path');
 const ipcHandlers = require('./ipc-handlers');
 
-// Configure logging
-autoUpdater.logger = console;
-autoUpdater.autoDownload = false;
-autoUpdater.autoInstallOnAppQuit = true;
+// Declare autoUpdater - will be initialized after app is ready
+let autoUpdater;
 
 // Set App User Model ID for Windows Notifications
 if (process.platform === 'win32') {
@@ -34,6 +31,11 @@ function createWindow() {
     const initialWidth = useBigScreen ? 850 : 320;
     const initialHeight = useBigScreen ? 600 : 575;
 
+  // Choose the correct icon based on platform
+  const iconPath = process.platform === 'darwin'
+    ? path.join(__dirname, '../assets/icons/app_icon.png')
+    : path.join(__dirname, '../assets/icons/app_icon.ico');
+
   mainWindow = new BrowserWindow({
     width: initialWidth,
     height: initialHeight,
@@ -43,7 +45,7 @@ function createWindow() {
     alwaysOnTop: true,
     x: settings.position.x,
     y: settings.position.y,
-    icon: path.join(__dirname, '../assets/icons/app_icon.ico'),
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -56,6 +58,9 @@ function createWindow() {
     minHeight: 575,
     show: false
   });
+
+  // Setup IPC handlers BEFORE loading the page
+  ipcHandlers.setupHandlers(mainWindow);
 
   // Affiche le DevTools seulement si --enable-logging est passé en argument
   if (process.argv.includes('--enable-logging')) {
@@ -84,7 +89,11 @@ function createWindow() {
 
   // Ajout du Tray
   if (!tray) {
-    tray = new Tray(path.join(__dirname, '../assets/icons/app_icon.ico'));
+    const trayIconPath = process.platform === 'darwin'
+      ? path.join(__dirname, '../assets/icons/app_icon.png')
+      : path.join(__dirname, '../assets/icons/app_icon.ico');
+
+    tray = new Tray(trayIconPath);
     const contextMenu = Menu.buildFromTemplate([
       {
         label: 'Afficher Salaty Time',
@@ -109,9 +118,6 @@ function createWindow() {
     });
   }
 
-  // Setup IPC handlers
-  ipcHandlers.setupHandlers(mainWindow);
-
   // Update IPC Handlers
   ipcMain.on('start-download', () => {
     autoUpdater.downloadUpdate();
@@ -122,30 +128,6 @@ function createWindow() {
     autoUpdater.quitAndInstall(false, true);
   });
 }
-
-// Update handling
-autoUpdater.on('update-available', (info) => {
-  if (mainWindow) {
-    mainWindow.webContents.send('update-available', info);
-  }
-});
-
-autoUpdater.on('download-progress', (progressObj) => {
-  if (mainWindow) {
-    mainWindow.webContents.send('download-progress', progressObj);
-  }
-});
-
-autoUpdater.on('update-downloaded', (info) => {
-  if (mainWindow) {
-    mainWindow.webContents.send('update-downloaded', info);
-  }
-});
-
-autoUpdater.on('error', (err) => {
-  console.error('Error in auto-updater', err);
-  // Optional: Notify user about error only if logging is enabled or critical
-});
 
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -163,6 +145,35 @@ if (!gotTheLock) {
 
   app.whenReady().then(() => {
     try {
+      // Initialize autoUpdater after app is ready
+      autoUpdater = require('electron-updater').autoUpdater;
+      autoUpdater.logger = console;
+      autoUpdater.autoDownload = false;
+      autoUpdater.autoInstallOnAppQuit = true;
+
+      // Setup autoUpdater event handlers
+      autoUpdater.on('update-available', (info) => {
+        if (mainWindow) {
+          mainWindow.webContents.send('update-available', info);
+        }
+      });
+
+      autoUpdater.on('download-progress', (progressObj) => {
+        if (mainWindow) {
+          mainWindow.webContents.send('download-progress', progressObj);
+        }
+      });
+
+      autoUpdater.on('update-downloaded', (info) => {
+        if (mainWindow) {
+          mainWindow.webContents.send('update-downloaded', info);
+        }
+      });
+
+      autoUpdater.on('error', (err) => {
+        console.error('Error in auto-updater', err);
+      });
+
       createWindow();
       // Check for updates after window creation
       // Adding a small delay to ensure window is ready
