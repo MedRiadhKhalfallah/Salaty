@@ -41,8 +41,23 @@ async function initHijriCalendar() {
             currentHijriYear = parseInt(data.data.hijri.year);
         }
 
+        // Set initial screen size
+        const screenSizeManager = require('./screenSize');
+        const useBigScreen = screenSizeManager.isBigScreen();
+
+        if (useBigScreen) {
+            document.body.setAttribute('data-screen-size', 'big');
+            document.body.classList.add('big-screen');
+            document.querySelector('.calendar-container')?.classList.add('big-screen');
+        } else {
+            document.body.setAttribute('data-screen-size', 'small');
+            document.body.classList.add('small-screen');
+            document.querySelector('.calendar-container')?.classList.add('small-screen');
+        }
+
         setupEventListeners();
         await renderCalendar();
+        updateCalendarUI();
     } catch (error) {
         console.error('Error initializing Hijri calendar:', error);
     }
@@ -279,18 +294,58 @@ function renderIslamicEvents(lang) {
 }
 
 /**
- * Toggle fullscreen
+ * Update calendar UI elements (button icons, etc.)
+ */
+function updateCalendarUI() {
+    const screenSizeBtn = document.getElementById('calendarFullscreenBtn');
+
+    if (screenSizeBtn) {
+        const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
+
+        if (isBigScreen) {
+            // Currently big → button should show compress icon
+            screenSizeBtn.setAttribute('aria-label', t('switchToSmallScreen') || 'Switch to Small Screen');
+            const icon = screenSizeBtn.querySelector('i');
+            if (icon) {
+                icon.className = 'fas fa-compress';
+            }
+        } else {
+            // Currently small → button should show expand icon
+            screenSizeBtn.setAttribute('aria-label', t('switchToBigScreen') || 'Switch to Big Screen');
+            const icon = screenSizeBtn.querySelector('i');
+            if (icon) {
+                icon.className = 'fas fa-expand';
+            }
+        }
+    }
+}
+
+/**
+ * Toggle screen size
  */
 function toggleFullscreen() {
     const { ipcRenderer } = require('electron');
-    ipcRenderer.send('toggle-fullscreen');
+    const isCurrentlyBig = document.body.getAttribute('data-screen-size') === 'big';
 
-    const btn = document.getElementById('calendarFullscreenBtn');
-    const icon = btn?.querySelector('i');
-    if (icon) {
-        icon.classList.toggle('fa-expand');
-        icon.classList.toggle('fa-compress');
+    if (isCurrentlyBig) {
+        // Switch FROM big TO small screen
+        ipcRenderer.invoke('resize-window', 320, 575);
+        document.body.setAttribute('data-screen-size', 'small');
+        document.body.classList.remove('big-screen');
+        document.body.classList.add('small-screen');
+        document.querySelector('.calendar-container')?.classList.remove('big-screen');
+        document.querySelector('.calendar-container')?.classList.add('small-screen');
+    } else {
+        // Switch FROM small TO big screen
+        ipcRenderer.invoke('resize-window', 850, 600);
+        document.body.setAttribute('data-screen-size', 'big');
+        document.body.classList.remove('small-screen');
+        document.body.classList.add('big-screen');
+        document.querySelector('.calendar-container')?.classList.remove('small-screen');
+        document.querySelector('.calendar-container')?.classList.add('big-screen');
     }
+
+    updateCalendarUI();
 }
 
 module.exports = {
