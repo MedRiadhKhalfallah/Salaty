@@ -10,6 +10,7 @@ const { state } = require('../js/globalStore');
 const { initSettingsPage } = require('../js/settings');
 const { initQiblaPage } = require('../js/qibla');
 const { initAsmaPage } = require('../js/asmaUI');
+const { initHijriCalendar } = require('../js/hijriCalendar');
 const { applyTheme } = require('../js/theme');
 const { initAthkarAlertsSystem } = require('../js/athkarAlerts');
 const screenSizeManager = require('../js/screenSize');
@@ -61,6 +62,9 @@ async function initializeApp() {
     } else if (path.includes('asma.html')) {
       console.log('Initializing Asmallah page from renderer.js');
       initAsmaPage();
+    } else if (path.includes('hijri-calendar.html')) {
+      console.log('Initializing Hijri Calendar page from renderer.js');
+      initHijriCalendar();
     }
 
     // Setup window controls (common to all pages)

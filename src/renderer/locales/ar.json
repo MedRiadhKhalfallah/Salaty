@@ -121,7 +121,14 @@
     "screenSizeSettingLabel": "حجم الشاشة",
     "bigScreen": "شاشة كبيرة",
     "smallScreen": "شاشة صغيرة",
-    "notification": "إشعارات"
+    "notification": "إشعارات",
+    "hijriCalendar": "التقويم الهجري",
+    "islamicCalendar": "التقويم الإسلامي والمناسبات",
+    "today": "اليوم",
+    "gregorian": "ميلادي",
+    "hijri": "هجري",
+    "importantIslamicDates": "المناسبات الإسلامية المهمة",
+    "noEventsThisMonth": "لا توجد مناسبات هذا الشهر"
   },
   "themes": {
     "navy": "أزرق داكن",

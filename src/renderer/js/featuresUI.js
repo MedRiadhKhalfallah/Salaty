@@ -168,6 +168,12 @@ function setupFeatureCards() {
   if (asmaCard) {
     asmaCard.addEventListener('click', openAsma);
   }
+
+  // Calendar card
+  const calendarCard = document.querySelector('[data-feature="calendar"]');
+  if (calendarCard) {
+    calendarCard.addEventListener('click', openCalendar);
+  }
 }
 
 function openPlaylist() {
@@ -208,6 +214,13 @@ function openAsma() {
   const size = screenSizeManager.getWindowSize();
   ipcRenderer.invoke('resize-window', size.width, size.height);
   ipcRenderer.invoke('navigate-to', 'asma');
+}
+
+function openCalendar() {
+  console.log('Opening Hijri Calendar...');
+  const size = screenSizeManager.getWindowSize();
+  ipcRenderer.invoke('resize-window', size.width, size.height);
+  ipcRenderer.invoke('navigate-to', 'hijri-calendar');
 }
 
 function toggleFeaturesScreenSize() {

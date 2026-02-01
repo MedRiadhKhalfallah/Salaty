@@ -38,6 +38,11 @@ function createWindow() {
     const initialWidth = useBigScreen ? 850 : 320;
     const initialHeight = useBigScreen ? 600 : 575;
 
+  // Choose the correct icon based on platform
+  const iconPath = process.platform === 'darwin'
+    ? path.join(__dirname, '../assets/icons/app_icon.png')
+    : path.join(__dirname, '../assets/icons/app_icon.ico');
+
   mainWindow = new BrowserWindow({
     width: initialWidth,
     height: initialHeight,
@@ -47,7 +52,7 @@ function createWindow() {
     alwaysOnTop: true,
     x: settings.position.x,
     y: settings.position.y,
-    icon: path.join(__dirname, '../assets/icons/app_icon.ico'),
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -105,7 +110,11 @@ function createWindow() {
 
   // Ajout du Tray
   if (!tray) {
-    tray = new Tray(path.join(__dirname, '../assets/icons/app_icon.ico'));
+    const trayIconPath = process.platform === 'darwin'
+      ? path.join(__dirname, '../assets/icons/app_icon.png')
+      : path.join(__dirname, '../assets/icons/app_icon.ico');
+
+    tray = new Tray(trayIconPath);
     const contextMenu = Menu.buildFromTemplate([
       {
         label: 'Afficher Salaty Time',
