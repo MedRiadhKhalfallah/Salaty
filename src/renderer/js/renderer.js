@@ -14,6 +14,7 @@ const { initHijriCalendar } = require('../js/hijriCalendar');
 const { applyTheme } = require('../js/theme');
 const { initAthkarAlertsSystem } = require('../js/athkarAlerts');
 const screenSizeManager = require('../js/screenSize');
+const { setupMiniPlayer } = require('../js/mini-player');
 
 
 // ==================== INITIALIZATION ====================
@@ -68,6 +69,9 @@ async function initializeApp() {
 
     // Setup window controls (common to all pages)
     setupWindowControls();
+
+    // Setup Mini Player (Global)
+    setupMiniPlayer();
 
   } catch (error) {
     console.error('Error initializing app:', error);
