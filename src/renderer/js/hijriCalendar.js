@@ -5,21 +5,23 @@ const HIJRI_MONTHS = {
     en: ['Muharram', 'Safar', 'Rabi al-Awwal', 'Rabi al-Thani', 'Jumada al-Awwal', 'Jumada al-Thani',
          'Rajab', 'Shaban', 'Ramadan', 'Shawwal', 'Dhul-Qadah', 'Dhul-Hijjah'],
     ar: ['محرم', 'صفر', 'ربيع الأول', 'ربيع الثاني', 'جمادى الأولى', 'جمادى الثانية',
-         'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة']
+         'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'],
+    fr: ['Mouharram', 'Safar', 'Rabia al-Awal', 'Rabia ath-Thani', 'Joumada al-Oula', 'Joumada ath-Thania',
+         'Rajab', 'Chaabane', 'Ramadan', 'Chawwal', 'Dhou al-Qiada', 'Dhou al-Hijja']
 };
 
 // Important Islamic dates (month-day)
 const ISLAMIC_EVENTS = {
-    '1-1': { en: 'Islamic New Year', ar: 'رأس السنة الهجرية' },
-    '1-10': { en: 'Day of Ashura', ar: 'عاشوراء' },
-    '3-12': { en: 'Mawlid al-Nabi', ar: 'المولد النبوي' },
-    '7-27': { en: 'Isra and Miraj', ar: 'الإسراء والمعراج' },
-    '8-15': { en: 'Mid-Shaban', ar: 'ليلة النصف من شعبان' },
-    '9-1': { en: 'First Day of Ramadan', ar: 'أول رمضان' },
-    '9-27': { en: 'Laylat al-Qadr', ar: 'ليلة القدر' },
-    '10-1': { en: 'Eid al-Fitr', ar: 'عيد الفطر' },
-    '12-9': { en: 'Day of Arafah', ar: 'يوم عرفة' },
-    '12-10': { en: 'Eid al-Adha', ar: 'عيد الأضحى' }
+    '1-1': { en: 'Islamic New Year', ar: 'رأس السنة الهجرية', fr: 'Nouvel An Islamique' },
+    '1-10': { en: 'Day of Ashura', ar: 'عاشوراء', fr: 'Jour d\'Achoura' },
+    '3-12': { en: 'Mawlid al-Nabi', ar: 'المولد النبوي', fr: 'Mawlid (Naissance du Prophète)' },
+    '7-27': { en: 'Isra and Miraj', ar: 'الإسراء والمعراج', fr: 'Isra et Miraj' },
+    '8-15': { en: 'Mid-Shaban', ar: 'ليلة النصف من شعبان', fr: 'Mi-Chaabane' },
+    '9-1': { en: 'First Day of Ramadan', ar: 'أول رمضان', fr: 'Premier Jour de Ramadan' },
+    '9-27': { en: 'Laylat al-Qadr', ar: 'ليلة القدر', fr: 'Nuit du Destin' },
+    '10-1': { en: 'Eid al-Fitr', ar: 'عيد الفطر', fr: 'Aïd al-Fitr' },
+    '12-9': { en: 'Day of Arafah', ar: 'يوم عرفة', fr: 'Jour d\'Arafat' },
+    '12-10': { en: 'Eid al-Adha', ar: 'عيد الأضحى', fr: 'Aïd al-Adha' }
 };
 
 let currentHijriMonth = 1;
@@ -123,8 +125,11 @@ async function goToToday() {
 async function renderCalendar() {
     const lang = localStorage.getItem('language') || 'en';
 
-    // Update month and year display
-    const monthName = HIJRI_MONTHS[lang === 'ar' ? 'ar' : 'en'][currentHijriMonth - 1];
+    // Update month and year display - support all languages
+    let monthName = HIJRI_MONTHS.en[currentHijriMonth - 1]; // Default to English
+    if (HIJRI_MONTHS[lang]) {
+        monthName = HIJRI_MONTHS[lang][currentHijriMonth - 1];
+    }
     document.getElementById('currentMonth').textContent = monthName;
     document.getElementById('currentYear').textContent = `${currentHijriYear} ${t('ah')}`;
 
@@ -285,9 +290,20 @@ function renderIslamicEvents(lang) {
         const day = key.split('-')[1];
         const eventEl = document.createElement('div');
         eventEl.className = 'event-item';
+
+        // Get the event name based on the current language
+        let eventName = event.en; // Default to English
+        if (lang === 'ar' && event.ar) {
+            eventName = event.ar;
+        } else if (lang === 'fr' && event.fr) {
+            eventName = event.fr;
+        } else if (event[lang]) {
+            eventName = event[lang];
+        }
+
         eventEl.innerHTML = `
             <div class="event-date">${day}</div>
-            <div class="event-name">${lang === 'ar' ? event.ar : event.en}</div>
+            <div class="event-name">${eventName}</div>
         `;
         eventsList.appendChild(eventEl);
     });

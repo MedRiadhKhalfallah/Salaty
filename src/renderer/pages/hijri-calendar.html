@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
   <link rel="stylesheet" href="../css/rtl.css">
   <link rel="stylesheet" href="../css/hijri-calendar.css">
 </head>
+
 <body>
   <div class="app-container theme-dark" id="app">
     <div class="drag-area"></div>
@@ -51,8 +53,13 @@
             <span id="todayBtnText">Today</span>
           </button>
         </div>
-
+        <!-- Gregorian Date Display -->
+        <div class="gregorian-date-display" id="gregorianDisplay">
+          <i class="fas fa-calendar"></i>
+          <span id="gregorianDateText">Loading...</span>
+        </div>
         <!-- Calendar Grid -->
+
         <div class="calendar-grid-container">
           <div class="calendar-weekdays" id="calendarWeekdays">
             <div class="weekday">Sun</div>
@@ -68,11 +75,7 @@
           </div>
         </div>
 
-        <!-- Gregorian Date Display -->
-        <div class="gregorian-date-display" id="gregorianDisplay">
-          <i class="fas fa-calendar"></i>
-          <span id="gregorianDateText">Loading...</span>
-        </div>
+
 
         <!-- Islamic Events Section -->
         <div class="islamic-events" id="islamicEvents">
@@ -87,4 +90,5 @@
 
   <script type="module" src="../js/renderer.js"></script>
 </body>
+
 </html>
