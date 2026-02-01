@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Playlist - Salaty</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/themes.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/utilities.css">
+  <link rel="stylesheet" href="../css/rtl.css">
+  <link rel="stylesheet" href="../css/playlist.css">
+</head>
+<body>
+  <div class="app-container theme-navy" id="app">
+    <div class="drag-area"></div>
+    <div class="header">
+      <div class="window-controls">
+        <button class="back-btn" id="backBtn" aria-label="Back">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <button class="control-btn minimize-btn" id="minimizeBtn" aria-label="Minimize">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 13H5v-2h14v2z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="playlist-container">
+      <div class="playlist-header">
+        <div class="search-box">
+          <input type="text" id="searchInput" class="search-input" placeholder="Search in playlist...">
+        </div>
+      </div>
+      <div class="content-area">
+        <div class="results-list" id="resultsList">
+          <!-- Results will be injected here -->
+        </div>
+        <div class="player-controls">
+          <div class="album-art">
+            <i class="fas fa-music"></i>
+          </div>
+          <div class="current-track-display">
+            <h4 id="currentTrackTitle">No Track Selected</h4>
+            <p id="currentTrackArtist">-</p>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" id="progressBar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="time-display">
+              <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+            </div>
+          </div>
+          <div class="control-buttons">
+            <button class="skip-btn" id="prevBtn"><i class="fas fa-step-backward"></i></button>
+            <button class="play-pause-btn" id="playPauseBtn"><i class="fas fa-play"></i></button>
+            <button class="skip-btn" id="nextBtn"><i class="fas fa-step-forward"></i></button>
+          </div>
+          <div class="volume-control">
+            <i class="fas fa-volume-up"></i>
+            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="100">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../js/playlist.js"></script>
+  <script src="../js/toast.js"></script>
+  <script src="../js/globalStore.js"></script>
+</body>
+</html>

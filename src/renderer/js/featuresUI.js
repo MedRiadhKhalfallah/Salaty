@@ -1,14 +1,15 @@
 const { ipcRenderer } = require('electron');
 const { t } = require('./translations');
-const screenSizeManager = require('./screenSize'); 
+const screenSizeManager = require('./screenSize');
 
+// ==================== FEATURES PAGE FUNCTIONS ====================
 function initFeaturesPage() {
   console.log('Initializing Features page...');
 
   // SET INITIAL SCREEN SIZE
   const useBigScreen = screenSizeManager.isBigScreen();
   console.log('Initial screen size preference:', useBigScreen ? 'big' : 'small');
-  
+
   if (useBigScreen) {
     document.body.setAttribute('data-screen-size', 'big');
     document.body.classList.add('big-screen');
@@ -62,6 +63,7 @@ function updateFeaturesUI() {
   const featureRamadhan = document.getElementById('featureRamadhan');
   const featureAsma = document.getElementById('featureAsma');
   const featureQibla = document.getElementById('featureQibla');
+  const featurePlaylist = document.getElementById('featurePlaylist');
 
   // Feature descriptions
   const featureQuranDesc = document.getElementById('featureQuranDesc');
@@ -72,6 +74,7 @@ function updateFeaturesUI() {
   const featureRamadhanDesc = document.getElementById('featureRamadhanDesc');
   const featureAsmaDesc = document.getElementById('featureAsmaDesc');
   const featureQiblaDesc = document.getElementById('featureQiblaDesc');
+  const featurePlaylistDesc = document.getElementById('featurePlaylistDesc');
 
   // Coming soon badges
   const comingSoonBadges = document.querySelectorAll('.coming-soon-badge');
@@ -90,6 +93,7 @@ function updateFeaturesUI() {
   if (featureRamadhan) featureRamadhan.textContent = t('ramadhan');
   if (featureAsma) featureAsma.textContent = t('asmaAllah');
   if (featureQibla) featureQibla.textContent = t('qiblaFinder');
+  if (featurePlaylist) featurePlaylist.textContent = "Audio Archive";
 
   if (featureQuranDesc) featureQuranDesc.textContent = t('quranDesc');
   if (featureAthkarDesc) featureAthkarDesc.textContent = t('athkarDesc');
@@ -99,6 +103,7 @@ function updateFeaturesUI() {
   if (featureRamadhanDesc) featureRamadhanDesc.textContent = t('ramadhanDesc');
   if (featureAsmaDesc) featureAsmaDesc.textContent = t('asmaDesc');
   if (featureQiblaDesc) featureQiblaDesc.textContent = t('qiblaDesc');
+  if (featurePlaylistDesc) featurePlaylistDesc.textContent = "Listen to Islamic audio";
 
   comingSoonBadges.forEach(badge => {
     badge.textContent = t('comingSoon');
@@ -107,7 +112,7 @@ function updateFeaturesUI() {
   // Update screen size button
   if (screenSizeBtn) {
     const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
-    
+
     if (isBigScreen) {
       // Currently big → button should say "Small Screen"
       screenSizeBtn.setAttribute('aria-label', t('switchToSmallScreen') || 'Switch to Small Screen');
@@ -134,6 +139,12 @@ function setupFeatureCards() {
     quranCard.addEventListener('click', openQuran);
   }
 
+  // Playlist card
+  const playlistCard = document.querySelector('[data-feature="playlist"]');
+  if (playlistCard) {
+    playlistCard.addEventListener('click', openPlaylist);
+  }
+
   // Athkar card
   const athkarCard = document.querySelector('[data-feature="athkar"]');
 
@@ -157,6 +168,12 @@ function setupFeatureCards() {
   if (asmaCard) {
     asmaCard.addEventListener('click', openAsma);
   }
+}
+
+function openPlaylist() {
+  console.log('Opening Playlist...');
+  ipcRenderer.invoke('resize-window', 850, 600);
+  ipcRenderer.invoke('navigate-to', 'playlist');
 }
 
 function openQuran() {
@@ -196,7 +213,7 @@ function openAsma() {
 function toggleFeaturesScreenSize() {
   const isCurrentlyBig = document.body.getAttribute('data-screen-size') === 'big';
   console.log('toggleFeaturesScreenSize: Switching FROM', isCurrentlyBig ? 'BIG to SMALL' : 'SMALL to BIG');
-  
+
   if (isCurrentlyBig) {
     // Switch FROM big TO small screen
     ipcRenderer.invoke('resize-window', 320, 575);
