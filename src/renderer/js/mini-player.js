@@ -42,10 +42,12 @@ function setupMiniPlayer() {
 
     if (!miniPlayer) return;
 
+    let pauseFromMiniPlayer = false;
     // Listeners for Buttons -> IPC
     playBtn.addEventListener('click', () => {
          // We toggle based on icon state or let main logic handle toggle
          if (playBtn.querySelector('.fa-pause')) {
+             pauseFromMiniPlayer = true;
              ipcRenderer.send('player-command', { type: 'pause' });
          } else {
              ipcRenderer.send('player-command', { type: 'resume' });
@@ -64,17 +66,19 @@ function setupMiniPlayer() {
     ipcRenderer.on('player-update', (event, arg) => {
         if (arg.type === 'state') {
             const state = arg.state;
-            if (state.currentTrack && (state.isPlaying || state.currentTime > 0)) {
+            if (state.currentTrack && (state.isPlaying || pauseFromMiniPlayer)) {
                 miniPlayer.classList.remove('hidden');
                 titleEl.innerText = state.currentTrack.title;
                 artistEl.innerText = state.currentTrack.artist;
                 if (state.isPlaying) {
                     playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    pauseFromMiniPlayer = false; // Reset si lecture
                 } else {
                     playBtn.innerHTML = '<i class="fas fa-play"></i>';
                 }
             } else {
                 miniPlayer.classList.add('hidden');
+                pauseFromMiniPlayer = false; // Reset si masqué
             }
         }
     });
