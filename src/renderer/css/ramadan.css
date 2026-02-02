@@ -1,21 +1,24 @@
 /* Ramadan Page Styles */
 .ramadan-container {
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 16px;
+  gap: 12px;
+  position: relative;
   overflow: hidden;
-  /* CRITICAL: Allow interaction in the container, overrides global drag */
-  -webkit-app-region: no-drag;
 }
 
-/* Header */
+/* ========== HEADER - EXACTLY LIKE FEATURES PAGE ========== */
 .ramadan-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  flex-shrink: 0;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  gap: 8px;
+  direction: ltr !important;
   -webkit-app-region: drag;
 }
 
@@ -24,194 +27,117 @@
   -webkit-app-region: no-drag;
 }
 
+/* Back button - NO STYLES HERE, use global styles */
+/* The .back-btn styles should come from components.css */
+
+/* Title - Centered with flex EXACTLY like Features */
 .ramadan-title {
-  font-family: 'Poppins', sans-serif;
-  font-size: 1.5rem;
-  color: var(--text-primary);
-  font-weight: 600;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  user-select: none;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+  pointer-events: none;
+  z-index: 1;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Control buttons container */
+/* Control buttons container EXACTLY like Features */
 .ramadan-controls {
   display: flex;
   gap: 6px;
+  flex: 0 0 auto;
   z-index: 102;
-  flex-shrink: 0;
+  position: relative;
 }
 
-/* Fullscreen Button */
-.fullscreen-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  -webkit-app-region: no-drag;
-}
+/* Control buttons - NO STYLES HERE, use global styles */
+/* The .control-btn styles should come from components.css */
 
-.fullscreen-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: var(--accent-color);
-}
-
-.fullscreen-btn i {
-  color: var(--text-primary);
-  font-size: 12px;
-}
-
-/* Back Button */
-.back-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  -webkit-app-region: no-drag;
-}
-
-.back-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: var(--accent-color);
-}
-
-.back-btn i {
-  color: var(--text-primary);
-  font-size: 14px;
-}
-
-/* ARABIC (RTL) LAYOUT */
-/* Order: back button on LEFT, title in center, fullscreen on RIGHT */
+/* Force consistent layout for ALL languages - EXACTLY like Features */
 [dir="rtl"] .ramadan-header,
-[lang="ar"] .ramadan-header,
-[lang="fa"] .ramadan-header,
-[lang="ur"] .ramadan-header,
-[lang="he"] .ramadan-header {
-  direction: ltr !important; /* Force LTR layout for proper ordering */
-}
-
-/* Back button on LEFT side */
-[dir="rtl"] .back-btn,
-[lang="ar"] .back-btn,
-[lang="fa"] .back-btn,
-[lang="ur"] .back-btn,
-[lang="he"] .back-btn {
-  order: 1; /* First item on the left */
-  transform: none; /* Remove arrow flip */
-  margin-right: auto; /* Push to left */
-}
-
-/* Title in center */
-[dir="rtl"] .ramadan-title,
-[lang="ar"] .ramadan-title,
-[lang="fa"] .ramadan-title,
-[lang="ur"] .ramadan-title,
-[lang="he"] .ramadan-title {
-  order: 2; /* Middle */
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 0;
-  pointer-events: none;
-  width: auto;
-  white-space: nowrap;
-}
-
-/* Controls container on RIGHT side */
-[dir="rtl"] .ramadan-controls,
-[lang="ar"] .ramadan-controls,
-[lang="fa"] .ramadan-controls,
-[lang="ur"] .ramadan-controls,
-[lang="he"] .ramadan-controls {
-  order: 3; /* Last on the right */
-  margin-left: auto; /* Push to right */
-}
-
-/* OTHER LANGUAGES (LTR) LAYOUT */
-[dir="ltr"] .ramadan-header:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .ramadan-header,
-[lang="fr"] .ramadan-header,
-[lang="es"] .ramadan-header,
-[lang="de"] .ramadan-header,
-[lang="ru"] .ramadan-header,
-[lang="zh"] .ramadan-header,
-[lang="ja"] .ramadan-header {
+[dir="ltr"] .ramadan-header,
+.ramadan-header {
   direction: ltr !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
 }
 
-/* Back button on LEFT side */
-[dir="ltr"] .back-btn:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .back-btn,
-[lang="fr"] .back-btn,
-[lang="es"] .back-btn,
-[lang="de"] .back-btn,
-[lang="ru"] .back-btn,
-[lang="zh"] .back-btn,
-[lang="ja"] .back-btn {
-  order: 1; /* First on left */
-  margin-right: auto;
+[dir="rtl"] .back-btn,
+[dir="ltr"] .back-btn,
+.back-btn {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
 }
 
-/* Title in center */
-[dir="ltr"] .ramadan-title:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .ramadan-title,
-[lang="fr"] .ramadan-title,
-[lang="es"] .ramadan-title,
-[lang="de"] .ramadan-title,
-[lang="ru"] .ramadan-title,
-[lang="zh"] .ramadan-title,
-[lang="ja"] .ramadan-title {
-  order: 2; /* Middle */
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 0;
-  pointer-events: none;
-  width: auto;
-  white-space: nowrap;
+[dir="rtl"] .ramadan-title,
+[dir="ltr"] .ramadan-title,
+.ramadan-title {
+  flex: 1 !important;
+  text-align: center !important;
+  position: static !important;
+  transform: none !important;
+  left: auto !important;
+  width: auto !important;
+  margin: 0 !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
 }
 
-/* Controls container on RIGHT side */
-[dir="ltr"] .ramadan-controls:not([lang="ar"]):not([lang="fa"]):not([lang="ur"]):not([lang="he"]),
-[lang="en"] .ramadan-controls,
-[lang="fr"] .ramadan-controls,
-[lang="es"] .ramadan-controls,
-[lang="de"] .ramadan-controls,
-[lang="ru"] .ramadan-controls,
-[lang="zh"] .ramadan-controls,
-[lang="ja"] .ramadan-controls {
-  order: 3; /* Last on right */
-  margin-left: auto;
+[dir="rtl"] .ramadan-controls,
+[dir="ltr"] .ramadan-controls,
+.ramadan-controls {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  gap: 6px !important;
 }
+
+/* Don't flip arrow in any language - always point left */
+[dir="rtl"] .back-btn i,
+[dir="ltr"] .back-btn i,
+.back-btn i {
+  transform: none !important;
+}
+
+[dir="rtl"] .back-btn:hover i,
+[dir="ltr"] .back-btn:hover i,
+.back-btn:hover i {
+  transform: translateX(-2px) !important;
+}
+
+/* ========== END OF HEADER - NOW MATCHES FEATURES PAGE ========== */
 
 .ramadan-content {
   flex: 1;
   overflow-y: auto;
-  padding-right: 5px; /* Scrollbar space on RIGHT */
-  padding-left: 0;
+  padding: 6px 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  /* CRITICAL: Ensure scrolling works */
+  gap: 12px;
   -webkit-app-region: no-drag;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) transparent;
+  direction: ltr !important; /* Force LTR for scrollbar on right */
 }
 
-/* FORCE SCROLLBAR TO ALWAYS BE ON RIGHT SIDE FOR ALL LANGUAGES */
-.ramadan-content {
-  direction: ltr !important; /* This keeps scrollbar on right */
+.ramadan-content::-webkit-scrollbar {
+  width: 5px;
+  right: 0 !important;
+  left: auto !important;
+}
+
+.ramadan-content::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.ramadan-content::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 3px;
 }
 
 /* For Arabic text inside content */
@@ -232,29 +158,6 @@
   text-align: right;
 }
 
-/* Custom Scrollbar - ALWAYS ON RIGHT */
-.ramadan-content::-webkit-scrollbar {
-  width: 6px;
-  right: 0 !important;
-  left: auto !important;
-}
-
-.ramadan-content::-webkit-scrollbar-track {
-  background: var(--bg-surface);
-  border-radius: 3px;
-}
-
-.ramadan-content::-webkit-scrollbar-thumb {
-  background: var(--accent-color);
-  border-radius: 3px;
-}
-
-/* Firefox scrollbar */
-.ramadan-content {
-  scrollbar-width: thin;
-  scrollbar-color: var(--accent-color) var(--bg-surface);
-}
-
 .fasting-card {
   background: var(--bg-surface);
   backdrop-filter: blur(10px);
@@ -262,7 +165,6 @@
   border-radius: 15px;
   padding: 20px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  margin-bottom: 10px;
 }
 
 .fasting-card h3 {

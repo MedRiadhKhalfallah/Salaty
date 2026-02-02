@@ -3,120 +3,110 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 12px 12px 8px;
-  gap: 8px;
+  padding: 16px;
+  gap: 12px;
   position: relative;
-  overflow: hidden;
 }
 
-/* ========== HEADER - ALWAYS LTR ========== */
+/* ========== HEADER - EXACTLY LIKE FEATURES PAGE ========== */
 .asma-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0;
-  padding-bottom: 8px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border-color);
   position: relative;
-  z-index: 101;
-  direction: ltr !important; /* Force LTR for header */
+  direction: ltr !important;
+  gap: 8px;
 }
 
-/* Back button - Always on left */
-.back-btn {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  order: 1; /* Always first (left side) */
-  margin-right: auto; /* Push everything else to the right */
-}
+/* Back button - NO STYLES HERE, use global styles */
+/* The .back-btn styles should come from components.css */
 
-.back-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: var(--accent-color);
-}
-
-.back-btn i {
-  color: var(--text-primary);
-  font-size: 14px;
-}
-
-/* Title - Always centered */
+/* Title - Centered with flex EXACTLY like Features */
 .asma-title {
   font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-weight: 700;
+  color: #ffffff;
   text-align: center;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
   margin: 0;
   pointer-events: none;
-  width: auto;
+  z-index: 1;
+  flex: 1;
   white-space: nowrap;
-  order: 2;
-  direction: ltr !important; /* Force LTR for title */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Control buttons container - Always on right */
+/* Control buttons container EXACTLY like Features */
 .asma-controls {
   display: flex;
   gap: 6px;
-  z-index: 102;
-  flex-shrink: 0;
-  order: 3; /* Always last (right side) */
-  margin-left: auto; /* Push to the right */
+  flex: 0 0 auto;
+  z-index: 2;
+  position: relative;
 }
 
-/* Fullscreen Button - Always on right */
-.fullscreen-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  direction: ltr !important; /* Force LTR */
+/* Control buttons - NO STYLES HERE, use global styles */
+/* The .control-btn styles should come from components.css */
+
+/* Force consistent layout for ALL languages - EXACTLY like Features */
+[dir="rtl"] .asma-header,
+[dir="ltr"] .asma-header,
+.asma-header {
+  direction: ltr !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
 }
 
-.fullscreen-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
+[dir="rtl"] .back-btn,
+[dir="ltr"] .back-btn,
+.back-btn {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
 }
 
-.fullscreen-btn i {
-  color: var(--text-primary);
-  font-size: 14px;
+[dir="rtl"] .asma-title,
+[dir="ltr"] .asma-title,
+.asma-title {
+  flex: 1 !important;
+  text-align: center !important;
+  position: static !important;
+  transform: none !important;
+  left: auto !important;
+  width: auto !important;
+  margin: 0 !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
 }
-/* ========== END OF HEADER ========== */
+
+[dir="rtl"] .asma-controls,
+[dir="ltr"] .asma-controls,
+.asma-controls {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  gap: 6px !important;
+}
+
+/* ========== END OF HEADER - NOW MATCHES FEATURES PAGE ========== */
 
 /* Asma Content - Compact */
 .asma-content {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 8px 0;
+  padding: 6px 0;
   -webkit-app-region: no-drag;
   scrollbar-width: thin;
   scrollbar-color: var(--accent-color) transparent;
-  direction: ltr !important;
+  direction: ltr !important; /* Force LTR for scrollbar on right */
 }
 
-/* Custom scrollbar - always on right */
 .asma-content::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
+  right: 0 !important;
+  left: auto !important;
 }
 
 .asma-content::-webkit-scrollbar-track {
@@ -127,10 +117,6 @@
 .asma-content::-webkit-scrollbar-thumb {
   background: var(--accent-color);
   border-radius: 3px;
-}
-
-.asma-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(var(--accent-rgb, 0, 122, 255), 0.8);
 }
 
 /* Loading */
@@ -356,13 +342,20 @@
 /* ========== DYNAMIC FOOTER ========== */
 /* Footer base styles */
 .asma-footer {
-  padding-top: 8px;
+  padding-top: 12px;
   border-top: 1px solid var(--border-color);
   text-align: center;
+}
+
+.asma-footer-text {
   font-size: 12px;
   color: var(--text-secondary);
   font-style: italic;
-  flex-shrink: 0;
+  opacity: 0.8;
+  background: linear-gradient(135deg, var(--text-secondary), rgba(var(--accent-rgb), 0.8));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* RTL support for Arabic footer */
@@ -565,7 +558,7 @@
 /* Responsive */
 @media (max-width: 480px) {
   .asma-container {
-    padding: 12px 10px 8px;
+    padding: 16px;
   }
   
   .asma-title {
