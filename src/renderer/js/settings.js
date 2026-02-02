@@ -6,11 +6,13 @@ const { state } = require('./globalStore');
 const { showToast } = require('./toast');
 const { applyTheme } = require('./theme');
 const screenSizeManager = require('./screenSize');
+const { initLocationManagementUI } = require('./locationManagementUI');
 
 let pendingTheme = 'navy';
 
 function initSettingsPage() {
     initSelectLocation();
+    initLocationManagementUI();
 
     // Setup back button
     const backBtn = document.getElementById('backBtn');
@@ -36,6 +38,7 @@ function initSettingsPage() {
     initAthkarAlerts();
     initPreAdhanNotification();
     initScreenSizeSetting();
+    initTravelMode();
 }
 
 /**
@@ -272,6 +275,31 @@ function initPreAdhanNotification() {
 
     // Listen for changes
     toggle.addEventListener('change', updateUI);
+}
+
+/**
+ * Initialize Travel Mode toggle
+ */
+function initTravelMode() {
+    const toggle = document.getElementById('travelModeToggle');
+
+    if (!toggle) return;
+
+    // Set initial value
+    toggle.checked = state.settings.travelMode?.enabled || false;
+
+    // Listen for changes
+    toggle.addEventListener('change', async () => {
+        try {
+            await ipcRenderer.invoke('toggle-travel-mode', toggle.checked);
+            state.settings.travelMode = state.settings.travelMode || {};
+            state.settings.travelMode.enabled = toggle.checked;
+            showToast(toggle.checked ? t('travelModeEnabled') : t('travelModeDisabled'), 'success');
+        } catch (error) {
+            console.error('Error toggling travel mode:', error);
+            toggle.checked = !toggle.checked;
+        }
+    });
 }
 
 /**

@@ -8,7 +8,13 @@ let settingsData = {
   theme: 'navy',
   language: 'en',
   position: { x: 100, y: 100 },
-  bigScreen: true
+  bigScreen: true,
+  locations: [],
+  travelMode: {
+    enabled: false,
+    autoSwitch: true,
+    lastDetected: null
+  }
 };
 
 function getSettingsPath() {
@@ -33,9 +39,87 @@ function loadSettings() {
       // Save to userData immediately to ensure persistence for next time
       saveSettings();
     }
+
+    // Migrate old single location to new multi-location structure
+    migrateToMultiLocation();
   } catch (error) {
     console.error('Error loading settings:', error);
   }
+}
+
+/**
+ * Migrate old single location format to new multi-location structure
+ */
+function migrateToMultiLocation() {
+  // Check if migration is needed (no locations array or empty)
+  if (!settingsData.locations || settingsData.locations.length === 0) {
+    const hasOldLocation = settingsData.city && settingsData.country;
+
+    if (hasOldLocation) {
+      // Create first location from existing city/country
+      const firstLocation = {
+        id: generateLocationId(),
+        name: 'Home',
+        city: settingsData.city,
+        country: settingsData.country,
+        isActive: true,
+        isFavorite: true,
+        createdAt: new Date().toISOString()
+      };
+
+      settingsData.locations = [firstLocation];
+      saveSettings();
+      console.log('Migrated old location to multi-location structure');
+    } else {
+      // No existing location, create default
+      const defaultLocation = {
+        id: generateLocationId(),
+        name: 'Home',
+        city: 'Tunis',
+        country: 'Tunisia',
+        isActive: true,
+        isFavorite: true,
+        createdAt: new Date().toISOString()
+      };
+
+      settingsData.locations = [defaultLocation];
+      settingsData.city = 'Tunis';
+      settingsData.country = 'Tunisia';
+      saveSettings();
+    }
+  }
+
+  // Ensure travelMode structure exists
+  if (!settingsData.travelMode) {
+    settingsData.travelMode = {
+      enabled: false,
+      autoSwitch: true,
+      lastDetected: null
+    };
+  }
+
+  // Sync active location with city/country for backward compatibility
+  syncActiveLocation();
+}
+
+/**
+ * Sync active location with city/country fields for backward compatibility
+ */
+function syncActiveLocation() {
+  if (settingsData.locations && settingsData.locations.length > 0) {
+    const activeLocation = settingsData.locations.find(loc => loc.isActive);
+    if (activeLocation) {
+      settingsData.city = activeLocation.city;
+      settingsData.country = activeLocation.country;
+    }
+  }
+}
+
+/**
+ * Generate unique location ID
+ */
+function generateLocationId() {
+  return 'loc_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
 }
 
 function saveSettings() {
@@ -66,8 +150,154 @@ function setupHandlers(mainWindow) {
 
   ipcMain.handle('save-settings', (event, newSettings) => {
     settingsData = { ...settingsData, ...newSettings };
+    syncActiveLocation();
     saveSettings();
     return settingsData;
+  });
+
+  // Location management handlers
+  ipcMain.handle('add-location', (_event, locationData) => {
+    const newLocation = {
+      id: generateLocationId(),
+      name: locationData.name || 'New Location',
+      city: locationData.city,
+      country: locationData.country,
+      isActive: false,
+      isFavorite: locationData.isFavorite || false,
+      createdAt: new Date().toISOString()
+    };
+
+    if (!settingsData.locations) {
+      settingsData.locations = [];
+    }
+
+    settingsData.locations.push(newLocation);
+    saveSettings();
+    return newLocation;
+  });
+
+  ipcMain.handle('update-location', (_event, locationId, updates) => {
+    if (!settingsData.locations) return null;
+
+    const locationIndex = settingsData.locations.findIndex(loc => loc.id === locationId);
+    if (locationIndex === -1) return null;
+
+    settingsData.locations[locationIndex] = {
+      ...settingsData.locations[locationIndex],
+      ...updates
+    };
+
+    saveSettings();
+    return settingsData.locations[locationIndex];
+  });
+
+  ipcMain.handle('delete-location', (_event, locationId) => {
+    if (!settingsData.locations) return false;
+
+    const locationIndex = settingsData.locations.findIndex(loc => loc.id === locationId);
+    if (locationIndex === -1) return false;
+
+    // Prevent deleting the active location if it's the only one
+    const location = settingsData.locations[locationIndex];
+    if (location.isActive && settingsData.locations.length === 1) {
+      return false;
+    }
+
+    // If deleting active location, activate another one
+    if (location.isActive && settingsData.locations.length > 1) {
+      const nextLocation = settingsData.locations.find((_loc, idx) => idx !== locationIndex);
+      if (nextLocation) {
+        nextLocation.isActive = true;
+      }
+    }
+
+    settingsData.locations.splice(locationIndex, 1);
+    syncActiveLocation();
+    saveSettings();
+    return true;
+  });
+
+  ipcMain.handle('set-active-location', (_event, locationId) => {
+    if (!settingsData.locations) return false;
+
+    // Deactivate all locations
+    settingsData.locations.forEach(loc => {
+      loc.isActive = false;
+    });
+
+    // Activate the selected location
+    const location = settingsData.locations.find(loc => loc.id === locationId);
+    if (location) {
+      location.isActive = true;
+      syncActiveLocation();
+      saveSettings();
+      return true;
+    }
+
+    return false;
+  });
+
+  ipcMain.handle('get-locations', () => {
+    return settingsData.locations || [];
+  });
+
+  ipcMain.handle('toggle-travel-mode', (_event, enabled) => {
+    if (!settingsData.travelMode) {
+      settingsData.travelMode = {
+        enabled: false,
+        autoSwitch: true,
+        lastDetected: null
+      };
+    }
+
+    settingsData.travelMode.enabled = enabled;
+    saveSettings();
+    return settingsData.travelMode;
+  });
+
+  ipcMain.handle('detect-location', async () => {
+    try {
+      const https = require('https');
+
+      return new Promise((resolve, reject) => {
+        https.get('https://ip-api.com/json', (res) => {
+          let data = '';
+
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+
+          res.on('end', () => {
+            try {
+              const locationData = JSON.parse(data);
+              if (locationData && locationData.status === 'success') {
+                const detected = {
+                  city: locationData.city,
+                  country: locationData.country,
+                  detectedAt: new Date().toISOString()
+                };
+
+                if (settingsData.travelMode) {
+                  settingsData.travelMode.lastDetected = detected;
+                  saveSettings();
+                }
+
+                resolve(detected);
+              } else {
+                reject(new Error('Location detection failed'));
+              }
+            } catch (error) {
+              reject(error);
+            }
+          });
+        }).on('error', (error) => {
+          reject(error);
+        });
+      });
+    } catch (error) {
+      console.error('Location detection error:', error);
+      throw error;
+    }
   });
 
   ipcMain.handle('minimize-window', () => {

@@ -14,6 +14,7 @@ const { initHijriCalendar } = require('../js/hijriCalendar');
 const { applyTheme } = require('../js/theme');
 const { initAthkarAlertsSystem } = require('../js/athkarAlerts');
 const screenSizeManager = require('../js/screenSize');
+const { initLocationSwitcher } = require('../js/locationSwitcher');
 
 
 // ==================== INITIALIZATION ====================
@@ -183,6 +184,9 @@ function setupUpdateHandlers() {
 
 // ==================== MAIN PAGE FUNCTIONS ====================
 function initMainPage() {
+  // Initialize location switcher
+  initLocationSwitcher();
+
   // Setup navigation buttons
   const settingsBtn = document.getElementById('mainSettingsBtn');
   const featuresBtn = document.getElementById('mainFeaturesBtn');
