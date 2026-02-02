@@ -9,12 +9,7 @@ let settingsData = {
   language: 'en',
   position: { x: 100, y: 100 },
   bigScreen: true,
-  locations: [],
-  travelMode: {
-    enabled: false,
-    autoSwitch: true,
-    lastDetected: null
-  }
+  locations: []
 };
 
 function getSettingsPath() {
@@ -87,15 +82,6 @@ function migrateToMultiLocation() {
       settingsData.country = 'Tunisia';
       saveSettings();
     }
-  }
-
-  // Ensure travelMode structure exists
-  if (!settingsData.travelMode) {
-    settingsData.travelMode = {
-      enabled: false,
-      autoSwitch: true,
-      lastDetected: null
-    };
   }
 
   // Sync active location with city/country for backward compatibility
@@ -261,14 +247,8 @@ function setupHandlers(mainWindow) {
               if (locationData && locationData.status === 'success') {
                 const detected = {
                   city: locationData.city,
-                  country: locationData.country,
-                  detectedAt: new Date().toISOString()
+                  country: locationData.country
                 };
-
-                if (settingsData.travelMode) {
-                  settingsData.travelMode.lastDetected = detected;
-                  saveSettings();
-                }
 
                 resolve(detected);
               } else {
