@@ -18,6 +18,31 @@ const { initLocationSwitcher } = require('../js/locationSwitcher');
 const { setupMiniPlayer } = require('../js/mini-player');
 
 
+// ==================== SCREEN SIZE HELPER FUNCTIONS ====================
+/**
+ * Setup screen size for any page with a specific container class
+ * @param {string} containerClass - The CSS class of the main container
+ */
+function setupScreenSizeForPage(containerClass = '') {
+    // Initialize screen size
+    screenSizeManager.initPageScreenSize(containerClass);
+    
+    // Setup screen size toggle button
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    if (fullscreenBtn) {
+        fullscreenBtn.addEventListener('click', () => {
+            screenSizeManager.toggleScreenSize(containerClass);
+        });
+    }
+}
+
+/**
+ * Get current window size based on screen size setting
+ */
+function getCurrentWindowSize() {
+    return screenSizeManager.getWindowSize();
+}
+
 // ==================== INITIALIZATION ====================
 async function initializeApp() {
   try {
@@ -50,22 +75,39 @@ async function initializeApp() {
       initQuranPage();
     } else if (path.includes('athkar.html')) {
       console.log('Initializing Athkar page from renderer.js');
+      // Setup screen size for athkar page
+      setupScreenSizeForPage('athkar-container');
       initAthkarPage();
     } else if (path.includes('features.html')) {
       console.log('Initializing Features page from renderer.js');
+      // Setup screen size for features page
+      setupScreenSizeForPage('features-container');
       initFeaturesPage();
     } else if (path.includes('ramadan.html')) {
       console.log('Initializing Ramadan page from renderer.js');
+      // Setup screen size for ramadan page
+      setupScreenSizeForPage('ramadan-container');
       initRamadanPage();
     } else if (path.includes('qibla.html')) {
       console.log('Initializing Qibla page from renderer.js');
+      // Setup screen size for qibla page
+      setupScreenSizeForPage('qibla-container');
       initQiblaPage();
     } else if (path.includes('asma.html')) {
       console.log('Initializing Asmallah page from renderer.js');
+      // Setup screen size for asma page
+      setupScreenSizeForPage('asma-container');
       initAsmaPage();
     } else if (path.includes('hijri-calendar.html')) {
       console.log('Initializing Hijri Calendar page from renderer.js');
+      // Setup screen size for calendar page
+      setupScreenSizeForPage('calendar-container');
       initHijriCalendar();
+    } else if (path.includes('playlist.html')) {
+      console.log('Initializing Playlist page from renderer.js');
+      // Setup screen size for playlist page
+      setupScreenSizeForPage('playlist-container');
+      // Note: playlist.js handles its own player initialization
     }
 
     // Setup window controls (common to all pages)
@@ -82,24 +124,12 @@ async function initializeApp() {
 // Setup window controls
 function setupWindowControls() {
   const minimizeBtn = document.getElementById('minimizeBtn');
-  const fullscreenBtn = document.getElementById('fullscreenBtn');
   const closeBtn = document.getElementById('closeBtn');
 
   if (minimizeBtn) {
     minimizeBtn.addEventListener('click', async () => {
       await ipcRenderer.invoke('minimize-window');
     });
-  }
-
-  if (fullscreenBtn) {
-    // Set initial screen size classes on body
-    initMainScreenSize();
-    
-    // Update button state
-    updateMainScreenSizeButton();
-    
-    // Add toggle listener
-    fullscreenBtn.addEventListener('click', toggleMainScreenSize);
   }
 
   if (closeBtn) {
@@ -110,63 +140,6 @@ function setupWindowControls() {
 
   // Setup update handlers
   setupUpdateHandlers();
-}
-
-function initMainScreenSize() {
-  const useBigScreen = screenSizeManager.isBigScreen();
-  console.log('Main page initial screen size preference:', useBigScreen ? 'big' : 'small');
-  
-  if (useBigScreen) {
-    document.body.setAttribute('data-screen-size', 'big');
-    document.body.classList.add('big-screen');
-  } else {
-    document.body.setAttribute('data-screen-size', 'small');
-    document.body.classList.add('small-screen');
-  }
-}
-
-function updateMainScreenSizeButton() {
-  const fullscreenBtn = document.getElementById('fullscreenBtn');
-  if (!fullscreenBtn) return;
-  
-  const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
-  console.log('updateMainScreenSizeButton: Current screen size is', isBigScreen ? 'BIG' : 'SMALL');
-  
-  const icon = fullscreenBtn.querySelector('i');
-  if (isBigScreen) {
-    // Currently big → button should say "Small Screen"
-    fullscreenBtn.setAttribute('aria-label', 'Switch to Small Screen');
-    if (icon) {
-      icon.className = 'fas fa-compress';
-    }
-  } else {
-    // Currently small → button should say "Big Screen"
-    fullscreenBtn.setAttribute('aria-label', 'Switch to Big Screen');
-    if (icon) {
-      icon.className = 'fas fa-expand';
-    }
-  }
-}
-
-function toggleMainScreenSize() {
-  const isCurrentlyBig = document.body.getAttribute('data-screen-size') === 'big';
-  console.log('toggleMainScreenSize: Switching FROM', isCurrentlyBig ? 'BIG to SMALL' : 'SMALL to BIG');
-  
-  if (isCurrentlyBig) {
-    // Switch FROM big TO small screen
-    ipcRenderer.invoke('resize-window', 320, 575);
-    document.body.setAttribute('data-screen-size', 'small');
-    document.body.classList.remove('big-screen');
-    document.body.classList.add('small-screen');
-  } else {
-    // Switch FROM small TO big screen
-    ipcRenderer.invoke('resize-window', 850, 600);
-    document.body.setAttribute('data-screen-size', 'big');
-    document.body.classList.remove('small-screen');
-    document.body.classList.add('big-screen');
-  }
-
-  updateMainScreenSizeButton();
 }
 
 function setupUpdateHandlers() {

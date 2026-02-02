@@ -1,9 +1,10 @@
+// qibla.js
 const { ipcRenderer } = require('electron');
 const { state } = require('./globalStore');
 const { t } = require('./translations');
 const { showToast } = require('./toast');
 const QiblaMap = require('salaty-qibla-map');
-const screenSizeManager = require('./screenSize'); // Add this import
+const screenSizeManager = require('./screenSize');
 
 let qiblaMapInstance = null;
 let currentUserLat = null;
@@ -12,34 +13,16 @@ let currentUserLng = null;
 async function initQiblaPage() {
     console.log('Initializing Qibla page with Map...');
 
-    // SET INITIAL SCREEN SIZE
-    const useBigScreen = screenSizeManager.isBigScreen();
-    console.log('Initial screen size preference:', useBigScreen ? 'big' : 'small');
-    
-    if (useBigScreen) {
-        document.body.setAttribute('data-screen-size', 'big');
-        document.body.classList.add('big-screen');
-        document.querySelector('.qibla-container')?.classList.add('big-screen');
-    } else {
-        document.body.setAttribute('data-screen-size', 'small');
-        document.body.classList.add('small-screen');
-        document.querySelector('.qibla-container')?.classList.add('small-screen');
-    }
+    // SCREEN SIZE IS NOW HANDLED IN renderer.js
 
     // Setup back button
     const backBtn = document.getElementById('backBtn');
     if (backBtn) {
         backBtn.addEventListener('click', () => {
-            const currentSize = getCurrentWindowSize();
+            const currentSize = screenSizeManager.getWindowSize();
             ipcRenderer.invoke('resize-window', currentSize.width, currentSize.height);
             ipcRenderer.invoke('navigate-to', 'features');
         });
-    }
-
-    // Setup Screen Size Toggle Button (formerly fullscreen button)
-    const screenSizeBtn = document.getElementById('qiblaFullscreenBtn');
-    if (screenSizeBtn) {
-        screenSizeBtn.addEventListener('click', toggleQiblaScreenSize);
     }
 
     // Setup Zoom Button
@@ -64,9 +47,6 @@ async function initQiblaPage() {
     if (instructionText) {
         instructionText.textContent = t('dragToAdjustInfo') || 'Vous pouvez déplacer le marqueur pour corriger votre position.';
     }
-
-    // Update UI for screen size button
-    updateQiblaUI();
 
     let lat = null;
     let lng = null;
@@ -110,36 +90,6 @@ async function initQiblaPage() {
     }
 }
 
-function getCurrentWindowSize() {
-    const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
-    return isBigScreen ? { width: 850, height: 600 } : { width: 320, height: 575 };
-}
-
-function updateQiblaUI() {
-    const screenSizeBtn = document.getElementById('qiblaFullscreenBtn');
-    
-    if (screenSizeBtn) {
-        const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
-        console.log('updateQiblaUI: Current screen size is', isBigScreen ? 'BIG' : 'SMALL');
-        
-        if (isBigScreen) {
-            // Currently big → button should say "Small Screen"
-            screenSizeBtn.setAttribute('aria-label', t('switchToSmallScreen') || 'Switch to Small Screen');
-            const icon = screenSizeBtn.querySelector('i');
-            if (icon) {
-                icon.className = 'fas fa-compress';
-            }
-        } else {
-            // Currently small → button should say "Big Screen"
-            screenSizeBtn.setAttribute('aria-label', t('switchToBigScreen') || 'Switch to Big Screen');
-            const icon = screenSizeBtn.querySelector('i');
-            if (icon) {
-                icon.className = 'fas fa-expand';
-            }
-        }
-    }
-}
-
 function initMap(userLat, userLng) {
     currentUserLat = userLat;
     currentUserLng = userLng;
@@ -170,37 +120,6 @@ function zoomToUserLocation() {
         qiblaMapInstance.flyTo(currentUserLat, currentUserLng, 15);
     } else {
         console.warn("Cannot zoom: Map or location not ready.");
-    }
-}
-
-function toggleQiblaScreenSize() {
-    const isCurrentlyBig = document.body.getAttribute('data-screen-size') === 'big';
-    console.log('toggleQiblaScreenSize: Switching FROM', isCurrentlyBig ? 'BIG to SMALL' : 'SMALL to BIG');
-    
-    if (isCurrentlyBig) {
-        // Switch FROM big TO small screen
-        ipcRenderer.invoke('resize-window', 320, 575);
-        document.body.setAttribute('data-screen-size', 'small');
-        document.body.classList.remove('big-screen');
-        document.body.classList.add('small-screen');
-        document.querySelector('.qibla-container')?.classList.remove('big-screen');
-        document.querySelector('.qibla-container')?.classList.add('small-screen');
-    } else {
-        // Switch FROM small TO big screen
-        ipcRenderer.invoke('resize-window', 850, 600);
-        document.body.setAttribute('data-screen-size', 'big');
-        document.body.classList.remove('small-screen');
-        document.body.classList.add('big-screen');
-        document.querySelector('.qibla-container')?.classList.remove('small-screen');
-        document.querySelector('.qibla-container')?.classList.add('big-screen');
-    }
-
-    // Update UI
-    updateQiblaUI();
-    
-    // Invalidate map size so it fills new space
-    if (qiblaMapInstance) {
-        setTimeout(() => { qiblaMapInstance.invalidateSize(); }, 300);
     }
 }
 
