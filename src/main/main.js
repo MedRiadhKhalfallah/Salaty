@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const ipcHandlers = require('./ipc-handlers');
