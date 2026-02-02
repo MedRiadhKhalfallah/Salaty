@@ -166,6 +166,7 @@
     "travelModeEnabled": "Travel mode enabled",
     "travelModeDisabled": "Travel mode disabled",
     "errorDetectingLocation": "Error detecting location",
+    "locationChangedMessage": "You appear to be in {detectedLocation}, but your current location is set to {currentLocation}. Would you like to switch?",
     "notification": "Notifications"
   },
   "themes": {

@@ -166,6 +166,7 @@
     "travelModeEnabled": "تم تفعيل وضع السفر",
     "travelModeDisabled": "تم تعطيل وضع السفر",
     "errorDetectingLocation": "خطأ في اكتشاف الموقع",
+    "locationChangedMessage": "يبدو أنك في {detectedLocation}، ولكن موقعك الحالي مضبوط على {currentLocation}. هل تريد التبديل؟",
     "notification": "الإشعارات"
   },
   "themes": {

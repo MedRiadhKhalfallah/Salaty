@@ -241,26 +241,12 @@ function setupHandlers(mainWindow) {
     return settingsData.locations || [];
   });
 
-  ipcMain.handle('toggle-travel-mode', (_event, enabled) => {
-    if (!settingsData.travelMode) {
-      settingsData.travelMode = {
-        enabled: false,
-        autoSwitch: true,
-        lastDetected: null
-      };
-    }
-
-    settingsData.travelMode.enabled = enabled;
-    saveSettings();
-    return settingsData.travelMode;
-  });
-
   ipcMain.handle('detect-location', async () => {
     try {
-      const https = require('https');
+      const http = require('http');
 
       return new Promise((resolve, reject) => {
-        https.get('https://ip-api.com/json', (res) => {
+        http.get('http://ip-api.com/json', (res) => {
           let data = '';
 
           res.on('data', (chunk) => {
@@ -270,6 +256,8 @@ function setupHandlers(mainWindow) {
           res.on('end', () => {
             try {
               const locationData = JSON.parse(data);
+              console.log('Location detection response:', locationData);
+
               if (locationData && locationData.status === 'success') {
                 const detected = {
                   city: locationData.city,
@@ -284,13 +272,18 @@ function setupHandlers(mainWindow) {
 
                 resolve(detected);
               } else {
-                reject(new Error('Location detection failed'));
+                const errorMsg = locationData.message || 'Location detection failed';
+                console.error('Location detection failed:', errorMsg);
+                reject(new Error(errorMsg));
               }
             } catch (error) {
+              console.error('Error parsing location data:', error);
               reject(error);
             }
+            
           });
         }).on('error', (error) => {
+          console.error('HTTP request error:', error);
           reject(error);
         });
       });

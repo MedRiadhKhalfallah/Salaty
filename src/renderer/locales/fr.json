@@ -166,6 +166,7 @@
     "travelModeEnabled": "Mode voyage activé",
     "travelModeDisabled": "Mode voyage désactivé",
     "errorDetectingLocation": "Erreur lors de la détection de l'emplacement",
+    "locationChangedMessage": "Vous semblez être à {detectedLocation}, mais votre emplacement actuel est défini sur {currentLocation}. Voulez-vous changer?",
     "notification": "Notifications"
   },
   "themes": {
