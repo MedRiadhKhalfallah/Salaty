@@ -20,7 +20,9 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "38.2.2",
-    "electron-builder": "24.13.3"
+    "electron-builder": "24.13.3",
+    "eslint": "^9.39.2",
+    "globals": "^17.3.0"
   },
   "build": {
     "appId": "com.yassindaboussi.salaty",
@@ -36,9 +38,7 @@
     ],
     "publish": [
       {
-        "provider": "github",
-        "owner": "yassindaboussi",
-        "repo": "Salaty"
+        "provider": "github"
       }
     ],
     "extraResources": [
@@ -50,8 +50,15 @@
       "artifactName": "Salaty-Time-Setup.exe"
     },
     "mac": {
-      "target": "dmg",
-      "icon": "src/assets/icons/icon.icns"
+      "target": {
+        "target": "dmg",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      },
+      "icon": "src/assets/icons/app_icon_512.png",
+      "identity": null
     },
     "linux": {
       "target": [
