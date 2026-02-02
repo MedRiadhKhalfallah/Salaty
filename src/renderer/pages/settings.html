@@ -53,6 +53,11 @@
             <i class="fas fa-location-crosshairs"></i>
             <span id="detectLocationLabel">Auto Detect Location</span>
           </button>
+
+          <button id="manageLocationsBtn" class="manage-locations-btn">
+            <i class="fas fa-map-marked-alt"></i>
+            <span id="manageLocationsLabel">Manage Saved Locations</span>
+          </button>
         </div>
 
         <!-- Appearance Section -->
@@ -250,6 +255,79 @@
           <p class="footer-text" id="footerText">Made with ❤️ for the Muslim Ummah</p>
         </div>
 
+      </div>
+    </div>
+
+    <!-- Location Manager Modal -->
+    <div class="modal-overlay" id="locationManagerModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h3 id="manageLocationsTitle">Manage Locations</h3>
+          <button class="modal-close-btn" id="closeLocationModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-content">
+          <div class="locations-list" id="locationsList">
+            <!-- Locations will be dynamically inserted here -->
+          </div>
+
+          <button class="add-location-btn" id="addLocationBtn">
+            <i class="fas fa-plus"></i>
+            <span id="addLocationLabel">Add New Location</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add/Edit Location Modal -->
+    <div class="modal-overlay" id="addEditLocationModal">
+      <div class="modal-container modal-small">
+        <div class="modal-header">
+          <h3 id="addEditLocationTitle">Add Location</h3>
+          <button class="modal-close-btn" id="closeAddEditModal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-content">
+          <div class="form-field">
+            <label class="field-label" id="locationNameLabel">Location Name</label>
+            <input type="text" id="locationNameInput" class="field-input" placeholder="e.g. Home, Work, Family">
+          </div>
+
+          <div class="form-field">
+            <label class="field-label" id="locationCountryLabel">Country</label>
+            <select id="locationCountryInput" class="field-input"></select>
+          </div>
+
+          <div class="form-field">
+            <label class="field-label" id="locationCityLabel">City</label>
+            <select id="locationCityInput" class="field-input"></select>
+          </div>
+
+          <div class="toggle-field">
+            <div class="toggle-info">
+              <label class="subsection-label" id="favoriteLabel">Add to Favorites</label>
+              <span class="toggle-description" id="favoriteDescription">Show in quick switcher</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="locationFavoriteToggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn-secondary" id="cancelAddEditBtn">
+              <span id="cancelLabel">Cancel</span>
+            </button>
+            <button class="btn-primary" id="saveLocationBtn">
+              <i class="fas fa-check"></i>
+              <span id="saveLocationLabel">Save Location</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

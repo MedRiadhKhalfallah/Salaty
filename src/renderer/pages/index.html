@@ -40,7 +40,15 @@
           </button>
         </div>
       </div>
-      <div class="location" id="location">Loading...</div>
+      <div class="location-wrapper">
+        <div class="location" id="location">Loading...</div>
+        <button class="location-switcher-btn" id="locationSwitcherBtn" aria-label="Switch Location" style="display: none;">
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="location-switcher-dropdown" id="locationSwitcherDropdown">
+          <!-- Locations will be dynamically inserted here -->
+        </div>
+      </div>
       <div class="date-container">
         <span class="date-info" id="gregorianDate"></span>
         <span class="date-separator"> | </span>

@@ -6,11 +6,13 @@ const { state } = require('./globalStore');
 const { showToast } = require('./toast');
 const { applyTheme } = require('./theme');
 const screenSizeManager = require('./screenSize');
+const { initLocationManagementUI } = require('./locationManagementUI');
 
 let pendingTheme = 'navy';
 
 function initSettingsPage() {
     initSelectLocation();
+    initLocationManagementUI();
 
     // Setup back button
     const backBtn = document.getElementById('backBtn');
