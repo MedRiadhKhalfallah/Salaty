@@ -1,3 +1,4 @@
+// asmaUI.js
 const { ipcRenderer } = require('electron');
 const { t } = require('./translations');
 const screenSizeManager = require('./screenSize');
@@ -21,34 +22,16 @@ function initAsmaPage() {
   currentLanguage = document.documentElement.lang || 'en';
   console.log('Current language:', currentLanguage);
   
-  // SET INITIAL SCREEN SIZE HERE
-  const useBigScreen = screenSizeManager.isBigScreen();
-  console.log('Initial screen size preference:', useBigScreen ? 'big' : 'small');
-  
-  if (useBigScreen) {
-    document.body.setAttribute('data-screen-size', 'big');
-    document.body.classList.add('big-screen');
-    document.querySelector('.asma-container')?.classList.add('big-screen');
-  } else {
-    document.body.setAttribute('data-screen-size', 'small');
-    document.body.classList.add('small-screen');
-    document.querySelector('.asma-container')?.classList.add('small-screen');
-  }
+  // SCREEN SIZE IS NOW HANDLED IN renderer.js
   
   // Setup back button
   const backBtn = document.getElementById('backBtn');
   if (backBtn) {
     backBtn.addEventListener('click', () => {
-      const currentSize = getCurrentWindowSize();
+      const currentSize = screenSizeManager.getWindowSize();
       ipcRenderer.invoke('resize-window', currentSize.width, currentSize.height);
       ipcRenderer.invoke('navigate-to', 'features');
     });
-  }
-
-  // Setup screen size toggle button
-  const screenSizeBtn = document.getElementById('asmaFullscreenBtn');
-  if (screenSizeBtn) {
-    screenSizeBtn.addEventListener('click', toggleScreenSize);
   }
 
   // Update UI text
@@ -58,42 +41,14 @@ function initAsmaPage() {
   loadAsmaData();
 }
 
-function getCurrentWindowSize() {
-  const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
-  return isBigScreen ? { width: 850, height: 600 } : { width: 320, height: 575 };
-}
-
 function updateAsmaUI() {
   const asmaTitle = document.getElementById('asmaTitle');
   const asmaFooterText = document.getElementById('asmaFooterText');
   const loadingText = document.getElementById('loadingTextAsma');
-  const screenSizeBtn = document.getElementById('asmaFullscreenBtn');
 
   if (asmaTitle) asmaTitle.textContent = t('asmaAllah');
   if (asmaFooterText) asmaFooterText.textContent = t('beautifulNames');
   if (loadingText) loadingText.textContent = t('loadingAsma');
-
-  // Update screen size toggle button
-  if (screenSizeBtn) {
-    const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
-    console.log('updateAsmaUI: Current screen size is', isBigScreen ? 'BIG' : 'SMALL');
-    
-    if (isBigScreen) {
-      // Currently big → button should say "Small Screen"
-      screenSizeBtn.setAttribute('aria-label', t('switchToSmallScreen') || 'Switch to Small Screen');
-      const icon = screenSizeBtn.querySelector('i');
-      if (icon) {
-        icon.className = 'fas fa-compress';
-      }
-    } else {
-      // Currently small → button should say "Big Screen"
-      screenSizeBtn.setAttribute('aria-label', t('switchToBigScreen') || 'Switch to Big Screen');
-      const icon = screenSizeBtn.querySelector('i');
-      if (icon) {
-        icon.className = 'fas fa-expand';
-      }
-    }
-  }
 }
 
 function loadAsmaData() {
@@ -221,34 +176,6 @@ function showError() {
     `;
     document.getElementById('retryAsma').addEventListener('click', loadAsmaData);
   }
-}
-
-function toggleScreenSize() {
-  const isCurrentlyBig = document.body.getAttribute('data-screen-size') === 'big';
-  console.log('toggleScreenSize: Switching FROM', isCurrentlyBig ? 'BIG to SMALL' : 'SMALL to BIG');
-  
-  if (isCurrentlyBig) {
-    // Switch FROM big TO small screen
-    ipcRenderer.invoke('resize-window', 320, 575);
-    document.body.setAttribute('data-screen-size', 'small');
-    document.body.classList.remove('big-screen');
-    document.body.classList.add('small-screen');
-    document.querySelector('.asma-container')?.classList.remove('big-screen');
-    document.querySelector('.asma-container')?.classList.add('small-screen');
-    
-  } else {
-    // Switch FROM small TO big screen
-    ipcRenderer.invoke('resize-window', 850, 600);
-    document.body.setAttribute('data-screen-size', 'big');
-    document.body.classList.remove('small-screen');
-    document.body.classList.add('big-screen');
-    document.querySelector('.asma-container')?.classList.remove('small-screen');
-    document.querySelector('.asma-container')?.classList.add('big-screen');
-    
-  }
-
-  updateAsmaUI();
-  setTimeout(() => renderAsmaList(), 150);
 }
 
 // Listen for language changes only
