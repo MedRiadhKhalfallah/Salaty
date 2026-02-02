@@ -21,7 +21,8 @@
   "devDependencies": {
     "electron": "38.2.2",
     "electron-builder": "24.13.3",
-    "eslint": "^9.39.2"
+    "eslint": "^9.39.2",
+    "globals": "^17.3.0"
   },
   "build": {
     "appId": "com.yassindaboussi.salaty",
@@ -51,7 +52,10 @@
     "mac": {
       "target": {
         "target": "dmg",
-        "arch": ["x64", "arm64"]
+        "arch": [
+          "x64",
+          "arm64"
+        ]
       },
       "icon": "src/assets/icons/app_icon_512.png",
       "identity": null
