@@ -611,3 +611,163 @@
 .big-screen .event-name {
   font-size: 1.1rem;
 }
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablet (768px and below) */
+@media (max-width: 768px) {
+  .calendar-container {
+    padding: 12px;
+    gap: 8px;
+  }
+  
+  .calendar-header {
+    padding-bottom: 8px;
+    min-height: 32px;
+  }
+  
+  .calendar-title {
+    font-size: 16px;
+  }
+  
+  .calendar-controls {
+    gap: 4px;
+  }
+  
+  .control-btn {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .calendar-content {
+    padding: 4px 0;
+    gap: 10px;
+  }
+  
+  .calendar-nav {
+    padding: 10px;
+  }
+  
+  .nav-btn {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .current-month {
+    font-size: 1.1rem;
+  }
+  
+  .current-year {
+    font-size: 0.85rem;
+  }
+  
+  .action-btn span {
+    display: none;
+  }
+  
+  .calendar-day {
+    min-height: 40px;
+  }
+  
+  .day-number {
+    font-size: 1rem;
+  }
+  
+  .day-gregorian {
+    font-size: 0.65rem;
+  }
+}
+
+/* Mobile (480px and below) */
+@media (max-width: 480px) {
+  .calendar-container {
+    padding: 8px;
+    gap: 6px;
+  }
+  
+  .calendar-title {
+    font-size: 14px;
+  }
+  
+  .control-btn {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .control-btn i,
+  .control-btn svg {
+    font-size: 10px;
+    width: 10px;
+    height: 10px;
+  }
+  
+  .calendar-content {
+    gap: 8px;
+  }
+  
+  .calendar-nav {
+    padding: 8px;
+  }
+  
+  .nav-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+  }
+  
+  .current-month {
+    font-size: 1rem;
+  }
+  
+  .current-year {
+    font-size: 0.8rem;
+  }
+  
+  .calendar-grid-container {
+    padding: 0.4rem;
+  }
+  
+  .calendar-weekdays {
+    gap: 0.2rem;
+    margin-bottom: 0.4rem;
+  }
+  
+  .weekday {
+    font-size: 0.7rem;
+    padding: 0.2rem 0;
+  }
+  
+  .calendar-days {
+    gap: 0.2rem;
+  }
+  
+  .calendar-day {
+    min-height: 35px;
+  }
+  
+  .day-number {
+    font-size: 0.9rem;
+  }
+  
+  .day-gregorian {
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .calendar-header {
+    gap: 4px;
+  }
+  
+  .calendar-title {
+    font-size: 13px;
+  }
+  
+  .calendar-day {
+    min-height: 30px;
+  }
+  
+  .day-number {
+    font-size: 0.85rem;
+  }
+}

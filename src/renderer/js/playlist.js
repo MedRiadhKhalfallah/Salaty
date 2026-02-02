@@ -120,6 +120,7 @@ class PlaylistManager {
     initElements() {
         this.minimizeBtn = document.getElementById('minimizeBtn');
         this.fullscreenBtn = document.getElementById('fullscreenBtn');
+        this.closeBtn = document.getElementById('closeBtn');
 
         this.searchInput = document.getElementById('searchInput');
         this.resultsList = document.getElementById('resultsList');
@@ -146,6 +147,12 @@ class PlaylistManager {
         this.minimizeBtn.addEventListener('click', async () => {
             await ipcRenderer.invoke('minimize-window');
         });
+
+        if (this.closeBtn) {
+        this.closeBtn.addEventListener('click', async () => {
+            await ipcRenderer.invoke('close-window');
+        });
+        }
 
         // Add fullscreen button listener
         if (this.fullscreenBtn) {
