@@ -1,9 +1,13 @@
-const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
+const { app, BrowserWindow, Tray, Menu, dialog, ipcMain, screen } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const ipcHandlers = require('./ipc-handlers');
+const playerManager = require('./player-manager');
 
-// Declare autoUpdater - will be initialized after app is ready
-let autoUpdater;
+// Configure logging
+autoUpdater.logger = console;
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = true;
 
 // Set App User Model ID for Windows Notifications
 if (process.platform === 'win32') {
@@ -22,6 +26,9 @@ app.on('before-quit', () => {
 function createWindow() {
   // Load settings
   ipcHandlers.loadSettings();
+
+  // Create hidden player window first
+  playerManager.createPlayerWindow();
 
   // Get settings after loading
   const settings = ipcHandlers.getSettingsData();
@@ -59,13 +66,27 @@ function createWindow() {
     show: false
   });
 
-  // Setup IPC handlers BEFORE loading the page
-  ipcHandlers.setupHandlers(mainWindow);
-
   // Affiche le DevTools seulement si --enable-logging est passé en argument
   if (process.argv.includes('--enable-logging')) {
     mainWindow.webContents.openDevTools({ mode: 'detach' });
   }
+
+  // Handle Minimize/Restore behavior for Mini Player
+  mainWindow.on('minimize', () => {
+    if (playerManager.getIsPlayerPlaying()) {
+      playerManager.showMiniPlayer();
+    }
+  });
+
+  mainWindow.on('restore', () => {
+    const playerWindow = playerManager.getPlayerWindow();
+    if (playerWindow) playerWindow.hide();
+  });
+
+  mainWindow.on('show', () => {
+      const playerWindow = playerManager.getPlayerWindow();
+      if (playerWindow) playerWindow.hide();
+  });
 
   // Load main page
   mainWindow.loadFile(path.join(__dirname, '../renderer/pages/index.html'));
@@ -118,6 +139,10 @@ function createWindow() {
     });
   }
 
+  // Setup IPC handlers
+  ipcHandlers.setupHandlers(mainWindow);
+  playerManager.setupPlayerIpc(mainWindow);
+
   // Update IPC Handlers
   ipcMain.on('start-download', () => {
     autoUpdater.downloadUpdate();
@@ -128,6 +153,30 @@ function createWindow() {
     autoUpdater.quitAndInstall(false, true);
   });
 }
+
+// Update handling
+autoUpdater.on('update-available', (info) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('update-available', info);
+  }
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('download-progress', progressObj);
+  }
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('update-downloaded', info);
+  }
+});
+
+autoUpdater.on('error', (err) => {
+  console.error('Error in auto-updater', err);
+  // Optional: Notify user about error only if logging is enabled or critical
+});
 
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -145,35 +194,6 @@ if (!gotTheLock) {
 
   app.whenReady().then(() => {
     try {
-      // Initialize autoUpdater after app is ready
-      autoUpdater = require('electron-updater').autoUpdater;
-      autoUpdater.logger = console;
-      autoUpdater.autoDownload = false;
-      autoUpdater.autoInstallOnAppQuit = true;
-
-      // Setup autoUpdater event handlers
-      autoUpdater.on('update-available', (info) => {
-        if (mainWindow) {
-          mainWindow.webContents.send('update-available', info);
-        }
-      });
-
-      autoUpdater.on('download-progress', (progressObj) => {
-        if (mainWindow) {
-          mainWindow.webContents.send('download-progress', progressObj);
-        }
-      });
-
-      autoUpdater.on('update-downloaded', (info) => {
-        if (mainWindow) {
-          mainWindow.webContents.send('update-downloaded', info);
-        }
-      });
-
-      autoUpdater.on('error', (err) => {
-        console.error('Error in auto-updater', err);
-      });
-
       createWindow();
       // Check for updates after window creation
       // Adding a small delay to ensure window is ready
