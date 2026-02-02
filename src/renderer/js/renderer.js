@@ -82,12 +82,24 @@ async function initializeApp() {
 // Setup window controls
 function setupWindowControls() {
   const minimizeBtn = document.getElementById('minimizeBtn');
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
   const closeBtn = document.getElementById('closeBtn');
 
   if (minimizeBtn) {
     minimizeBtn.addEventListener('click', async () => {
       await ipcRenderer.invoke('minimize-window');
     });
+  }
+
+  if (fullscreenBtn) {
+    // Set initial screen size classes on body
+    initMainScreenSize();
+    
+    // Update button state
+    updateMainScreenSizeButton();
+    
+    // Add toggle listener
+    fullscreenBtn.addEventListener('click', toggleMainScreenSize);
   }
 
   if (closeBtn) {
@@ -98,6 +110,63 @@ function setupWindowControls() {
 
   // Setup update handlers
   setupUpdateHandlers();
+}
+
+function initMainScreenSize() {
+  const useBigScreen = screenSizeManager.isBigScreen();
+  console.log('Main page initial screen size preference:', useBigScreen ? 'big' : 'small');
+  
+  if (useBigScreen) {
+    document.body.setAttribute('data-screen-size', 'big');
+    document.body.classList.add('big-screen');
+  } else {
+    document.body.setAttribute('data-screen-size', 'small');
+    document.body.classList.add('small-screen');
+  }
+}
+
+function updateMainScreenSizeButton() {
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
+  if (!fullscreenBtn) return;
+  
+  const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
+  console.log('updateMainScreenSizeButton: Current screen size is', isBigScreen ? 'BIG' : 'SMALL');
+  
+  const icon = fullscreenBtn.querySelector('i');
+  if (isBigScreen) {
+    // Currently big → button should say "Small Screen"
+    fullscreenBtn.setAttribute('aria-label', 'Switch to Small Screen');
+    if (icon) {
+      icon.className = 'fas fa-compress';
+    }
+  } else {
+    // Currently small → button should say "Big Screen"
+    fullscreenBtn.setAttribute('aria-label', 'Switch to Big Screen');
+    if (icon) {
+      icon.className = 'fas fa-expand';
+    }
+  }
+}
+
+function toggleMainScreenSize() {
+  const isCurrentlyBig = document.body.getAttribute('data-screen-size') === 'big';
+  console.log('toggleMainScreenSize: Switching FROM', isCurrentlyBig ? 'BIG to SMALL' : 'SMALL to BIG');
+  
+  if (isCurrentlyBig) {
+    // Switch FROM big TO small screen
+    ipcRenderer.invoke('resize-window', 320, 575);
+    document.body.setAttribute('data-screen-size', 'small');
+    document.body.classList.remove('big-screen');
+    document.body.classList.add('small-screen');
+  } else {
+    // Switch FROM small TO big screen
+    ipcRenderer.invoke('resize-window', 850, 600);
+    document.body.setAttribute('data-screen-size', 'big');
+    document.body.classList.remove('small-screen');
+    document.body.classList.add('big-screen');
+  }
+
+  updateMainScreenSizeButton();
 }
 
 function setupUpdateHandlers() {

@@ -1,5 +1,7 @@
 const { ipcRenderer } = require('electron'); // Import ipcRenderer
 const { getArchiveOrgTracks } = require('../js/utils/trackUtils');
+const screenSizeManager = require('../js/screenSize');
+
 
 class PlaylistManager {
     constructor() {
@@ -15,6 +17,8 @@ class PlaylistManager {
 
     // Nouvelle méthode pour gérer tout ce qui est asynchrone
     async init() {
+        await this.loadSettings();   // Load settings FIRST
+        await this.initScreenSize(); // Then set screen size
         await this.initTheme();      // On attend le thème
         await this.loadLocalTracks(); // On attend le chargement des pistes
 
@@ -23,6 +27,40 @@ class PlaylistManager {
         ipcRenderer.send('player-command', { type: 'get-state' });
 
         return this;
+    }
+
+    async loadSettings() {
+        try {
+            const settings = await ipcRenderer.invoke('get-settings');
+            if (settings) {
+                // Make settings available to screenSizeManager
+                const { state } = require('../js/globalStore');
+                state.settings = { ...state.settings, ...settings };
+                console.log('Settings loaded:', settings);
+            }
+        } catch (err) {
+            console.error('Failed to load settings:', err);
+        }
+    }
+
+    async initScreenSize() {
+        const useBigScreen = screenSizeManager.isBigScreen();
+        console.log('Initial screen size preference:', useBigScreen ? 'big' : 'small');
+        
+        if (useBigScreen) {
+            document.body.setAttribute('data-screen-size', 'big');
+            document.body.classList.add('big-screen');
+            document.querySelector('.playlist-container')?.classList.add('big-screen');
+        } else {
+            document.body.setAttribute('data-screen-size', 'small');
+            document.body.classList.add('small-screen');
+            document.querySelector('.playlist-container')?.classList.add('small-screen');
+        }
+    }
+
+    getCurrentWindowSize() {
+        const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
+        return isBigScreen ? { width: 850, height: 600 } : { width: 320, height: 575 };
     }
 
     initIPC() {
@@ -81,6 +119,7 @@ class PlaylistManager {
 
     initElements() {
         this.minimizeBtn = document.getElementById('minimizeBtn');
+        this.fullscreenBtn = document.getElementById('fullscreenBtn');
 
         this.searchInput = document.getElementById('searchInput');
         this.resultsList = document.getElementById('resultsList');
@@ -98,12 +137,20 @@ class PlaylistManager {
         this.durationEl = document.getElementById('duration');
 
         this.backBtn = document.getElementById('backBtn');
+        
+        // Update fullscreen button initial state
+        this.updateScreenSizeButton();
     }
 
     initListeners() {
-            this.minimizeBtn.addEventListener('click', async () => {
-                await ipcRenderer.invoke('minimize-window');
-            });
+        this.minimizeBtn.addEventListener('click', async () => {
+            await ipcRenderer.invoke('minimize-window');
+        });
+
+        // Add fullscreen button listener
+        if (this.fullscreenBtn) {
+            this.fullscreenBtn.addEventListener('click', () => this.toggleScreenSize());
+        }
 
         this.searchInput.addEventListener('input', () => {
              const query = this.searchInput.value.trim();
@@ -142,8 +189,57 @@ class PlaylistManager {
         });
 
         this.backBtn.addEventListener('click', () => {
+            const currentSize = this.getCurrentWindowSize();
+            ipcRenderer.invoke('resize-window', currentSize.width, currentSize.height);
             ipcRenderer.invoke('navigate-to', 'features');
         });
+    }
+
+    updateScreenSizeButton() {
+        if (!this.fullscreenBtn) return;
+        
+        const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
+        console.log('updateScreenSizeButton: Current screen size is', isBigScreen ? 'BIG' : 'SMALL');
+        
+        const icon = this.fullscreenBtn.querySelector('i');
+        if (isBigScreen) {
+            // Currently big → button should say "Small Screen"
+            this.fullscreenBtn.setAttribute('aria-label', 'Switch to Small Screen');
+            if (icon) {
+                icon.className = 'fas fa-compress';
+            }
+        } else {
+            // Currently small → button should say "Big Screen"
+            this.fullscreenBtn.setAttribute('aria-label', 'Switch to Big Screen');
+            if (icon) {
+                icon.className = 'fas fa-expand';
+            }
+        }
+    }
+
+    toggleScreenSize() {
+        const isCurrentlyBig = document.body.getAttribute('data-screen-size') === 'big';
+        console.log('toggleScreenSize: Switching FROM', isCurrentlyBig ? 'BIG to SMALL' : 'SMALL to BIG');
+        
+        if (isCurrentlyBig) {
+            // Switch FROM big TO small screen
+            ipcRenderer.invoke('resize-window', 320, 575);
+            document.body.setAttribute('data-screen-size', 'small');
+            document.body.classList.remove('big-screen');
+            document.body.classList.add('small-screen');
+            document.querySelector('.playlist-container')?.classList.remove('big-screen');
+            document.querySelector('.playlist-container')?.classList.add('small-screen');
+        } else {
+            // Switch FROM small TO big screen
+            ipcRenderer.invoke('resize-window', 850, 600);
+            document.body.setAttribute('data-screen-size', 'big');
+            document.body.classList.remove('small-screen');
+            document.body.classList.add('big-screen');
+            document.querySelector('.playlist-container')?.classList.remove('small-screen');
+            document.querySelector('.playlist-container')?.classList.add('big-screen');
+        }
+
+        this.updateScreenSizeButton();
     }
 
    // Helper to store duration
@@ -278,6 +374,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         await playlistManager.init();
         console.log('Playlist Manager est entièrement initialisé');
     } catch (err) {
-        console.error('Erreur lors de l’initialisation de la playlist:', err);
+        console.error('Erreur lors de linitialisation de la playlist:', err);
     }
 });

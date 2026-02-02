@@ -16,20 +16,7 @@
   border-bottom: 1px solid var(--border-color);
   position: relative;
   direction: ltr !important; /* Force LTR direction */
-}
-
-.features-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #ffffff;
-  text-align: center;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 0;
-  pointer-events: none;
-  z-index: 1;
-  width: 100%;
+  gap: 8px;
 }
 
 /* Back button - Always on LEFT side regardless of language */
@@ -37,21 +24,31 @@
   margin: 0;
   z-index: 2;
   position: relative;
-  order: 1;
+  flex: 0 0 auto;
+}
+
+/* Features Title */
+.features-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+  pointer-events: none;
+  z-index: 1;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Features Controls */
 .features-controls {
   display: flex;
   gap: 6px;
-  margin-left: auto;
+  flex: 0 0 auto;
   z-index: 2;
   position: relative;
-  order: 3;
-}
-
-.features-title {
-  order: 2;
 }
 
 /* Features Content */
@@ -374,11 +371,6 @@
 }
 
 /* RTL Support */
-[dir="rtl"] .features-title {
-  left: 50%;
-  transform: translateX(-50%);
-}
-
 [dir="rtl"] .coming-soon-badge {
   right: 6px;
   left: auto;
@@ -404,7 +396,7 @@
   left: auto !important;
 }
 
-/* Force back button on LEFT for ALL languages */
+/* Force layout consistency for ALL languages */
 /* Override any RTL behavior for the header */
 [dir="rtl"] .features-header,
 [dir="ltr"] .features-header,
@@ -412,14 +404,15 @@
   direction: ltr !important;
   display: flex !important;
   flex-direction: row !important;
-  justify-content: flex-start !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
 }
 
 [dir="rtl"] .features-header .back-btn,
 [dir="ltr"] .features-header .back-btn,
 .features-header .back-btn {
   margin: 0 !important;
-  margin-right: auto !important;
+  flex: 0 0 auto !important;
 }
 
 /* Don't flip arrow in any language - always point left */
@@ -437,10 +430,21 @@
 [dir="rtl"] .features-title,
 [dir="ltr"] .features-title,
 .features-title {
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: 100% !important;
+  position: static !important;
+  transform: none !important;
+  left: auto !important;
+  width: auto !important;
   text-align: center !important;
+  flex: 1 !important;
+  margin: 0 !important;
+}
+
+[dir="rtl"] .features-controls,
+[dir="ltr"] .features-controls,
+.features-controls {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  gap: 6px !important;
 }
 
 /* Responsive Grid */
