@@ -501,3 +501,125 @@
     transform: translateY(0);
   }
 }
+
+/* ========== RESPONSIVE DESIGN - Updated ========== */
+
+@media (max-width: 768px) {
+  .features-container {
+    padding: 12px;
+    gap: 8px;
+  }
+  
+  .features-header {
+    padding-bottom: 8px;
+    min-height: 32px;
+  }
+  
+  .features-title {
+    font-size: 16px;
+  }
+  
+  .features-controls {
+    gap: 4px;
+  }
+  
+  .control-btn {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .features-content {
+    padding: 4px 0;
+  }
+  
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 2px;
+  }
+  
+  .feature-card {
+    padding: 10px 6px;
+    min-height: 110px;
+  }
+  
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .feature-icon i {
+    font-size: 20px;
+  }
+  
+  .feature-name {
+    font-size: 12px;
+  }
+  
+  .feature-description {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 480px) {
+  .features-container {
+    padding: 8px;
+    gap: 6px;
+  }
+  
+  .features-title {
+    font-size: 14px;
+  }
+  
+  .control-btn {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .control-btn i,
+  .control-btn svg {
+    font-size: 10px;
+    width: 10px;
+    height: 10px;
+  }
+  
+  .features-grid {
+    gap: 6px;
+  }
+  
+  .feature-card {
+    padding: 8px 5px;
+    min-height: 100px;
+  }
+  
+  .feature-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .feature-icon i {
+    font-size: 18px;
+  }
+  
+  .feature-name {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 320px) {
+  .features-header {
+    gap: 4px;
+  }
+  
+  .features-title {
+    font-size: 13px;
+  }
+  
+  .features-grid {
+    gap: 4px;
+  }
+  
+  .feature-card {
+    min-height: 90px;
+  }
+}

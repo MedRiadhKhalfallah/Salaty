@@ -631,3 +631,112 @@
     padding: 12px;
   }
 }
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablet (768px and below) */
+@media (max-width: 768px) {
+  .asma-container {
+    padding: 12px;
+    gap: 8px;
+  }
+  
+  .asma-header {
+    padding-bottom: 8px;
+    min-height: 32px;
+  }
+  
+  .asma-title {
+    font-size: 16px;
+  }
+  
+  .asma-controls {
+    gap: 4px;
+  }
+  
+  .control-btn {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .asma-content {
+    padding: 4px 0;
+  }
+}
+
+/* Mobile (480px and below) */
+@media (max-width: 480px) {
+  .asma-container {
+    padding: 8px;
+    gap: 6px;
+  }
+  
+  .asma-title {
+    font-size: 14px;
+  }
+  
+  .control-btn {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .control-btn i,
+  .control-btn svg {
+    font-size: 10px;
+    width: 10px;
+    height: 10px;
+  }
+  
+  /* Arabic grid mobile adjustment */
+  [lang="ar"] .asma-list {
+    gap: 4px;
+    padding: 0 1px;
+  }
+  
+  [lang="ar"] .asma-card {
+    width: calc(50% - 2px);
+    padding: 6px;
+    min-height: 60px;
+  }
+  
+  [lang="ar"] .asma-card .asma-name {
+    font-size: 14px;
+  }
+}
+
+/* Very Small Mobile (320px and below) */
+@media (max-width: 320px) {
+  .asma-header {
+    gap: 4px;
+  }
+  
+  .asma-title {
+    font-size: 13px;
+  }
+  
+  [lang="ar"] .asma-card {
+    padding: 5px;
+    min-height: 55px;
+  }
+  
+  [lang="ar"] .asma-card .asma-name {
+    font-size: 13px;
+  }
+}
+
+/* Landscape Mode (for mobile) */
+@media (max-height: 500px) and (orientation: landscape) {
+  .asma-container {
+    padding: 8px;
+    gap: 8px;
+  }
+  
+  .asma-header {
+    padding-bottom: 8px;
+    min-height: 32px;
+  }
+  
+  .asma-content {
+    padding: 4px 0;
+  }
+}
