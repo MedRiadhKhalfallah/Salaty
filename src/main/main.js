@@ -1,7 +1,8 @@
-const { app, BrowserWindow, Tray, Menu, ipcMain } = require('electron');
+const { app, BrowserWindow, Tray, Menu, dialog, ipcMain, screen } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const ipcHandlers = require('./ipc-handlers');
+const playerManager = require('./player-manager');
 
 // Configure logging
 autoUpdater.logger = console;
@@ -26,6 +27,9 @@ function createWindow() {
   // Load settings
   ipcHandlers.loadSettings();
 
+  // Create hidden player window first
+  playerManager.createPlayerWindow();
+
   // Get settings after loading
   const settings = ipcHandlers.getSettingsData();
 
@@ -33,6 +37,11 @@ function createWindow() {
     const useBigScreen = settings.bigScreen || false;
     const initialWidth = useBigScreen ? 850 : 320;
     const initialHeight = useBigScreen ? 600 : 575;
+
+  // Choose the correct icon based on platform
+  const iconPath = process.platform === 'darwin'
+    ? path.join(__dirname, '../assets/icons/app_icon.png')
+    : path.join(__dirname, '../assets/icons/app_icon.ico');
 
   mainWindow = new BrowserWindow({
     width: initialWidth,
@@ -43,7 +52,7 @@ function createWindow() {
     alwaysOnTop: true,
     x: settings.position.x,
     y: settings.position.y,
-    icon: path.join(__dirname, '../assets/icons/app_icon.ico'),
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -61,6 +70,23 @@ function createWindow() {
   if (process.argv.includes('--enable-logging')) {
     mainWindow.webContents.openDevTools({ mode: 'detach' });
   }
+
+  // Handle Minimize/Restore behavior for Mini Player
+  mainWindow.on('minimize', () => {
+    if (playerManager.getIsPlayerPlaying()) {
+      playerManager.showMiniPlayer();
+    }
+  });
+
+  mainWindow.on('restore', () => {
+    const playerWindow = playerManager.getPlayerWindow();
+    if (playerWindow) playerWindow.hide();
+  });
+
+  mainWindow.on('show', () => {
+      const playerWindow = playerManager.getPlayerWindow();
+      if (playerWindow) playerWindow.hide();
+  });
 
   // Load main page
   mainWindow.loadFile(path.join(__dirname, '../renderer/pages/index.html'));
@@ -84,7 +110,11 @@ function createWindow() {
 
   // Ajout du Tray
   if (!tray) {
-    tray = new Tray(path.join(__dirname, '../assets/icons/app_icon.ico'));
+    const trayIconPath = process.platform === 'darwin'
+      ? path.join(__dirname, '../assets/icons/app_icon.png')
+      : path.join(__dirname, '../assets/icons/app_icon.ico');
+
+    tray = new Tray(trayIconPath);
     const contextMenu = Menu.buildFromTemplate([
       {
         label: 'Afficher Salaty Time',
@@ -111,6 +141,7 @@ function createWindow() {
 
   // Setup IPC handlers
   ipcHandlers.setupHandlers(mainWindow);
+  playerManager.setupPlayerIpc(mainWindow);
 
   // Update IPC Handlers
   ipcMain.on('start-download', () => {

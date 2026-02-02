@@ -121,7 +121,14 @@
     "screenSizeSettingLabel": "Screen Size",
     "bigScreen": "Big Screen",
     "smallScreen": "Small Screen",
-    "notification": "Notification"
+    "notification": "Notification",
+    "hijriCalendar": "Hijri Calendar",
+    "islamicCalendar": "Islamic Calendar & Events",
+    "today": "Today",
+    "gregorian": "Gregorian",
+    "hijri": "Hijri",
+    "importantIslamicDates": "Important Islamic Dates",
+    "noEventsThisMonth": "No special events this month"
   },
   "themes": {
     "navy": "Navy",
