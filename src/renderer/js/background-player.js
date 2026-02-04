@@ -1,260 +1,319 @@
 const { ipcRenderer } = require('electron');
-const { getArchiveOrgTracks } = require('../js/utils/trackUtils');
 
-class BackgroundPlayer {
-    constructor() {
-        this.tracks = []; // { title, artist, url, filename }
-        this.currentTrackIndex = -1;
-        this.sound = null;
-        this.isPlaying = false;
+// ─────────────────────────────────────────────
+// DOM refs (resolved once DOM is ready)
+// ─────────────────────────────────────────────
+let titleEl, artistEl, playBtn, prevBtn, nextBtn, playlistBtn, closeBtn;
 
-        this.initIPC();
-        this.initUI();
-    }
+// ─────────────────────────────────────────────
+// State
+// ─────────────────────────────────────────────
+let tracks = [];          // full track list (refreshed via IPC)
+let currentIndex = -1;
+let isPlaying = false;
+let sound = null;         // current Howl instance
 
-    // Static method to handle the async creation
-    static async create() {
-        const instance = new BackgroundPlayer();
-        await instance.loadLocalTracks(); // Wait for tracks to load
-        return instance;
-    }
+// ─────────────────────────────────────────────
+// THEME — the fix lives here
+// ─────────────────────────────────────────────
+/**
+ * Fetches the saved theme from main-process settings and applies it to <body>.
+ * Falls back to 'navy' if anything goes wrong.
+ * Every step is logged so you can trace issues in the DevTools of THIS window
+ * (player-manager opens it as a BrowserWindow — attach DevTools there).
+ */
+async function initTheme() {
+    console.log('[MiniPlayer Theme] initTheme() started');
 
-    initIPC() {
-        ipcRenderer.on('player-command', (event, arg) => {
-            switch (arg.type) {
-                case 'play':
-                    this.playTrack(arg.index);
-                    break;
-                case 'pause':
-                    this.togglePlay(false);
-                    break;
-                case 'resume':
-                    this.togglePlay(true);
-                    break;
-                case 'next':
-                    this.playNext();
-                    break;
-                case 'prev':
-                    this.playPrevious();
-                    break;
-                case 'seek':
-                    this.seek(arg.value);
-                    break;
-                case 'volume':
-                    Howler.volume(arg.value);
-                    break;
-                case 'get-state':
-                    this.sendState();
-                    break;
-                case 'refresh-tracks':
-                    this.loadLocalTracks();
-                    break;
-            }
-        });
-    }
+    try {
+        // This is a SEPARATE renderer process from the main window.
+        // It must make its OWN call to get-settings via IPC.
+        const settings = await ipcRenderer.invoke('get-settings');
 
-    initUI() {
-        this.ui = {
-            title: document.getElementById('title'),
-            artist: document.getElementById('artist'),
-            playBtn: document.getElementById('playBtn'),
-            prevBtn: document.getElementById('prevBtn'),
-            nextBtn: document.getElementById('nextBtn'),
-            closeBtn: document.getElementById('closeBtn'),
-            playlistBtn: document.getElementById('miniPlaylistBtn')
-        };
+        console.log('[MiniPlayer Theme] settings received from main process:', settings);
 
-        if(this.ui.playBtn) {
-            this.ui.playBtn.addEventListener('click', () => this.togglePlay());
-            this.ui.prevBtn.addEventListener('click', () => this.playPrevious());
-            this.ui.nextBtn.addEventListener('click', () => this.playNext());
-
-            // Logic for close button to hide mini player
-            if(this.ui.closeBtn) {
-                this.ui.closeBtn.addEventListener('click', () => {
-                     ipcRenderer.send('close-mini-player');
-                });
-            }
-            // Ajout du gestionnaire pour le bouton miniPlaylistBtn
-            if(this.ui.playlistBtn) {
-                this.ui.playlistBtn.addEventListener('click', () => {
-                    ipcRenderer.send('show-main-window');
-                });
-            }
-        }
-    }
-
-    sendState() {
-        const state = {
-            isPlaying: this.isPlaying,
-            currentTrackIndex: this.currentTrackIndex,
-            currentTrack: this.tracks[this.currentTrackIndex] || null,
-            duration: this.sound ? this.sound.duration() : 0,
-            currentTime: this.sound ? this.sound.seek() : 0,
-            volume: Howler.volume()
-        };
-        ipcRenderer.send('player-update', { type: 'state', state: state });
-        this.updateLocalUI(); // Update UI
-    }
-
-    sendTimeUpdate() {
-        if (this.sound && this.isPlaying) {
-             const seek = this.sound.seek() || 0;
-             ipcRenderer.send('player-update', {
-                 type: 'time-update',
-                 currentTime: seek,
-                 duration: this.sound.duration()
-             });
-        }
-    }
-
-    updateLocalUI() {
-        if (!this.ui || !this.ui.title) return;
-
-        if (this.currentTrackIndex !== -1 && this.tracks[this.currentTrackIndex]) {
-            const track = this.tracks[this.currentTrackIndex];
-            this.ui.title.innerText = track.title;
-            this.ui.artist.innerText = track.artist;
-        } else {
-            this.ui.title.innerText = 'Salaty Player';
-            this.ui.artist.innerText = 'Waiting for track...';
+        if (!settings) {
+            console.warn('[MiniPlayer Theme] settings is null/undefined → falling back to navy');
+            applyTheme('navy');
+            return;
         }
 
-        if (this.isPlaying) {
-            this.ui.playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        } else {
-            this.ui.playBtn.innerHTML = '<i class="fas fa-play"></i>';
-        }
-    }
+        const theme = settings.theme;
+        console.log('[MiniPlayer Theme] theme value from settings:', theme);
 
-    async loadLocalTracks() {
-        try {
-            // Archive.org Configuration
-            const ARCHIVE_ITEM_ID = 'Mishary-Alafasy'; // Example ID containing audio
-            const ARCHIVE_METADATA_URL = `https://archive.org/metadata/${ARCHIVE_ITEM_ID}`;
-            this.tracks = await getArchiveOrgTracks(ARCHIVE_METADATA_URL);
-
-            // Notify UI about tracks
-            ipcRenderer.send('player-update', { type: 'tracks', tracks: this.tracks });
-            this.sendState();
-        } catch (error) {
-            console.error('Error fetching tracks from Archive.org:', error);
-            ipcRenderer.send('player-update', { type: 'error', message: 'Failed to load playlist from Archive.org.' });
-        }
-    }
-
-    playTrack(index) {
-        if (index < 0 || index >= this.tracks.length) return;
-
-        // Check if we are already playing this exact track
-        const track = this.tracks[index];
-
-        // If it's the current track, just resume/toggle instead of re-loading
-        if (this.currentTrackIndex === index && this.sound) {
-             if (!this.isPlaying) {
-                 this.togglePlay(true);
-             }
-             return;
+        if (!theme || typeof theme !== 'string' || theme.trim() === '') {
+            console.warn('[MiniPlayer Theme] theme is empty/invalid → falling back to navy');
+            applyTheme('navy');
+            return;
         }
 
-        if (this.sound) {
-            this.sound.unload();
-        }
+        applyTheme(theme);
 
-        this.currentTrackIndex = index;
-        this.isPlaying = true; // Optimistic
-
-        // Notify UI immediately
-        this.sendState();
-
-        this.sound = new Howl({
-            src: [track.url],
-            html5: true,
-             onplay: () => {
-                this.isPlaying = true;
-                this.sendState();
-                this.startStepLoop();
-            },
-            onpause: () => {
-                this.isPlaying = false;
-                this.sendState();
-                this.stopStepLoop();
-            },
-            onend: () => {
-                this.playNext();
-            },
-            onloaderror: (id, err) => {
-                console.error('Load error', err);
-            }
-        });
-
-        this.sound.play();
-    }
-
-    togglePlay(shouldPlay) {
-        if (!this.sound) return;
-
-        // If shouldPlay is undefined, toggle
-        if (shouldPlay === undefined) {
-             shouldPlay = !this.isPlaying;
-        }
-
-        if (shouldPlay) {
-            this.sound.play();
-        } else {
-            this.sound.pause();
-        }
-    }
-
-    playNext() {
-        if (this.currentTrackIndex < this.tracks.length - 1) {
-            this.playTrack(this.currentTrackIndex + 1);
-        } else {
-            // Loop or stop? Stop for now
-            this.isPlaying = false;
-            this.sendState();
-        }
-    }
-
-    playPrevious() {
-        if (this.currentTrackIndex > 0) {
-            this.playTrack(this.currentTrackIndex - 1);
-        } else {
-            // Replay current if at start
-             this.seek(0);
-        }
-    }
-
-    seek(value) { // 0 to 1 position or seconds? Actually UI sends seconds?
-         // Let's assume input is 0-100 percentage.
-         // Or usually it is simpler to send seconds or percentage.
-         // Let's assume the UI logic calculates seconds.
-         if(this.sound) {
-             this.sound.seek(value);
-         }
-    }
-
-    startStepLoop() {
-        if (this.stepInterval) clearInterval(this.stepInterval);
-        this.stepInterval = setInterval(() => {
-            this.sendTimeUpdate();
-        }, 1000); // 1Hz update is enough for IPC
-    }
-
-    stopStepLoop() {
-        if (this.stepInterval) clearInterval(this.stepInterval);
+    } catch (err) {
+        console.error('[MiniPlayer Theme] ERROR while fetching settings:', err);
+        console.warn('[MiniPlayer Theme] Falling back to navy due to error');
+        applyTheme('navy');
     }
 }
 
 /**
- * Initialisation du lecteur
+ * Strips any existing theme-* class from <body> and adds the new one.
  */
-const player = new BackgroundPlayer();
+function applyTheme(themeName) {
+    const body = document.body;
 
-// On lance l'initialisation asynchrone (chargement des pistes)
-// sans bloquer l'export de l'objet lui-même.
-player.loadLocalTracks().catch(err => {
-    console.error("Erreur lors du chargement initial des pistes:", err);
+    // Remove every class that starts with "theme-"
+    const before = body.className;
+    body.className = body.className
+        .split(' ')
+        .filter(c => !c.startsWith('theme-'))
+        .join(' ');
+
+    // Add the target theme
+    const targetClass = `theme-${themeName}`;
+    body.classList.add(targetClass);
+
+    console.log(`[MiniPlayer Theme] applyTheme("${themeName}")  |  before: "${before}"  →  after: "${body.className}"`);
+}
+
+// ─────────────────────────────────────────────
+// PLAYER LOGIC
+// ─────────────────────────────────────────────
+function playTrackAt(index) {
+    if (index < 0 || index >= tracks.length) {
+        console.warn('[MiniPlayer] playTrackAt: index out of range', index, 'tracks.length:', tracks.length);
+        return;
+    }
+
+    // Stop current sound cleanly
+    if (sound) {
+        sound.stop();
+        sound.unload();
+        sound = null;
+    }
+
+    currentIndex = index;
+    const track = tracks[currentIndex];
+    console.log('[MiniPlayer] Playing track', currentIndex, ':', track.title);
+
+    sound = new Howl({
+        src: [track.url],
+        html5: true,
+        onplay() {
+            isPlaying = true;
+            updateUI();
+            broadcastState();
+        },
+        onpause() {
+            isPlaying = false;
+            updateUI();
+            broadcastState();
+        },
+        onstop() {
+            isPlaying = false;
+            updateUI();
+            broadcastState();
+        },
+        onerror(id, error) {
+            console.error('[MiniPlayer] Howler error on track', currentIndex, ':', error);
+        },
+        onend() {
+            console.log('[MiniPlayer] Track ended, going to next');
+            playTrackAt(currentIndex + 1 < tracks.length ? currentIndex + 1 : 0);
+        },
+        onload() {
+            console.log('[MiniPlayer] Track loaded, duration:', sound.duration());
+        }
+    });
+
+    sound.play();
+}
+
+function updateUI() {
+    if (!titleEl || !artistEl || !playBtn) return;
+
+    if (currentIndex >= 0 && currentIndex < tracks.length) {
+        const track = tracks[currentIndex];
+        titleEl.innerText  = track.title;
+        artistEl.innerText = track.artist;
+    }
+
+    // Swap play / pause icon
+    playBtn.innerHTML = isPlaying
+        ? '<i class="fas fa-pause"></i>'
+        : '<i class="fas fa-play"></i>';
+}
+
+/**
+ * Sends the current player state back to the main window
+ * so playlist.js / mini-player.js can react.
+ */
+function broadcastState() {
+    const state = {
+        isPlaying,
+        currentTrack: currentIndex >= 0 && currentIndex < tracks.length
+            ? tracks[currentIndex]
+            : null,
+        volume: Howler.volume()
+    };
+
+    ipcRenderer.send('player-update', { type: 'state', state });
+    console.log('[MiniPlayer] broadcastState →', JSON.stringify(state));
+}
+
+function broadcastTimeUpdate() {
+    if (!sound) return;
+    ipcRenderer.send('player-update', {
+        type: 'time-update',
+        currentTime: sound.seek(),
+        duration: sound.duration()
+    });
+}
+
+// ─────────────────────────────────────────────
+// IPC: commands coming IN from main / playlist
+// ─────────────────────────────────────────────
+ipcRenderer.on('player-command', (event, arg) => {
+    console.log('[MiniPlayer] Received player-command:', JSON.stringify(arg));
+
+    switch (arg.type) {
+        case 'play':
+            // arg.index = index into tracks[]
+            if (typeof arg.index === 'number') {
+                playTrackAt(arg.index);
+            }
+            break;
+
+        case 'pause':
+            if (sound && sound.playing()) {
+                sound.pause();
+            }
+            break;
+
+        case 'resume':
+            if (sound) {
+                sound.play();
+            }
+            break;
+
+        case 'next':
+            playTrackAt(currentIndex + 1 < tracks.length ? currentIndex + 1 : 0);
+            break;
+
+        case 'prev':
+            playTrackAt(currentIndex - 1 >= 0 ? currentIndex - 1 : tracks.length - 1);
+            break;
+
+        case 'seek':
+            if (sound) {
+                sound.seek(arg.value);
+                console.log('[MiniPlayer] Seeked to', arg.value);
+            }
+            break;
+
+        case 'volume':
+            if (typeof arg.value === 'number') {
+                Howler.volume(arg.value);
+                console.log('[MiniPlayer] Volume set to', arg.value);
+                broadcastState();
+            }
+            break;
+
+        case 'refresh-tracks':
+            // playlist.js sends this after loading tracks from archive.org.
+            // We receive the track list so we can play by index.
+            if (Array.isArray(arg.tracks) && arg.tracks.length > 0) {
+                tracks = arg.tracks;
+                console.log('[MiniPlayer] Tracks refreshed, count:', tracks.length);
+            } else {
+                console.warn('[MiniPlayer] refresh-tracks arrived but arg.tracks is missing or empty:', arg.tracks);
+            }
+            break;
+
+        case 'get-state':
+            // Someone asked for the current state – broadcast it immediately
+            broadcastState();
+            break;
+
+        default:
+            console.warn('[MiniPlayer] Unknown player-command type:', arg.type);
+    }
 });
 
-module.exports = { player };
+// ─────────────────────────────────────────────
+// THEME LIVE UPDATE — listen for theme changes
+// ─────────────────────────────────────────────
+ipcRenderer.on('theme-changed', (event, newTheme) => {
+    console.log('[MiniPlayer] theme-changed event received, new theme:', newTheme);
+    applyTheme(newTheme);
+});
+
+// ─────────────────────────────────────────────
+// TIME TICKER — sends time-update every 250 ms
+// ─────────────────────────────────────────────
+setInterval(() => {
+    if (sound && isPlaying) {
+        broadcastTimeUpdate();
+    }
+}, 250);
+
+// ─────────────────────────────────────────────
+// BUTTON WIRING
+// ─────────────────────────────────────────────
+function wireButtons() {
+    titleEl      = document.getElementById('title');
+    artistEl     = document.getElementById('artist');
+    playBtn      = document.getElementById('playBtn');
+    prevBtn      = document.getElementById('prevBtn');
+    nextBtn      = document.getElementById('nextBtn');
+    playlistBtn  = document.getElementById('miniPlaylistBtn');
+    closeBtn     = document.getElementById('closeBtn');
+
+    playBtn.addEventListener('click', () => {
+        if (isPlaying) {
+            sound?.pause();
+        } else {
+            sound?.play();
+        }
+    });
+
+    prevBtn.addEventListener('click', () => {
+        playTrackAt(currentIndex - 1 >= 0 ? currentIndex - 1 : tracks.length - 1);
+    });
+
+    nextBtn.addEventListener('click', () => {
+        playTrackAt(currentIndex + 1 < tracks.length ? currentIndex + 1 : 0);
+    });
+
+    playlistBtn.addEventListener('click', async () => {
+        console.log('[MiniPlayer] Playlist button clicked → showing main window with playlist');
+        // Hide mini player
+        ipcRenderer.send('close-mini-player');
+        // Tell main process to show and navigate main window to playlist
+        await ipcRenderer.invoke('show-playlist-in-main');
+    });
+
+    closeBtn.addEventListener('click', () => {
+        console.log('[MiniPlayer] Close button clicked → hiding mini player');
+        ipcRenderer.send('close-mini-player');
+    });
+
+    console.log('[MiniPlayer] Buttons wired successfully');
+}
+
+// ─────────────────────────────────────────────
+// BOOT
+// ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('[MiniPlayer] DOMContentLoaded fired');
+
+    // 1. Wire buttons first so UI is interactive immediately
+    wireButtons();
+
+    // 2. Apply the theme — THIS is the fix.
+    //    Must run here because this is a separate BrowserWindow;
+    //    the main window's theme logic does NOT affect us.
+    await initTheme();
+
+    console.log('[MiniPlayer] Fully initialised. Body classes:', document.body.className);
+});
