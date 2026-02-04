@@ -2,6 +2,7 @@
 const { ipcRenderer } = require('electron');
 const { t } = require('./translations');
 const screenSizeManager = require('./screenSize');
+const { getNamesOfAllah } = require('./config-api/api');
 
 let asmaData = null;
 let currentLanguage = 'en';
@@ -9,7 +10,7 @@ let currentLanguage = 'en';
 // Function to decode Unicode escape sequences
 function decodeUnicode(str) {
   if (!str) return '';
-  return str.replace(/\\u([\dA-F]{4})/gi, (match, grp) => 
+  return str.replace(/\\u([\dA-F]{4})/gi, (match, grp) =>
     String.fromCharCode(parseInt(grp, 16))
   ).replace(/\\'/g, "'").replace(/\\"/g, '"').replace(/\\\\/g, '\\');
 }
@@ -17,13 +18,13 @@ function decodeUnicode(str) {
 // ==================== ASMA PAGE FUNCTIONS ====================
 function initAsmaPage() {
   console.log('Initializing Asma page...');
-  
+
   // Get current language from HTML
   currentLanguage = document.documentElement.lang || 'en';
   console.log('Current language:', currentLanguage);
-  
+
   // SCREEN SIZE IS NOW HANDLED IN renderer.js
-  
+
   // Setup back button
   const backBtn = document.getElementById('backBtn');
   if (backBtn) {
@@ -51,14 +52,14 @@ function updateAsmaUI() {
   if (loadingText) loadingText.textContent = t('loadingAsma');
 }
 
-function loadAsmaData() {
+async function loadAsmaData() {
   try {
-    const rawData = require('../data/99_Names_Of_Allah.json');
+    const rawData = await getNamesOfAllah();
     asmaData = rawData.data;
     console.log('Asma data loaded:', asmaData.length, 'names');
-    
+
     renderAsmaList();
-    
+
     const loadingEl = document.getElementById('asmaLoading');
     if (loadingEl) {
       loadingEl.style.opacity = '0';
@@ -75,15 +76,15 @@ function loadAsmaData() {
 function renderAsmaList() {
   const list = document.getElementById('asmaList');
   if (!list) return;
-  
+
   list.innerHTML = '';
-  
+
   const isArabic = currentLanguage === 'ar';
-  
+
   asmaData.forEach((item) => {
     const card = document.createElement('div');
     card.className = 'asma-card';
-    
+
     if (isArabic) {
       card.innerHTML = `
         <button class="asma-copy-btn" aria-label="${t('copy')}">
@@ -92,14 +93,14 @@ function renderAsmaList() {
         <div class="asma-name">${item.name}</div>
         <div class="asma-number">${item.number}</div>
       `;
-      
+
       const copyBtn = card.querySelector('.asma-copy-btn');
       copyBtn.addEventListener('click', () => copyAsmaArabic(item.name));
     } else {
       const langData = item[currentLanguage] || item.en;
       const meaning = decodeUnicode(langData.meaning);
       const desc = decodeUnicode(langData.desc);
-      
+
       card.innerHTML = `
         <div class="asma-number">${item.number}</div>
         <div class="asma-name">${item.name}</div>
@@ -110,18 +111,18 @@ function renderAsmaList() {
           <i class="fas fa-copy"></i>
         </button>
       `;
-      
+
       const copyBtn = card.querySelector('.asma-copy-btn');
       copyBtn.addEventListener('click', () => copyAsma(item, meaning, desc));
     }
-    
+
     list.appendChild(card);
   });
 }
 
 function copyAsma(item, meaning, desc) {
   const text = `${item.name} - ${item.transliteration} - ${meaning}\n${desc}`;
-  
+
   navigator.clipboard.writeText(text)
     .then(() => {
       showSuccessToast(t('copiedToClipboard'));
@@ -145,16 +146,16 @@ function copyAsmaArabic(name) {
 
 function showSuccessToast(message, isError = false) {
   document.querySelectorAll('.success-toast').forEach(toast => toast.remove());
-  
+
   const toast = document.createElement('div');
   toast.className = `success-toast ${isError ? 'error' : ''}`;
   toast.innerHTML = `
     <i class="fas fa-${isError ? 'exclamation-circle' : 'check-circle'}"></i>
     <span>${message}</span>
   `;
-  
+
   document.body.appendChild(toast);
-  
+
   setTimeout(() => toast.classList.add('show'), 10);
   setTimeout(() => {
     toast.classList.remove('show');
@@ -189,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
-  
+
   observer.observe(document.documentElement, {
     attributes: true,
     attributeFilter: ['lang']

@@ -1,10 +1,16 @@
 const { state } = require('./globalStore');
 const { t } = require('./translations');
-const adkarData = require('../data/adkar.json');
+const { getAdkar } = require('./config-api/api');
+let adkarData = require('../data/adkar.json');
 
 let alertIntervalId = null;
 
 function initAthkarAlertsSystem() {
+    // Update data from API
+    getAdkar().then(data => {
+        adkarData = data;
+    }).catch(err => console.error(err));
+
     // Clear any existing interval
     if (alertIntervalId) {
         clearInterval(alertIntervalId);

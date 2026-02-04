@@ -1,6 +1,7 @@
 const {ipcRenderer} = require('electron');
 const screenSizeManager = require('../js/screenSize');
-const audioAlbums = require('../data/audio_albums.json');
+const { getAudioAlbums } = require('./config-api/api');
+let audioAlbums = require('../data/audio_albums.json');
 const { setLanguage, t,getLanguage } = require('../js/translations');
 
 // Helper to get translated string
@@ -18,11 +19,15 @@ class AlbumsManager {
     }
 
     async init() {
-        await this.loadSettings();
-        await this.initScreenSize();
-        await this.initTheme();
-        this.updateTranslations();
+        // Update data from API
+        try {
+            const data = await getAudioAlbums();
+            if (data) audioAlbums = data;
+        } catch (error) {
+            console.error('Failed to update albums from API:', error);
+        }
 
+        this.updateTranslations();
         this.displayAlbums(audioAlbums);
         return this;
     }
