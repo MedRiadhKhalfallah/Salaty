@@ -135,9 +135,29 @@ function setupHandlers(mainWindow) {
   });
 
   ipcMain.handle('save-settings', (event, newSettings) => {
+    const oldTheme = settingsData.theme;
     settingsData = { ...settingsData, ...newSettings };
     syncActiveLocation();
     saveSettings();
+
+    // If theme changed, notify ALL windows to update their theme
+    if (newSettings.theme && newSettings.theme !== oldTheme) {
+      console.log('[IPC] Theme changed from', oldTheme, 'to', newSettings.theme, '→ broadcasting to all windows');
+
+      // Notify main window
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('theme-changed', newSettings.theme);
+      }
+
+      // Notify player window (mini player) via player-manager
+      // We'll import getPlayerWindow() and call it here
+      const playerManager = require('./player-manager');
+      const playerWindow = playerManager.getPlayerWindow();
+      if (playerWindow && !playerWindow.isDestroyed()) {
+        playerWindow.webContents.send('theme-changed', newSettings.theme);
+      }
+    }
+
     return settingsData;
   });
 
@@ -307,6 +327,23 @@ function setupHandlers(mainWindow) {
       mainWindow.loadFile(path.join(__dirname, `../renderer/pages/${page}.html`));
     }
     return true;
+  });
+
+  // New handler for mini-player "Open Playlist" button
+  // Shows main window and navigates it to playlist page
+  ipcMain.handle('show-playlist-in-main', async () => {
+    if (mainWindow) {
+      // Resize to big screen for playlist view
+      mainWindow.setSize(850, 600, true);
+      // Show and focus the main window
+      mainWindow.show();
+      mainWindow.focus();
+      // Navigate to playlist
+      mainWindow.loadFile(path.join(__dirname, '../renderer/pages/playlist.html'));
+      console.log('[IPC] show-playlist-in-main: main window shown and navigated to playlist');
+      return true;
+    }
+    return false;
   });
 
   ipcMain.handle('go-back', () => {

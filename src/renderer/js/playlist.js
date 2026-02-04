@@ -23,7 +23,10 @@ class PlaylistManager {
         await this.loadLocalTracks(); // On attend le chargement des pistes
 
         // Une fois prêt, on communique avec le background player
-        ipcRenderer.send('player-command', { type: 'refresh-tracks' });
+        // ── attach the actual track list so background-player can play by index.
+        //    Without this, its tracks[] stays [] and every 'play' command fails.
+        console.log('[Playlist] Sending refresh-tracks, count:', this.originalTracks.length);
+        ipcRenderer.send('player-command', { type: 'refresh-tracks', tracks: this.originalTracks });
         ipcRenderer.send('player-command', { type: 'get-state' });
 
         return this;
@@ -167,8 +170,13 @@ class PlaylistManager {
         this.playPauseBtn.addEventListener('click', () => {
              if (this.isPlaying) {
                  ipcRenderer.send('player-command', { type: 'pause' });
-             } else {
+             } else if (this.currentTrackData) {
+                 // A track was previously played/paused → resume it
                  ipcRenderer.send('player-command', { type: 'resume' });
+             } else if (this.originalTracks.length > 0) {
+                 // Nothing has played yet → start the first track
+                 console.log('[Playlist] No current track, auto-playing first track');
+                 ipcRenderer.send('player-command', { type: 'play', index: 0 });
              }
         });
 
@@ -328,11 +336,18 @@ class PlaylistManager {
         const track = this.tracks[index]; // Track from current (possibly filtered) list
         const urlToCheck = track.url;
 
-        // Find index in originalTracks
+        // Find index in originalTracks (the background player uses this master list)
         const globalIndex = this.originalTracks.findIndex(t => t.url === urlToCheck);
 
-        if(globalIndex !== -1) {
+        if (globalIndex !== -1) {
+            // Always push the full track list before the play command.
+            // This is cheap (same-process IPC) and guarantees the background
+            // player has the list even if it reloaded since the last refresh.
+            ipcRenderer.send('player-command', { type: 'refresh-tracks', tracks: this.originalTracks });
+            console.log('[Playlist] playTrack → globalIndex:', globalIndex, 'title:', track.title);
             ipcRenderer.send('player-command', { type: 'play', index: globalIndex });
+        } else {
+            console.warn('[Playlist] playTrack: track not found in originalTracks, url:', urlToCheck);
         }
     }
 
