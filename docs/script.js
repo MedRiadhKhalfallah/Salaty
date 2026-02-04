@@ -1,5 +1,7 @@
 // Smooth scroll behavior for anchor links
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize language
+    updatePageLanguage(currentLanguage);
     // Add smooth scrolling to all anchor links
     const anchors = document.querySelectorAll('a[href^="#"]');
 
@@ -105,6 +107,14 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTime();
         setInterval(updateTime, 60000);
     }
+
+    // Language switcher functionality
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const lang = btn.getAttribute('data-lang');
+            updatePageLanguage(lang);
+        });
+    });
 });
 
 // Add keyboard navigation for accessibility
