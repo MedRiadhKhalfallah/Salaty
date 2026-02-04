@@ -46,11 +46,19 @@ class BackgroundPlayer {
                 case 'get-state':
                     this.sendState();
                     break;
+                case 'set-playlist':
+                    this.setPlaylist(arg.tracks, arg.startIndex);
+                    break;
                 case 'refresh-tracks':
                     this.loadLocalTracks();
                     break;
             }
         });
+    }
+
+    setPlaylist(tracks, startIndex = 0) {
+        this.tracks = tracks;
+        this.playTrack(startIndex);
     }
 
     initUI() {

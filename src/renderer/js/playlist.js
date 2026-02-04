@@ -1,7 +1,15 @@
 const { ipcRenderer } = require('electron'); // Import ipcRenderer
-const { getArchiveOrgTracks } = require('../js/utils/trackUtils');
 const screenSizeManager = require('../js/screenSize');
+const { getArchiveOrgTracks } = require('../js/utils/trackUtils');
+const { setLanguage, t, getLanguage } = require('../js/translations');
 
+// Helper to get translated string
+function getLocalized(obj) {
+    if (typeof obj === 'string') return obj;
+    if (!obj) return '';
+    const lang = getLanguage();
+    return obj[lang] || obj['en'] || Object.values(obj)[0] || '';
+}
 
 class PlaylistManager {
     constructor() {
@@ -10,23 +18,103 @@ class PlaylistManager {
 
         this.initElements();
         this.initListeners();
-
-        // Listen to background player state
         this.initIPC();
     }
 
-    // Nouvelle méthode pour gérer tout ce qui est asynchrone
+    // New initialization method
     async init() {
-        await this.loadSettings();   // Load settings FIRST
-        await this.initScreenSize(); // Then set screen size
-        await this.initTheme();      // On attend le thème
-        await this.loadLocalTracks(); // On attend le chargement des pistes
+        await this.loadSettings();
+        await this.initScreenSize();
+        await this.initTheme();
 
-        // Une fois prêt, on communique avec le background player
-        ipcRenderer.send('player-command', { type: 'refresh-tracks' });
+        // Load Album
+        await this.loadCurrentAlbum();
+
+        // Get player state
         ipcRenderer.send('player-command', { type: 'get-state' });
 
+        this.updateTranslations();
+
         return this;
+    }
+
+    async loadCurrentAlbum() {
+        const storedAlbum = localStorage.getItem('selectedAlbum');
+        if (storedAlbum) {
+            try {
+                const album = JSON.parse(storedAlbum);
+                document.querySelector('.playlist-title').innerText = getLocalized(album.title);
+                await this.loadTracks(album);
+            } catch (e) {
+                console.error("Error parsing stored album", e);
+                this.resultsList.innerHTML = `<div class="error"><p>${t('errorLoadingAlbums')}</p></div>`;
+            }
+        } else {
+             this.resultsList.innerHTML = `<div class="empty-state"><p>${t('noAlbumSelected')}</p></div>`;
+        }
+    }
+
+    async loadTracks(album) {
+        this.resultsList.innerHTML = `<div class="loading"><i class="fas fa-spinner"></i>${t('loadingTracks')}</div>`;
+        try {
+             const ARCHIVE_METADATA_URL = album.url || `https://archive.org/metadata/${album.id}`;
+             this.originalTracks = await getArchiveOrgTracks(ARCHIVE_METADATA_URL);
+             this.tracks = [...this.originalTracks];
+             this.displayTracks();
+        } catch (error) {
+             console.error('Error loading tracks:', error);
+             let errorMsg = t('ui.errorLoadingTracks');
+             if (errorMsg.includes('{album}')) {
+                 errorMsg = errorMsg.replace('{album}', getLocalized(album.title) || album.id);
+             } else {
+                 errorMsg += ` ${getLocalized(album.title) || album.id}`;
+             }
+             this.resultsList.innerHTML = `<div class="error"><i class="fas fa-exclamation-circle"></i>${errorMsg}</div>`;
+        }
+    }
+
+    filterTracks(query) {
+        if (query) {
+            const lowerQuery = query.toLowerCase();
+            this.tracks = this.originalTracks.filter(t =>
+                t.title.toLowerCase().includes(lowerQuery) ||
+                t.artist.toLowerCase().includes(lowerQuery)
+            );
+        } else {
+            this.tracks = [...this.originalTracks];
+        }
+        this.displayTracks();
+    }
+
+    displayTracks() {
+        this.resultsList.innerHTML = '';
+        if (this.tracks.length === 0) {
+            this.resultsList.innerHTML = `<div class="empty-state"><p>${t('noTracksFound')}</p></div>`;
+            return;
+        }
+
+        const container = document.createElement('div');
+        this.tracks.forEach((track, index) => {
+            const el = document.createElement('div');
+            el.className = 'track-item';
+            el.dataset.url = track.url;
+
+            if (this.currentTrackData && this.currentTrackData.url === track.url) {
+                el.classList.add('active');
+            }
+
+            el.innerHTML = `
+            <div class="track-info">
+                <span class="track-title">${track.title}</span>
+                <span class="track-meta">${track.artist}</span>
+            </div>
+            <i class="fas fa-play-circle start-track-btn"></i>
+            `;
+
+            el.addEventListener('click', () => this.playTrack(index));
+            container.appendChild(el);
+        });
+        this.resultsList.appendChild(container);
     }
 
     async loadSettings() {
@@ -36,6 +124,12 @@ class PlaylistManager {
                 // Make settings available to screenSizeManager
                 const { state } = require('../js/globalStore');
                 state.settings = { ...state.settings, ...settings };
+
+                if (settings.language) {
+                    setLanguage(settings.language);
+                    // applyLanguageDirection(); // Disabled by request: keep LTR
+                }
+
                 console.log('Settings loaded:', settings);
             }
         } catch (err) {
@@ -44,24 +138,20 @@ class PlaylistManager {
     }
 
     async initScreenSize() {
-        const useBigScreen = screenSizeManager.isBigScreen();
+        const useBigScreen = await screenSizeManager.applyScreenSize();
         console.log('Initial screen size preference:', useBigScreen ? 'big' : 'small');
-        
+
         if (useBigScreen) {
-            document.body.setAttribute('data-screen-size', 'big');
+            document.body.dataset.screenSize = 'big';
             document.body.classList.add('big-screen');
             document.querySelector('.playlist-container')?.classList.add('big-screen');
         } else {
-            document.body.setAttribute('data-screen-size', 'small');
+            document.body.dataset.screenSize = 'small';
             document.body.classList.add('small-screen');
             document.querySelector('.playlist-container')?.classList.add('small-screen');
         }
     }
 
-    getCurrentWindowSize() {
-        const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
-        return isBigScreen ? { width: 850, height: 600 } : { width: 320, height: 575 };
-    }
 
     initIPC() {
         ipcRenderer.on('player-update', (event, arg) => {
@@ -79,13 +169,21 @@ class PlaylistManager {
         this.currentTrackData = state.currentTrack;
 
         this.updatePlayBtn();
-        this.highlightCurrentTrack();
+        // Highlight logic
+        const items = document.querySelectorAll('.track-item');
+        items.forEach((item) => {
+            if (item.dataset.url === (state.currentTrack ? state.currentTrack.url : '')) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
 
         if (state.currentTrack) {
             this.currentTrackTitle.innerText = state.currentTrack.title;
             this.currentTrackArtist.innerText = state.currentTrack.artist;
         } else {
-             this.currentTrackTitle.innerText = "No Track Selected";
+             this.currentTrackTitle.innerText = t('noTrackSelected');
              this.currentTrackArtist.innerText = "-";
         }
 
@@ -99,6 +197,14 @@ class PlaylistManager {
                  this.updateVolumeFill();
              }
         }
+    }
+
+    updateTranslations() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.placeholder = t('searchInPlaylist');
+
+        const backBtn = document.getElementById('backBtn');
+        if (backBtn) backBtn.setAttribute('aria-label', t('back'));
     }
 
     async initTheme() {
@@ -123,7 +229,8 @@ class PlaylistManager {
         this.closeBtn = document.getElementById('closeBtn');
 
         this.searchInput = document.getElementById('searchInput');
-        this.resultsList = document.getElementById('resultsList');
+
+        this.resultsList = document.getElementById('resultsList'); // Initialize resultsList
 
         this.playPauseBtn = document.getElementById('playPauseBtn');
         this.prevBtn = document.getElementById('prevBtn');
@@ -138,7 +245,7 @@ class PlaylistManager {
         this.durationEl = document.getElementById('duration');
 
         this.backBtn = document.getElementById('backBtn');
-        
+
         // Update fullscreen button initial state
         this.updateScreenSizeButton();
     }
@@ -158,6 +265,7 @@ class PlaylistManager {
         if (this.fullscreenBtn) {
             this.fullscreenBtn.addEventListener('click', () => this.toggleScreenSize());
         }
+
 
         this.searchInput.addEventListener('input', () => {
              const query = this.searchInput.value.trim();
@@ -196,18 +304,16 @@ class PlaylistManager {
         });
 
         this.backBtn.addEventListener('click', () => {
-            const currentSize = this.getCurrentWindowSize();
-            ipcRenderer.invoke('resize-window', currentSize.width, currentSize.height);
-            ipcRenderer.invoke('navigate-to', 'features');
+             ipcRenderer.invoke('navigate-to', 'albums');
         });
     }
 
     updateScreenSizeButton() {
         if (!this.fullscreenBtn) return;
-        
-        const isBigScreen = document.body.getAttribute('data-screen-size') === 'big';
+
+        const isBigScreen = document.body.dataset.screenSize === 'big';
         console.log('updateScreenSizeButton: Current screen size is', isBigScreen ? 'BIG' : 'SMALL');
-        
+
         const icon = this.fullscreenBtn.querySelector('i');
         if (isBigScreen) {
             // Currently big → button should say "Small Screen"
@@ -225,13 +331,13 @@ class PlaylistManager {
     }
 
     toggleScreenSize() {
-        const isCurrentlyBig = document.body.getAttribute('data-screen-size') === 'big';
+        const isCurrentlyBig = document.body.dataset.screenSize === 'big';
         console.log('toggleScreenSize: Switching FROM', isCurrentlyBig ? 'BIG to SMALL' : 'SMALL to BIG');
-        
+
         if (isCurrentlyBig) {
             // Switch FROM big TO small screen
             ipcRenderer.invoke('resize-window', 320, 575);
-            document.body.setAttribute('data-screen-size', 'small');
+            document.body.dataset.screenSize = 'small';
             document.body.classList.remove('big-screen');
             document.body.classList.add('small-screen');
             document.querySelector('.playlist-container')?.classList.remove('big-screen');
@@ -239,7 +345,7 @@ class PlaylistManager {
         } else {
             // Switch FROM small TO big screen
             ipcRenderer.invoke('resize-window', 850, 600);
-            document.body.setAttribute('data-screen-size', 'big');
+            document.body.dataset.screenSize = 'big';
             document.body.classList.remove('small-screen');
             document.body.classList.add('big-screen');
             document.querySelector('.playlist-container')?.classList.remove('small-screen');
@@ -267,72 +373,17 @@ class PlaylistManager {
         return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
     }
 
-    async loadLocalTracks() {
-        this.resultsList.innerHTML = '<div class="loading">Loading local tracks...</div>';
-        try {
-            const ARCHIVE_ITEM_ID = 'Mishary-Alafasy'; // Example ID containing audio
-            const ARCHIVE_METADATA_URL = `https://archive.org/metadata/${ARCHIVE_ITEM_ID}`;
-            this.originalTracks = await getArchiveOrgTracks(ARCHIVE_METADATA_URL);
-            this.tracks = [...this.originalTracks];
-            this.displayTracks();
-        } catch (error) {
-            console.error('Error loading tracks:', error);
-            this.resultsList.innerHTML = '<div class="error">Error loading tracks </div>';
-        }
-    }
-
-    filterTracks(query) {
-        if (query) {
-            const lowerQuery = query.toLowerCase();
-            this.tracks = this.originalTracks.filter(t =>
-                t.title.toLowerCase().includes(lowerQuery) ||
-                t.artist.toLowerCase().includes(lowerQuery)
-            );
-        } else {
-            this.tracks = [...this.originalTracks];
-        }
-        this.displayTracks();
-    }
-
-    displayTracks() {
-        this.resultsList.innerHTML = '';
-        // ... (vérification du tableau vide)
-
-        const container = document.createElement('div');
-        this.tracks.forEach((track, index) => {
-            const el = document.createElement('div');
-            el.className = 'track-item';
-
-            el.dataset.url = track.url;
-
-            // Highlight initial lors du rendu
-            if (this.currentTrackData && this.currentTrackData.url === track.url) {
-                el.classList.add('active');
-            }
-
-            el.innerHTML = `
-            <div class="track-info">
-                <span class="track-title">${track.title}</span>
-                <span class="track-meta">${track.artist}</span>
-            </div>
-            <i class="fas fa-play-circle start-track-btn"></i>
-        `;
-
-            el.addEventListener('click', () => this.playTrack(index));
-            container.appendChild(el);
-        });
-        this.resultsList.appendChild(container);
-    }
-
-    playTrack(index) {
-        const track = this.tracks[index]; // Track from current (possibly filtered) list
+    async playTrack(index) {
+        const track = this.tracks[index];
         const urlToCheck = track.url;
-
-        // Find index in originalTracks
         const globalIndex = this.originalTracks.findIndex(t => t.url === urlToCheck);
 
         if(globalIndex !== -1) {
-            ipcRenderer.send('player-command', { type: 'play', index: globalIndex });
+             ipcRenderer.send('player-command', {
+                type: 'set-playlist',
+                tracks: this.originalTracks,
+                startIndex: globalIndex
+            });
         }
     }
 
@@ -342,25 +393,6 @@ class PlaylistManager {
             '<i class="fas fa-play"></i>';
     }
 
-    highlightCurrentTrack() {
-        // Si aucune donnée de piste n'est disponible, on arrête
-        if (!this.currentTrackData) return;
-
-        const items = document.querySelectorAll('.track-item');
-
-        items.forEach((item) => {
-            const trackUrl = item.dataset.url;
-
-            // On compare avec la piste actuellement lue par le background player
-            if (trackUrl === this.currentTrackData.url) {
-                item.classList.add('active');
-                // Optionnel : faire défiler jusqu'à la piste si elle n'est pas visible
-                // item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            } else {
-                item.classList.remove('active');
-            }
-        });
-    }
 
     updateVolumeFill() {
         const val = this.volumeSlider.value;
@@ -384,3 +416,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Erreur lors de linitialisation de la playlist:', err);
     }
 });
+

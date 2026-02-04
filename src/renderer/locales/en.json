@@ -82,7 +82,6 @@
     "open": "Open",
     "comingSoon": "Soon",
     "tasbih": "Tasbih",
-    "hijriCalendar": "Hijri Calendar",
     "ramadhan": "Ramadhan",
     "asmaAllah": "99 Names of Allah",
     "qiblaFinder": "Qibla Finder",
@@ -167,7 +166,16 @@
     "travelModeDisabled": "Travel mode disabled",
     "errorDetectingLocation": "Error detecting location",
     "locationChangedMessage": "You appear to be in {detectedLocation}, but your current location is set to {currentLocation}. Would you like to switch?",
-    "notification": "Notifications"
+    "audioArchive": "Audio Archive",
+    "audioArchiveDesc": "Listen to Islamic audio",
+    "searchAlbums": "Search albums...",
+    "searchInPlaylist": "Search in playlist...",
+    "errorLoadingAlbums": "Error loading album details.",
+    "noAlbumSelected": "No album selected.",
+    "loadingTracks": "Loading tracks...",
+    "noTracksFound": "No tracks found",
+    "errorLoadingTracks": "Error loading tracks",
+    "noTrackSelected": "No Track Selected"
   },
   "themes": {
     "navy": "Navy",
