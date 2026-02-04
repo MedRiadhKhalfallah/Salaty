@@ -53,6 +53,7 @@ function updateAllText() {
         'countryLabel': 'country',
         'cityLabel': 'city',
         'detectLocationLabel': 'detectLocation',
+        'manageLocationsLabel': 'manageLocationsLabel',
         
         // Appearance Section
         'appearanceSectionTitle': 'theme',

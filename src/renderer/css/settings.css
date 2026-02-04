@@ -947,6 +947,53 @@
   max-width: 400px;
 }
 
+/* Responsive modal for small screens */
+@media (max-width: 400px) {
+  .modal-container {
+    width: 95%;
+    max-height: 90vh;
+    border-radius: 12px;
+  }
+
+  .modal-header {
+    padding: 16px 18px;
+  }
+
+  .modal-header h3 {
+    font-size: 16px;
+  }
+
+  .modal-content {
+    padding: 16px 18px;
+  }
+
+  .modal-container.modal-small {
+    max-width: 95%;
+  }
+
+  .locations-list {
+    max-height: 300px;
+  }
+
+  .location-item {
+    padding: 12px;
+  }
+
+  .location-name {
+    font-size: 14px;
+  }
+
+  .location-details {
+    font-size: 12px;
+  }
+
+  .action-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+}
+
 /* Modal Header */
 .modal-header {
   display: flex;
@@ -1010,6 +1057,27 @@
   flex-direction: column;
   gap: 12px;
   margin-bottom: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.locations-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.locations-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.locations-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.locations-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .location-item {
