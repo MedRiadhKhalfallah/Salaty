@@ -1,6 +1,7 @@
 // src/renderer/js/locationSwitcher.js
 const locationManager = require('./locationManager');
 const { t } = require('./translations');
+const { showConfirmDialog } = require('./customDialog');
 
 let isDropdownOpen = false;
 
@@ -89,7 +90,12 @@ async function checkLocationOnLaunch() {
         .replace('{currentLocation}', `${activeLocation.city}, ${activeLocation.country}`)
         .replace('{detectedLocation}', `${detected.city}, ${detected.country}`);
 
-      if (confirm(message)) {
+      const confirmed = await showConfirmDialog(message, {
+        confirmText: t('switchLocation') || 'Switch',
+        cancelText: t('cancel') || 'Cancel'
+      });
+
+      if (confirmed) {
         // User confirmed, switch location
 
         // Check if detected location already exists

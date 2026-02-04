@@ -21,7 +21,14 @@ function createPlayerWindow() {
       backgroundThrottling: false
     }
   });
+
   playerWindow.loadFile(path.join(__dirname, '../renderer/pages/background-player.html'));
+
+  // ── Open DevTools for this window so [MiniPlayer Theme] logs are visible ──
+  // Remove this line once the theme issue is confirmed fixed.
+  playerWindow.webContents.openDevTools({ mode: 'detach' });
+
+  console.log('[PlayerManager] Mini-player window created');
 }
 
 function showMiniPlayer() {
