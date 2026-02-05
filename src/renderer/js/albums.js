@@ -1,6 +1,6 @@
 const {ipcRenderer} = require('electron');
 const screenSizeManager = require('../js/screenSize');
-const { getAudioAlbums } = require('./config-api/api');
+const { getAudioAlbums } = require('../js/config-api/api');
 let audioAlbums = require('../data/audio_albums.json');
 const { setLanguage, t,getLanguage } = require('../js/translations');
 
@@ -19,6 +19,10 @@ class AlbumsManager {
     }
 
     async init() {
+        await this.loadSettings();
+        await this.initTheme();
+        await this.initScreenSize();
+
         // Update data from API
         try {
             const data = await getAudioAlbums();
