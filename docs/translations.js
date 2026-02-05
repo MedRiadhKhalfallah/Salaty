@@ -62,7 +62,7 @@ const translations = {
         'footer.legal': 'Legal',
         'footer.license': 'License (MIT)',
         'footer.privacy': 'Privacy',
-        'footer.copyright': '2024-2026 Salaty Time. Developed by',
+        'footer.copyright': 'Salaty Time. Developed by',
         'footer.licensed': 'Licensed under MIT.'
     },
 
@@ -129,7 +129,7 @@ const translations = {
         'footer.legal': 'Légal',
         'footer.license': 'Licence (MIT)',
         'footer.privacy': 'Confidentialité',
-        'footer.copyright': '2024-2026 Salaty Time. Développé par',
+        'footer.copyright': 'Salaty Time. Développé par',
         'footer.licensed': 'Sous licence MIT.'
     },
 
@@ -196,7 +196,7 @@ const translations = {
         'footer.legal': 'قانوني',
         'footer.license': 'الترخيص (MIT)',
         'footer.privacy': 'الخصوصية',
-        'footer.copyright': '2024-2026 Salaty Time. تم التطوير بواسطة',
+        'footer.copyright': 'Salaty Time. تم التطوير بواسطة',
         'footer.licensed': 'مرخص بموجب MIT.'
     }
 };
