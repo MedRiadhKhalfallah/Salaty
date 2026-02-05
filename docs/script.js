@@ -115,6 +115,12 @@ document.addEventListener('DOMContentLoaded', () => {
             updatePageLanguage(lang);
         });
     });
+
+    // Ajout de l'année dynamique dans le footer
+    const yearSpan = document.getElementById('current-year');
+    if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+    }
 });
 
 // Add keyboard navigation for accessibility
