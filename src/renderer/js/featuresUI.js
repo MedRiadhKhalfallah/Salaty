@@ -8,7 +8,7 @@ function initFeaturesPage() {
   console.log('Initializing Features page...');
 
   // SCREEN SIZE IS NOW HANDLED IN renderer.js
-  
+
   // Setup back button
   const backBtn = document.getElementById('backBtn');
   if (backBtn) {
@@ -68,7 +68,7 @@ function updateFeaturesUI() {
   if (featureRamadhan) featureRamadhan.textContent = t('ramadhan');
   if (featureAsma) featureAsma.textContent = t('asmaAllah');
   if (featureQibla) featureQibla.textContent = t('qiblaFinder');
-  if (featurePlaylist) featurePlaylist.textContent = "Audio Archive";
+  if (featurePlaylist) featurePlaylist.textContent = t('audioArchive');
 
   if (featureQuranDesc) featureQuranDesc.textContent = t('quranDesc');
   if (featureAthkarDesc) featureAthkarDesc.textContent = t('athkarDesc');
@@ -78,7 +78,7 @@ function updateFeaturesUI() {
   if (featureRamadhanDesc) featureRamadhanDesc.textContent = t('ramadhanDesc');
   if (featureAsmaDesc) featureAsmaDesc.textContent = t('asmaDesc');
   if (featureQiblaDesc) featureQiblaDesc.textContent = t('qiblaDesc');
-  if (featurePlaylistDesc) featurePlaylistDesc.textContent = "Listen to Islamic audio";
+  if (featurePlaylistDesc) featurePlaylistDesc.textContent = t('audioArchiveDesc');
 
   comingSoonBadges.forEach(badge => {
     badge.textContent = t('comingSoon');
@@ -133,7 +133,7 @@ function setupFeatureCards() {
 function openPlaylist() {
   console.log('Opening Playlist...');
   ipcRenderer.invoke('resize-window', 850, 600);
-  ipcRenderer.invoke('navigate-to', 'playlist');
+  ipcRenderer.invoke('navigate-to', 'albums');
 }
 
 function openQuran() {
