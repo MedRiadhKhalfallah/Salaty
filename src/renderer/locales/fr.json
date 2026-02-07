@@ -212,5 +212,10 @@
     "tasua": { "event": "Tasu'a", "date": "9 Muharram", "description": "Recommandé de jeûner avec Achoura." },
     "shabanStart": { "event": "Mois de Sha‘bân", "date": "1 Sha‘bân", "description": "Mois où les actions sont élevées." },
     "muharramStart": { "event": "Nouvel an Hégirien", "date": "1 Muharram", "description": "Début de l'année. Il est recommandé de jeûner." }
+  },
+  "common": {
+    "timetable": "Emploi du temps",
+    "day": "Jour",
+    "date": "Date"
   }
 }

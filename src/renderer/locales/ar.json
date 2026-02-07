@@ -211,5 +211,10 @@
     "tasua": { "event": "يوم تاسوعاء", "date": "9 محرم", "description": "يُستحب صيامه مع اليوم التالي (عاشوراء)." },
     "shabanStart": { "event": "بداية شهر شعبان", "date": "1 شعبان", "description": "شهر ترفع فيه الأعمال." },
     "muharramStart": { "event": "شهر محرم", "date": "1 محرم", "description": "أفضل الصيام بعد رمضان." }
+  },
+  "common": {
+    "timetable": "الجدول الزمني",
+    "day": "اليوم",
+    "date": "التاريخ"
   }
 }
