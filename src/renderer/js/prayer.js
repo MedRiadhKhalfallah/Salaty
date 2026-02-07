@@ -4,7 +4,7 @@ const { ipcRenderer } = require('electron');
 const path = require('path');
 const { translations, getLanguage, t } = require('../js/translations');
 const {   showToast, } = require('../js/toast');
-const { getSecondsFromTime, formatTime, getGregorianDate, getHijriDate } = require('../js/dateUtils');
+const { getSecondsFromTime, formatTime, getGregorianDate, getHijriDate, checkUpcomingEvent } = require('../js/dateUtils');
 const { state, prayerIcons } = require('../js/globalStore');
 const { notifyPrayer } = require('../js/adhan');
 const { updateRamadanCountdown } = require('../js/ramadan');
@@ -111,6 +111,45 @@ function updatePrayerUI() {
     if (gregorianDateEl && hijriDateEl) {
         gregorianDateEl.textContent = getGregorianDate(prayerData);
         hijriDateEl.textContent = getHijriDate(prayerData, lang, t);
+
+        // Check for upcoming Islamic events
+        if (prayerData.date?.hijri) {
+            const now = new Date();
+            const dayOfWeek = now.getDay(); // 0 is Sunday
+            const eventKey = checkUpcomingEvent(prayerData.date.hijri.day, prayerData.date.hijri.month.number, dayOfWeek);
+            const eventsBanner = document.getElementById('eventsBanner');
+            const eventText = document.getElementById('eventText');
+
+            if (eventsBanner && eventText) {
+                if (eventKey) {
+                   const eventObj = t(eventKey, 'islamicEvents');
+                   // eventObj used to be a string, now it's an object with {event, date, description, note}
+                   const isObj = typeof eventObj === 'object';
+                   const eventName = isObj ? eventObj.event : eventObj;
+                   const eventDate = isObj ? eventObj.date : '';
+                   const eventDesc = isObj ? eventObj.description : '';
+                   const eventNote = isObj ? eventObj.note : '';
+
+                   const tomorrowLabel = t('tomorrowIs', 'islamicEvents').split(':')[0]; // "Tomorrow" or "Demain" or "غداً"
+
+                   let htmlContent = `<div class="event-title">${tomorrowLabel}: ${eventName}</div>`;
+                   if (eventDate) {
+                       htmlContent += `<div class="event-date"><i class="far fa-calendar-alt"></i> ${eventDate}</div>`;
+                   }
+                   if (eventDesc) {
+                       htmlContent += `<div class="event-desc">${eventDesc}</div>`;
+                   }
+                   if (eventNote) {
+                       htmlContent += `<div class="event-note"><i class="fas fa-info-circle"></i> ${eventNote}</div>`;
+                   }
+
+                   eventText.innerHTML = htmlContent;
+                   eventsBanner.style.display = 'flex';
+                } else {
+                   eventsBanner.style.display = 'none';
+                }
+            }
+        }
     }
     const loadingEl = document.getElementById('loadingText');
     if (loadingEl) {
