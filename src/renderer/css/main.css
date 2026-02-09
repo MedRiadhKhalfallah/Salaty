@@ -313,8 +313,8 @@ body {
 /* Prayer Times List */
 .prayer-times {
   padding: 0 20px;
-  max-height: 280px;
-  overflow-y: auto;
+   max-height: 280px;
+   overflow-y: auto;
 }
 
 /* Settings Container */

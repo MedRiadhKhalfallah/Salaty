@@ -26,7 +26,7 @@ const { setupMiniPlayer } = require('../js/mini-player');
 function setupScreenSizeForPage(containerClass = '') {
     // Initialize screen size
     screenSizeManager.initPageScreenSize(containerClass);
-    
+
     // Setup screen size toggle button
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     if (fullscreenBtn) {
@@ -41,6 +41,60 @@ function setupScreenSizeForPage(containerClass = '') {
  */
 function getCurrentWindowSize() {
     return screenSizeManager.getWindowSize();
+}
+
+/**
+ * Adjusts the window height to fit the content of the index page.
+ */
+let resizeTimeout;
+async function adjustIndexPageHeight() {
+    // Only applies to index page
+    const path = globalThis.location.pathname;
+    if (!path.includes('index.html') && !path.endsWith('/')) return;
+
+    // Build-in debounce
+    if (resizeTimeout) clearTimeout(resizeTimeout);
+
+    resizeTimeout = setTimeout(() => {
+        requestAnimationFrame(async () => {
+            const appContainer = document.getElementById('app');
+            if (!appContainer) return;
+
+            // Calculate total height of visible children
+            let totalHeight = 0;
+
+            // Add container padding
+            const style = globalThis.getComputedStyle(appContainer);
+            totalHeight += Number.parseFloat(style.paddingTop || 0) + Number.parseFloat(style.paddingBottom || 0);
+
+            const children = appContainer.children;
+            for (const element of children) {
+                const child = element;
+                const childStyle = globalThis.getComputedStyle(child);
+
+                // Skip hidden elements and absolute/fixed positioned elements
+                if (childStyle.display === 'none') continue;
+                if (childStyle.position === 'absolute' || childStyle.position === 'fixed') continue;
+                // Skip the "drag-area" explicitly if it's not positioned absolute (though CSS says it is)
+                if (child.classList.contains('drag-area')) continue;
+
+                // Add element height and margins
+                totalHeight += child.offsetHeight;
+                totalHeight += Number.parseFloat(childStyle.marginTop || 0) + Number.parseFloat(childStyle.marginBottom || 0);
+            }
+
+            // Add a buffer for safety (bottom spacing)
+            totalHeight += 20;
+
+            // Get current window size to preserve width
+            const currentSize = await ipcRenderer.invoke('get-window-size');
+
+            // Only resize if height is significantly different to avoid loops and jitter
+            if (currentSize && Math.abs(currentSize.height - totalHeight) > 10) {
+                 await ipcRenderer.invoke('resize-window', currentSize.width, Math.ceil(totalHeight));
+            }
+        });
+    }, 100); // 100ms debounce
 }
 
 // ==================== INITIALIZATION ====================
@@ -260,6 +314,34 @@ function initMainPage() {
   if (loadingEl) {
     loadingEl.textContent = t('loadingPrayerTimes');
   }
+
+  // Initialize Events Banner
+  const eventsBanner = document.getElementById('eventsBanner');
+  const closeEventBannerBtn = document.getElementById('closeEventBanner');
+
+  if (closeEventBannerBtn && eventsBanner) {
+    closeEventBannerBtn.addEventListener('click', () => {
+      eventsBanner.style.display = 'none';
+    });
+  }
+
+  // Monitor DOM changes for automatic resizing on the index page
+  const appContainer = document.getElementById('app');
+  if (appContainer) {
+    const observer = new MutationObserver(() => {
+        adjustIndexPageHeight();
+    });
+
+    observer.observe(appContainer, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style', 'class', 'hidden']
+    });
+  }
+
+  // Initial height adjustment
+  adjustIndexPageHeight();
 
   // Start prayer times functionality
   loadPrayerTimes();
