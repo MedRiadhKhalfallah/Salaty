@@ -212,5 +212,10 @@
     "tasua": { "event": "Tasu'a", "date": "9 Muharram", "description": "Recommended to fast with Ashura." },
     "shabanStart": { "event": "Start of Sha'ban", "date": "1 Sha'ban", "description": "Spiritual preparation before Ramadan." },
     "muharramStart": { "event": "Start of Muharram", "date": "1 Muharram", "description": "Beginning of the Hijri year. Recommended to fast." }
+  },
+  "common": {
+    "timetable": "Timetable",
+    "day": "Day",
+    "date": "Date"
   }
 }

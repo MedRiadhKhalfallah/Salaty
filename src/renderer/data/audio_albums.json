@@ -1,5 +1,30 @@
 [
   {
+    "id": "complete-quran-recitation-sidi-ali-al-barraq",
+    "title": {
+      "en": "Ali al barraq",
+      "fr": "Ali al barraq",
+      "ar": "علي البرّاق"
+    },
+    "artist": {
+      "en": "Ali al barraq",
+      "fr": "Ali al barraq",
+      "ar": "علي البرّاق"
+    },
+    "icon": "fas fa-book-quran",
+    "description": {
+      "en": "Complete Quran recitation.",
+      "fr": "Récitation complète du Coran.",
+      "ar": "تلاوة كاملة للقرآن الكريم."
+    },
+    "url": "https://archive.org/metadata/complete-quran-recitation-sidi-ali-al-barraq",
+    "category": {
+      "en": "Quran Recitation",
+      "fr": "Récitation du Coran",
+      "ar": "تلاوة القرآن"
+    }
+  },
+  {
     "id": "Quran-Mishary-Rashid-Al-Afasy",
     "title": {
       "en": "Mishary Rashid Alafasy",

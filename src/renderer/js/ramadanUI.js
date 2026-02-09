@@ -41,8 +41,27 @@ function initRamadanPage() {
     const todayFastingTitle = document.getElementById('todayFastingTitle');
     if (todayFastingTitle) todayFastingTitle.textContent = t('todayFasting');
 
+    // New Tab Translations
     const trackerTitle = document.getElementById('trackerTitle');
     if (trackerTitle) trackerTitle.textContent = t('fastingTracker');
+
+    const tableTitle = document.getElementById('tableTitle');
+    if (tableTitle) tableTitle.textContent = t('timetable', 'common') || "Timetable"; // Fallback if 'timetable' not in dictionary
+
+    const thDay = document.getElementById('thDay');
+    if (thDay) thDay.textContent = t('day', 'common') || "Day";
+
+    const thDate = document.getElementById('thDate');
+    if (thDate) thDate.textContent = t('date', 'common') || "Date";
+
+    const thSuhoor = document.getElementById('thSuhoor');
+    if (thSuhoor) thSuhoor.textContent = t('suhoor');
+
+    const thIftar = document.getElementById('thIftar');
+    if (thIftar) thIftar.textContent = t('iftar');
+
+    // Tab switching logic
+    initTabs();
 
     const labelTodaySuhoor = document.getElementById('labelTodaySuhoor');
     if (labelTodaySuhoor) labelTodaySuhoor.textContent = t('suhoor');
@@ -102,6 +121,7 @@ async function fetchRamadanData() {
         if (ramadanJson && ramadanJson.data) {
             ramadanData = ramadanJson.data;
             renderCalendar(ramadanData);
+            renderTable(ramadanData);
             updateTodayCard(ramadanData);
         }
 
@@ -290,6 +310,77 @@ function toggleDayTracking(hijriDay, dayElement, btn) {
 // Remove the (EST) part for cleaner display if present
 function formatTimeStr(time) {
     return time.split(' ')[0];
+}
+
+function initTabs() {
+    const tabBtns = document.querySelectorAll('.ramadan-tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Remove active class from all buttons
+            tabBtns.forEach(b => b.classList.remove('active'));
+            // Add active class to clicked button
+            btn.classList.add('active');
+
+            // Hide all tab contents
+            tabContents.forEach(content => content.style.display = 'none');
+
+            // Show selected tab content
+            const tabId = btn.getAttribute('data-tab');
+            const targetContent = document.getElementById(`content${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`);
+            if (targetContent) {
+                targetContent.style.display = 'block';
+            }
+        });
+    });
+}
+
+function renderTable(data) {
+    const tableBody = document.querySelector('#ramadanTable tbody');
+    if (!tableBody) return;
+    tableBody.innerHTML = '';
+
+    const lang = state.settings.language || 'en';
+    const monthFormatter = new Intl.DateTimeFormat(
+        lang === 'ar' ? 'ar-TN' : lang,
+        { month: 'short' }
+    );
+
+    // Today check for highlighting
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const d = String(today.getDate()).padStart(2, '0');
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const y = today.getFullYear();
+    const todayStr = `${d}-${m}-${y}`;
+
+    data.forEach(dayData => {
+        const hijriDay = dayData.date.hijri.day;
+        const gregDateStr = dayData.date.gregorian.date; // DD-MM-YYYY
+
+        // Format date display
+        const [gDay, gMonth, gYear] = gregDateStr.split('-').map(Number);
+        const jsDate = new Date(gYear, gMonth - 1, gDay);
+        let monthName = monthFormatter.format(jsDate).trim();
+         if (lang === 'ar') {
+            monthName = monthName.replace(/[.\s]+$/, '');
+        }
+
+        const row = document.createElement('tr');
+        if (gregDateStr === todayStr) {
+            row.classList.add('current-day-row');
+        }
+
+        row.innerHTML = `
+            <td>${hijriDay}</td>
+            <td>${gDay} ${monthName}</td>
+            <td>${formatTimeStr(dayData.timings.Fajr)}</td>
+            <td>${formatTimeStr(dayData.timings.Maghrib)}</td>
+        `;
+
+        tableBody.appendChild(row);
+    });
 }
 
 module.exports = { initRamadanPage };
