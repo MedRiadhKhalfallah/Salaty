@@ -19,10 +19,10 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "electron": "38.2.2",
-    "electron-builder": "24.13.3",
-    "eslint": "^9.39.2",
-    "globals": "^17.3.0"
+    "electron": "42.2.0",
+    "electron-builder": "26.8.1",
+    "eslint": "^9.39.4",
+    "globals": "^17.6.0"
   },
   "build": {
     "appId": "com.yassindaboussi.salaty",
@@ -81,10 +81,10 @@
     }
   },
   "dependencies": {
-    "electron-updater": "^6.7.3",
+    "electron-updater": "^6.8.3",
     "howler": "^2.2.4",
     "leaflet": "^1.9.4",
     "salaty-qibla-map": "^1.0.2",
-    "tom-select": "^2.4.3"
+    "tom-select": "^2.6.1"
   }
 }
