@@ -491,3 +491,169 @@ a,
   background: rgba(var(--accent-rgb, 74, 144, 226), 0.45);
 }
 
+/* ========== Prayer Tracker Widget on Home Page ========== */
+.tracker-widget {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 16px 14px;
+  padding: 12px 14px;
+  background: var(--bg-surface, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-app-region: no-drag;
+  pointer-events: auto;
+  position: relative;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.tracker-widget::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.04), rgba(var(--accent-rgb, 74, 144, 226), 0.03));
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.tracker-widget:hover {
+  border-color: rgba(var(--accent-rgb, 74, 144, 226), 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15),
+              0 0 0 1px rgba(var(--accent-rgb, 74, 144, 226), 0.1);
+}
+
+.tracker-widget:hover::before {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.08), rgba(var(--accent-rgb, 74, 144, 226), 0.06));
+}
+
+.tracker-widget:active {
+  transform: translateY(0);
+  transition: transform 0.1s ease;
+}
+
+/* Left: Tree */
+.tracker-widget-left {
+  flex-shrink: 0;
+}
+
+.tracker-widget-tree {
+  font-size: 30px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: rgba(76, 175, 80, 0.08);
+  border-radius: 12px;
+  border: 1px solid rgba(76, 175, 80, 0.15);
+  animation: treePulse 4s ease-in-out infinite;
+}
+
+@keyframes treePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Center: Info */
+.tracker-widget-center {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tracker-widget-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tracker-widget-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tracker-widget-streak {
+  font-size: 11px;
+  font-weight: 600;
+  color: #ff6b35;
+  background: rgba(255, 107, 53, 0.1);
+  padding: 2px 7px;
+  border-radius: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tracker-widget-progress {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.tracker-widget-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #4caf50, var(--accent-color, #8bc34a));
+  border-radius: 2px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tracker-widget-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tracker-widget-level {
+  font-size: 10px;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.55));
+  font-weight: 500;
+}
+
+.tracker-widget-points {
+  font-size: 10px;
+  color: var(--accent-color, #ffd700);
+  font-weight: 600;
+}
+
+/* Right: Arrow */
+.tracker-widget-right {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  transition: all 0.25s ease;
+}
+
+.tracker-widget-right i {
+  font-size: 10px;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.4));
+  transition: all 0.25s ease;
+}
+
+.tracker-widget:hover .tracker-widget-right {
+  background: rgba(var(--accent-rgb, 74, 144, 226), 0.15);
+}
+
+.tracker-widget:hover .tracker-widget-right i {
+  color: var(--accent-color, rgba(255, 255, 255, 0.8));
+  transform: translateX(2px);
+}

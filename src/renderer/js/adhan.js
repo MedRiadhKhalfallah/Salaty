@@ -5,7 +5,12 @@ const path = require('path');
 
 let adhanAudio = null;
 let fadeInterval = null;
+let prayerTimerInterval = null;
+let prayerStartTime = null;
+let currentPrayerName = null;
+let returnDetected = false;
 
+// ==================== ADHAN STOP BUTTON ====================
 function showAdhanStopBtn(show) {
     const btn = document.getElementById('adhanStopBtn');
     if (btn) {
@@ -18,8 +23,195 @@ function showAdhanStopBtn(show) {
     setAdhanStopText();
 }
 
+// ==================== "GOING TO PRAY" BUTTON ====================
+function showPrayGoBtn(show) {
+    const btn = document.getElementById('prayGoBtn');
+    if (btn) {
+        if (show) {
+            btn.classList.remove('pray-go-btn-hidden');
+        } else {
+            btn.classList.add('pray-go-btn-hidden');
+        }
+    }
+    setPrayGoText();
+}
+
+function setPrayGoText() {
+    const textEl = document.getElementById('prayGoText');
+    if (textEl) {
+        textEl.textContent = t('goingToPray', 'tracker') || 'Je vais prier';
+    }
+}
+
+// ==================== PRAYER TIMER ====================
+function startPrayerTimer() {
+    // Stop the adhan
+    stopAdhan();
+
+    // Record start time
+    prayerStartTime = Date.now();
+    returnDetected = false;
+
+    // Show the timer overlay
+    const overlay = document.getElementById('prayerTimerOverlay');
+    const welcomePanel = document.getElementById('prayerTimerWelcome');
+    if (overlay) {
+        overlay.classList.remove('prayer-timer-hidden');
+    }
+    if (welcomePanel) {
+        welcomePanel.classList.add('prayer-timer-welcome-hidden');
+    }
+
+    // Update timer text
+    const statusEl = document.getElementById('prayerTimerStatus');
+    if (statusEl) {
+        statusEl.textContent = t('praying', 'tracker') || 'En prière...';
+    }
+    const hintEl = document.getElementById('prayerTimerHint');
+    if (hintEl) {
+        hintEl.textContent = t('prayerTimerHint', 'tracker') || 'Bougez la souris ou appuyez sur une touche à votre retour';
+    }
+
+    // Start the clock
+    updateTimerDisplay();
+    prayerTimerInterval = setInterval(updateTimerDisplay, 1000);
+
+    // Listen for return (after a grace period of 30s to avoid accidental triggers)
+    setTimeout(() => {
+        if (!returnDetected) {
+            document.addEventListener('mousemove', onUserReturn, { once: true });
+            document.addEventListener('keydown', onUserReturn, { once: true });
+            document.addEventListener('click', onUserReturn, { once: true });
+        }
+    }, 30000); // 30 seconds grace period
+}
+
+function updateTimerDisplay() {
+    if (!prayerStartTime) return;
+    const elapsed = Math.floor((Date.now() - prayerStartTime) / 1000);
+    const minutes = Math.floor(elapsed / 60);
+    const seconds = elapsed % 60;
+
+    const clockEl = document.getElementById('prayerTimerClock');
+    if (clockEl) {
+        clockEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+}
+
+function onUserReturn() {
+    if (returnDetected) return;
+    returnDetected = true;
+
+    // Remove all listeners
+    document.removeEventListener('mousemove', onUserReturn);
+    document.removeEventListener('keydown', onUserReturn);
+    document.removeEventListener('click', onUserReturn);
+
+    // Stop the timer
+    if (prayerTimerInterval) {
+        clearInterval(prayerTimerInterval);
+        prayerTimerInterval = null;
+    }
+
+    // Calculate duration
+    const elapsed = Math.floor((Date.now() - prayerStartTime) / 1000);
+    const minutes = Math.floor(elapsed / 60);
+
+    // Show welcome back panel
+    const welcomePanel = document.getElementById('prayerTimerWelcome');
+    if (welcomePanel) {
+        welcomePanel.classList.remove('prayer-timer-welcome-hidden');
+    }
+
+    const titleEl = document.getElementById('welcomeTitle');
+    if (titleEl) {
+        titleEl.textContent = t('taqabbalAllah', 'tracker') || 'Taqabbal Allah';
+    }
+
+    const durationEl = document.getElementById('welcomeDuration');
+    if (durationEl) {
+        const durationLabel = t('duration', 'tracker') || 'Durée';
+        if (minutes > 0) {
+            durationEl.textContent = `${durationLabel} : ${minutes} min ${elapsed % 60}s`;
+        } else {
+            durationEl.textContent = `${durationLabel} : ${elapsed}s`;
+        }
+    }
+
+    const messageEl = document.getElementById('welcomeMessage');
+    if (messageEl) {
+        messageEl.textContent = t('prayerAccepted', 'tracker') || "MashaAllah, qu'Allah accepte ta prière";
+    }
+
+    const closeBtn = document.getElementById('welcomeCloseBtn');
+    if (closeBtn) {
+        closeBtn.textContent = t('alhamdulillah', 'tracker') || 'Alhamdulillah ✓';
+    }
+
+    // Auto-validate prayer in tracker if duration > 2 min (likely a real prayer)
+    if (minutes >= 2) {
+        validatePrayerFromTimer();
+    }
+}
+
+async function validatePrayerFromTimer() {
+    try {
+        const data = await ipcRenderer.invoke('get-prayer-tracker-data');
+        if (!data) return;
+
+        const today = new Date().toISOString().split('T')[0];
+        if (!data.days) data.days = {};
+        if (!data.days[today]) {
+            data.days[today] = { prayers: {}, points: 0 };
+            data.totalDays = (data.totalDays || 0) + 1;
+        }
+
+        // If we know the current prayer name, validate it
+        if (currentPrayerName && !data.days[today].prayers[currentPrayerName]?.status) {
+            const points = 10; // On-time points
+            data.days[today].prayers[currentPrayerName] = {
+                status: 'onTime',
+                bonuses: [],
+                points: points,
+                journal: null,
+                time: new Date().toISOString()
+            };
+            data.days[today].points = (data.days[today].points || 0) + points;
+            data.totalPoints = (data.totalPoints || 0) + points;
+            data.totalPrayers = (data.totalPrayers || 0) + 1;
+            data.onTimeCount = (data.onTimeCount || 0) + 1;
+
+            if (currentPrayerName === 'Fajr') {
+                data.fajrCount = (data.fajrCount || 0) + 1;
+            }
+
+            await ipcRenderer.invoke('save-prayer-tracker-data', data);
+        }
+    } catch (e) {
+        console.log('Could not auto-validate prayer:', e);
+    }
+}
+
+function closePrayerTimer() {
+    const overlay = document.getElementById('prayerTimerOverlay');
+    if (overlay) {
+        overlay.classList.add('prayer-timer-hidden');
+    }
+
+    if (prayerTimerInterval) {
+        clearInterval(prayerTimerInterval);
+        prayerTimerInterval = null;
+    }
+
+    prayerStartTime = null;
+    returnDetected = false;
+    currentPrayerName = null;
+}
+
+// ==================== ADHAN CORE ====================
 function notifyPrayer(prayer, mode = true) {
     const prayerName = t(prayer.key, 'prayerNames');
+    currentPrayerName = prayer.key; // Store current prayer name
 
     // Themed popup instead of native OS notification
     ipcRenderer.send('show-adhan-popup', {
@@ -30,6 +222,7 @@ function notifyPrayer(prayer, mode = true) {
 
     // Si mode silencieux, on s'arrête là (pas de son)
     if (mode === 'silent') {
+        showPrayGoBtn(true); // Still show the pray button
         return;
     }
 
@@ -42,17 +235,17 @@ function notifyPrayer(prayer, mode = true) {
         adhanAudio.pause();
         adhanAudio.currentTime = 0;
     }
-    const soundPath = path.join(__dirname, '../../assets/adhan.mp3'); // Correction du chemin
+    const soundPath = path.join(__dirname, '../../assets/adhan.mp3');
     adhanAudio = new Audio(soundPath);
-    adhanAudio.volume = 0; // Commencer avec le volume à 0 pour le fade-in
+    adhanAudio.volume = 0;
 
     adhanAudio.play().then(() => {
         showAdhanStopBtn(true);
+        showPrayGoBtn(true);
 
         // Effet de fade-in sur 60 secondes
-        const step = 0.0015; // Augmenter de ~0.15%
-        const intervalTime = 100; // Toutes les 100ms
-        // Durée totale = (1 / 0.0015) * 100ms ≈ 66000ms ≈ 66 secondes
+        const step = 0.0015;
+        const intervalTime = 100;
 
         fadeInterval = setInterval(() => {
             if (!adhanAudio) {
@@ -78,6 +271,10 @@ function notifyPrayer(prayer, mode = true) {
     if (adhanAudio) {
         adhanAudio.onended = () => {
             showAdhanStopBtn(false);
+            // Keep the pray button visible for 5 more minutes after adhan ends
+            setTimeout(() => {
+                if (!prayerStartTime) showPrayGoBtn(false);
+            }, 300000);
             if (fadeInterval) {
                 clearInterval(fadeInterval);
                 fadeInterval = null;
@@ -105,7 +302,8 @@ function setAdhanStopText() {
     }
 }
 
-// Gestion du bouton d'arrêt de l'Adhan
+// ==================== EVENT LISTENERS ====================
+// Adhan stop button
 const adhanStopBtn = document.getElementById('adhanStopBtn');
 if (adhanStopBtn) {
     adhanStopBtn.addEventListener('click', () => {
@@ -113,6 +311,24 @@ if (adhanStopBtn) {
     });
     showAdhanStopBtn(false);
     setAdhanStopText();
+}
+
+// "Going to pray" button
+const prayGoBtn = document.getElementById('prayGoBtn');
+if (prayGoBtn) {
+    prayGoBtn.addEventListener('click', () => {
+        showPrayGoBtn(false);
+        startPrayerTimer();
+    });
+    showPrayGoBtn(false);
+}
+
+// Welcome close button
+const welcomeCloseBtn = document.getElementById('welcomeCloseBtn');
+if (welcomeCloseBtn) {
+    welcomeCloseBtn.addEventListener('click', () => {
+        closePrayerTimer();
+    });
 }
 
 module.exports = { notifyPrayer };

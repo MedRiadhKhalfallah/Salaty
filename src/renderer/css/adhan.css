@@ -174,3 +174,278 @@
     outline: 3px solid rgba(255, 255, 255, 0.8);
     outline-offset: 5px;
 }
+
+/* ============================================
+   "GOING TO PRAY" BUTTON
+   Appears alongside the stop button during adhan
+   ============================================ */
+.pray-go-btn {
+    position: fixed;
+    bottom: 220px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 12px 24px;
+    border-radius: 30px;
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+
+    background: linear-gradient(135deg,
+        rgba(76, 175, 80, 0.9),
+        rgba(56, 142, 60, 0.95)
+    );
+    box-shadow:
+        0 8px 30px rgba(76, 175, 80, 0.3),
+        0 4px 15px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: prayBtnFloat 3s ease-in-out infinite;
+}
+
+@keyframes prayBtnFloat {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-4px); }
+}
+
+.pray-go-btn:hover {
+    transform: translateX(-50%) scale(1.06);
+    box-shadow:
+        0 12px 40px rgba(76, 175, 80, 0.4),
+        0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.pray-go-btn:active {
+    transform: translateX(-50%) scale(0.96);
+    transition: transform 0.1s ease;
+}
+
+.pray-go-icon {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.pray-go-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.97);
+    letter-spacing: 0.3px;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.pray-go-btn-hidden {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+.pray-go-btn:not(.pray-go-btn-hidden) {
+    display: flex !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+/* ============================================
+   PRAYER TIMER OVERLAY
+   Full-screen overlay while user is praying
+   ============================================ */
+.prayer-timer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg,
+        rgba(var(--accent-rgb, 74, 107, 255), 0.95),
+        rgba(0, 0, 0, 0.92)
+    );
+    backdrop-filter: blur(20px);
+    transition: opacity 0.5s ease;
+}
+
+.prayer-timer-hidden {
+    display: none !important;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.prayer-timer-overlay:not(.prayer-timer-hidden) {
+    display: flex !important;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.prayer-timer-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    animation: timerFadeIn 0.6s ease;
+}
+
+@keyframes timerFadeIn {
+    from { opacity: 0; transform: scale(0.9) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.prayer-timer-mosque {
+    font-size: 60px;
+    animation: mosqueGlow 3s ease-in-out infinite;
+}
+
+@keyframes mosqueGlow {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.05); filter: brightness(1.2); }
+}
+
+.prayer-timer-status {
+    font-size: 18px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 0.5px;
+}
+
+.prayer-timer-clock {
+    font-size: 52px;
+    font-weight: 700;
+    color: #ffffff;
+    font-feature-settings: 'tnum' on, 'lnum' on;
+    font-family: system-ui, -apple-system, sans-serif;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    letter-spacing: 2px;
+}
+
+.prayer-timer-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.prayer-timer-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    animation: dotPulse 1.5s ease-in-out infinite;
+}
+
+.prayer-timer-dots span:nth-child(2) { animation-delay: 0.3s; }
+.prayer-timer-dots span:nth-child(3) { animation-delay: 0.6s; }
+
+@keyframes dotPulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+.prayer-timer-hint {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 20px;
+    max-width: 250px;
+    line-height: 1.4;
+}
+
+/* ============================================
+   WELCOME BACK PANEL
+   Shown when user returns from prayer
+   ============================================ */
+.prayer-timer-welcome {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: linear-gradient(145deg,
+        rgba(76, 175, 80, 0.95),
+        rgba(27, 94, 32, 0.92)
+    );
+    backdrop-filter: blur(20px);
+    animation: welcomeFadeIn 0.5s ease;
+}
+
+.prayer-timer-welcome-hidden {
+    display: none !important;
+}
+
+.prayer-timer-welcome:not(.prayer-timer-welcome-hidden) {
+    display: flex !important;
+}
+
+@keyframes welcomeFadeIn {
+    from { opacity: 0; transform: scale(1.05); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.prayer-timer-welcome-icon {
+    font-size: 50px;
+    animation: starBurst 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes starBurst {
+    from { transform: scale(0) rotate(-30deg); }
+    to { transform: scale(1) rotate(0); }
+}
+
+.prayer-timer-welcome-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+}
+
+.prayer-timer-welcome-duration {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.15);
+    padding: 6px 16px;
+    border-radius: 20px;
+}
+
+.prayer-timer-welcome-message {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 260px;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.prayer-timer-welcome-btn {
+    margin-top: 8px;
+    padding: 12px 28px;
+    border-radius: 25px;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(5px);
+}
+
+.prayer-timer-welcome-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.prayer-timer-welcome-btn:active {
+    transform: translateY(0);
+    transition: transform 0.1s ease;
+}

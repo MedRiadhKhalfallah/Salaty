@@ -84,8 +84,58 @@
       <span class="adhan-stop-text" id="adhanStopText"></span>
     </button>
 
+    <!-- Going to Pray Button (appears with adhan) -->
+    <button class="pray-go-btn pray-go-btn-hidden" id="prayGoBtn">
+      <i class="fas fa-mosque pray-go-icon"></i>
+      <span class="pray-go-text" id="prayGoText">Je vais prier</span>
+    </button>
+
+    <!-- Prayer Timer Overlay (shown while user is praying) -->
+    <div class="prayer-timer-overlay prayer-timer-hidden" id="prayerTimerOverlay">
+      <div class="prayer-timer-content">
+        <div class="prayer-timer-mosque">🕌</div>
+        <div class="prayer-timer-status" id="prayerTimerStatus">En prière...</div>
+        <div class="prayer-timer-clock" id="prayerTimerClock">00:00</div>
+        <div class="prayer-timer-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="prayer-timer-hint" id="prayerTimerHint">Bougez la souris ou appuyez sur une touche à votre retour</div>
+      </div>
+      <!-- Welcome back panel (shown when user returns) -->
+      <div class="prayer-timer-welcome prayer-timer-welcome-hidden" id="prayerTimerWelcome">
+        <div class="prayer-timer-welcome-icon">✨</div>
+        <div class="prayer-timer-welcome-title" id="welcomeTitle">Taqabbal Allah</div>
+        <div class="prayer-timer-welcome-duration" id="welcomeDuration">Durée : 0 min</div>
+        <div class="prayer-timer-welcome-message" id="welcomeMessage">MashaAllah, qu'Allah accepte ta prière</div>
+        <button class="prayer-timer-welcome-btn" id="welcomeCloseBtn">Alhamdulillah ✓</button>
+      </div>
+    </div>
+
     <div class="prayer-times" id="prayerTimes">
       <div id="prayerList"></div>
+    </div>
+
+    <!-- Prayer Tracker Widget -->
+    <div class="tracker-widget" id="gardenWidget">
+      <div class="tracker-widget-left">
+        <div class="tracker-widget-tree" id="gardenWidgetTree">🌱</div>
+      </div>
+      <div class="tracker-widget-center">
+        <div class="tracker-widget-top">
+          <span class="tracker-widget-title" id="gardenWidgetLabel">Jardin de Hassanat</span>
+          <span class="tracker-widget-streak" id="widgetStreak">🔥 0</span>
+        </div>
+        <div class="tracker-widget-progress">
+          <div class="tracker-widget-progress-bar" id="gardenWidgetProgressBar"></div>
+        </div>
+        <div class="tracker-widget-bottom">
+          <span class="tracker-widget-level" id="widgetLevel">🌱 Débutant</span>
+          <span class="tracker-widget-points" id="widgetPoints">0 pts</span>
+        </div>
+      </div>
+      <div class="tracker-widget-right">
+        <i class="fas fa-chevron-right"></i>
+      </div>
     </div>
 
     <!-- Update Modal -->

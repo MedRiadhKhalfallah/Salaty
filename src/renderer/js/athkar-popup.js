@@ -71,10 +71,29 @@ ipcRenderer.once('init-themed-popup', (_event, data) => {
             ipcRenderer.send('show-themed-popup-ready', { height: neededHeight });
 
             // Start auto-close timer only after the window is shown
-            const autoCloseTimer = setTimeout(closePopup, CLOSE_DELAY_MS);
+            const endTime = Date.now() + CLOSE_DELAY_MS;
+            let autoCloseTimer = setTimeout(closePopup, CLOSE_DELAY_MS);
+
+            function pauseAutoClose() {
+                clearTimeout(autoCloseTimer);
+            }
+
+            function resumeAutoClose() {
+                const remaining = endTime - Date.now();
+                if (remaining <= 0) {
+                    closePopup();
+                } else {
+                    autoCloseTimer = setTimeout(closePopup, remaining);
+                }
+            }
+
+            app.addEventListener('mouseenter', pauseAutoClose);
+            app.addEventListener('mouseleave', resumeAutoClose);
 
             closeBtn.addEventListener('click', () => {
                 clearTimeout(autoCloseTimer);
+                app.removeEventListener('mouseenter', pauseAutoClose);
+                app.removeEventListener('mouseleave', resumeAutoClose);
                 closePopup();
             });
         });

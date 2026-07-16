@@ -90,6 +90,11 @@ function updateFeaturesUI() {
   if (featureLivestreams) featureLivestreams.textContent = t('liveHaramain');
   if (featureLivestreamsDesc) featureLivestreamsDesc.textContent = t('liveHaramainDesc');
 
+  const featureTracker = document.getElementById('featureTracker');
+  const featureTrackerDesc = document.getElementById('featureTrackerDesc');
+  if (featureTracker) featureTracker.textContent = t('featureTracker', 'tracker');
+  if (featureTrackerDesc) featureTrackerDesc.textContent = t('featureTrackerDesc', 'tracker');
+
   comingSoonBadges.forEach(badge => {
     badge.textContent = t('comingSoon');
   });
@@ -138,7 +143,7 @@ function setupFeatureCards() {
   if (calendarCard) {
     calendarCard.addEventListener('click', openCalendar);
   }
-  
+
   // Tasbih card
   const tasbihCard = document.querySelector('[data-feature="tasbih"]');
   if (tasbihCard) {
@@ -155,6 +160,12 @@ function setupFeatureCards() {
   const livestreamsCard = document.querySelector('[data-feature="livestreams"]');
   if (livestreamsCard) {
     livestreamsCard.addEventListener('click', openLiveStreams);
+  }
+
+  // Prayer Tracker card
+  const trackerCard = document.querySelector('[data-feature="prayer-tracker"]');
+  if (trackerCard) {
+    trackerCard.addEventListener('click', openPrayerTracker);
   }
 }
 
@@ -224,6 +235,13 @@ function openLiveStreams() {
   const size = screenSizeManager.getWindowSize();
   ipcRenderer.invoke('resize-window', size.width, size.height);
   ipcRenderer.invoke('navigate-to', 'livestreams');
+}
+
+function openPrayerTracker() {
+  analytics.navigation('features', 'prayer-tracker'); // ← ANALYTICS
+  const size = screenSizeManager.getWindowSize();
+  ipcRenderer.invoke('resize-window', size.width, size.height);
+  ipcRenderer.invoke('navigate-to', 'prayer-tracker');
 }
 
 module.exports = { initFeaturesPage };

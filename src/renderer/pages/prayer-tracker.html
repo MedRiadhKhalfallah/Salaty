@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prayer Tracker - Salaty Time</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/themes.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/utilities.css">
+  <link rel="stylesheet" href="../css/rtl.css">
+  <link rel="stylesheet" href="../css/prayer-tracker.css">
+</head>
+<body>
+  <div class="app-container theme-dark" id="app">
+    <div class="drag-area"></div>
+
+    <div class="tracker-container">
+      <!-- Header -->
+      <div class="tracker-header">
+        <button class="back-btn" id="backBtn" aria-label="Back">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2 class="tracker-title" id="trackerTitle">Prayer Tracker</h2>
+        <div class="tracker-controls">
+          <button class="control-btn minimize-btn" id="minimizeBtn" aria-label="Minimize">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 13H5v-2h14v2z" />
+            </svg>
+          </button>
+          <button class="control-btn fullscreen-btn" id="fullscreenBtn" aria-label="Toggle Fullscreen">
+            <i class="fas fa-expand"></i>
+          </button>
+          <button class="control-btn close-btn" id="closeBtn" aria-label="Close">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tracker-tabs">
+        <button class="tracker-tab active" data-tab="today" id="tabToday">
+          <i class="fas fa-check-circle"></i>
+          <span id="tabTodayLabel">Today</span>
+        </button>
+        <button class="tracker-tab" data-tab="stats" id="tabStats">
+          <i class="fas fa-chart-line"></i>
+          <span id="tabStatsLabel">Stats</span>
+        </button>
+        <button class="tracker-tab" data-tab="garden" id="tabGarden">
+          <i class="fas fa-seedling"></i>
+          <span id="tabGardenLabel">Garden</span>
+        </button>
+        <button class="tracker-tab" data-tab="achievements" id="tabAchievements">
+          <i class="fas fa-trophy"></i>
+          <span id="tabAchievementsLabel">Badges</span>
+        </button>
+      </div>
+
+      <!-- Content Area -->
+      <div class="tracker-content" id="trackerContent">
+
+        <!-- TODAY TAB -->
+        <div class="tab-panel active" id="panelToday">
+          <!-- Level & Points Banner -->
+          <div class="level-banner">
+            <div class="level-info">
+              <span class="level-badge" id="levelBadge">🌱 Débutant</span>
+              <span class="points-display" id="pointsDisplay">0 pts</span>
+            </div>
+            <div class="level-progress">
+              <div class="level-progress-bar" id="levelProgressBar" style="width: 0%"></div>
+            </div>
+            <div class="level-next" id="levelNext">Next: Régulier (500 pts)</div>
+          </div>
+
+          <!-- Streak -->
+          <div class="streak-banner" id="streakBanner">
+            <span class="streak-icon">🔥</span>
+            <span class="streak-text" id="streakText">Série : 0 jours</span>
+          </div>
+
+          <!-- Motivational Message -->
+          <div class="motivation-message" id="motivationMessage" style="display:none;"></div>
+
+          <!-- Today's Prayers -->
+          <div class="prayers-checklist" id="prayersChecklist">
+            <!-- Generated dynamically -->
+          </div>
+
+          <!-- Daily Bonus -->
+          <div class="daily-bonus" id="dailyBonus" style="display:none;">
+            <i class="fas fa-star"></i>
+            <span id="dailyBonusText">+20 bonus: 5 prières accomplies !</span>
+          </div>
+        </div>
+
+        <!-- STATS TAB -->
+        <div class="tab-panel" id="panelStats">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value" id="statMonthRate">0%</div>
+              <div class="stat-label" id="statMonthRateLabel">Taux ce mois</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="statBestStreak">0</div>
+              <div class="stat-label" id="statBestStreakLabel">Meilleure série</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="statTotalPrayers">0</div>
+              <div class="stat-label" id="statTotalPrayersLabel">Prières totales</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="statFajrCount">0</div>
+              <div class="stat-label" id="statFajrCountLabel">Fajr accomplis</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="statOnTimeCount">0</div>
+              <div class="stat-label" id="statOnTimeCountLabel">À l'heure</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="statMosqueCount">0</div>
+              <div class="stat-label" id="statMosqueCountLabel">À la mosquée</div>
+            </div>
+          </div>
+
+          <!-- Calendar View -->
+          <div class="calendar-section">
+            <div class="calendar-header">
+              <button class="calendar-nav" id="calPrev"><i class="fas fa-chevron-left"></i></button>
+              <span class="calendar-month" id="calMonth">Mai 2026</span>
+              <button class="calendar-nav" id="calNext"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid">
+              <!-- Generated dynamically -->
+            </div>
+            <div class="calendar-legend">
+              <span class="legend-item"><span class="legend-dot green"></span> <span id="legendComplete">Complète</span></span>
+              <span class="legend-item"><span class="legend-dot yellow"></span> <span id="legendPartial">Partielle</span></span>
+              <span class="legend-item"><span class="legend-dot red"></span> <span id="legendNone">Aucune</span></span>
+            </div>
+          </div>
+
+          <!-- Challenges -->
+          <div class="challenges-section">
+            <h3 class="section-title" id="challengesTitle">🎯 Défis personnels</h3>
+            <div class="challenges-list" id="challengesList">
+              <!-- Generated dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- GARDEN TAB -->
+        <div class="tab-panel" id="panelGarden">
+          <div class="garden-view">
+            <div class="garden-stage" id="gardenStage">
+              <!-- Garden visualization -->
+            </div>
+            <div class="garden-info">
+              <h3 class="garden-title" id="gardenTitle">🌱 Jardin de Hassanat</h3>
+              <p class="garden-description" id="gardenDescription">Chaque prière validée fait pousser votre jardin</p>
+              <div class="garden-progress">
+                <div class="garden-progress-bar" id="gardenProgressBar" style="width: 0%"></div>
+              </div>
+              <div class="garden-stats">
+                <span id="gardenSeeds">🌱 0 graines</span>
+                <span id="gardenTrees">🌳 0 arbres</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACHIEVEMENTS TAB -->
+        <div class="tab-panel" id="panelAchievements">
+          <div class="achievements-grid" id="achievementsGrid">
+            <!-- Generated dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/renderer.js"></script>
+</body>
+</html>
+

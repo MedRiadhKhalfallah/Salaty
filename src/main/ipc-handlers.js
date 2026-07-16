@@ -528,6 +528,31 @@ function setupHandlers(mainWindow) {
 
   // Returns true when running in development (not packaged)
   ipcMain.handle('is-dev-mode', () => !app.isPackaged);
+
+  // ===== Prayer Tracker Data =====
+  const trackerPath = path.join(app.getPath('userData'), 'prayer-tracker.json');
+
+  ipcMain.handle('get-prayer-tracker-data', () => {
+    try {
+      if (fs.existsSync(trackerPath)) {
+        const data = fs.readFileSync(trackerPath, 'utf8');
+        return JSON.parse(data);
+      }
+    } catch (e) {
+      console.error('Error loading prayer tracker data:', e);
+    }
+    return null;
+  });
+
+  ipcMain.handle('save-prayer-tracker-data', (event, data) => {
+    try {
+      fs.writeFileSync(trackerPath, JSON.stringify(data, null, 2), 'utf8');
+      return true;
+    } catch (e) {
+      console.error('Error saving prayer tracker data:', e);
+      return false;
+    }
+  });
 }
 
 module.exports = {

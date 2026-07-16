@@ -20,6 +20,7 @@ const { setupMiniPlayer } = require('../js/mini-player');
 const { initTasbihPage } = require('../js/tasbihUI');
 const { initRadioPage } = require('../js/radioUI');
 const { initLiveStreamsPage } = require('../js/livestreamsUI');
+const { initPrayerTrackerPage } = require('../js/prayerTrackerUI');
 const analytics = require('../js/utils/analytics');
 
 // ==================== SCREEN SIZE HELPER FUNCTIONS ====================
@@ -175,6 +176,11 @@ async function initializeApp() {
       analytics.featureOpen('livestreams'); // ← ANALYTICS
       setupScreenSizeForPage('livestreams-container');
       initLiveStreamsPage();
+
+    } else if (pagePath.includes('prayer-tracker.html')) {
+      analytics.featureOpen('prayer-tracker'); // ← ANALYTICS
+      setupScreenSizeForPage('tracker-container');
+      initPrayerTrackerPage();
     }
 
     setupWindowControls();
@@ -348,6 +354,94 @@ function initMainPage() {
   loadPrayerTimes();
   setInterval(updateCurrentAndNextPrayer, 1_000);
   setInterval(loadPrayerTimes, 3_600_000);
+
+  // Garden Widget Preview
+  initGardenWidget();
+}
+
+// ==================== PRAYER TRACKER WIDGET ON HOME PAGE ====================
+async function initGardenWidget() {
+  const widget = document.getElementById('gardenWidget');
+  if (!widget) return;
+
+  // Navigate to prayer tracker on click
+  widget.addEventListener('click', async () => {
+    analytics.navigation('home', 'prayer-tracker');
+    const size = screenSizeManager.getWindowSize();
+    await ipcRenderer.invoke('resize-window', size.width, size.height);
+    ipcRenderer.invoke('navigate-to', 'prayer-tracker');
+  });
+
+  // Load tracker data to display preview
+  try {
+    const data = await ipcRenderer.invoke('get-prayer-tracker-data');
+    if (data) {
+      const totalPrayers = data.totalPrayers || 0;
+      const totalPoints = data.totalPoints || 0;
+      const currentStreak = data.currentStreak || 0;
+      const seedsInProgress = totalPrayers % 100;
+
+      // Tree emoji based on progress
+      const treeEl = document.getElementById('gardenWidgetTree');
+      if (treeEl) {
+        if (totalPrayers >= 1000) treeEl.textContent = '🌲';
+        else if (totalPrayers >= 500) treeEl.textContent = '🌳';
+        else if (totalPrayers >= 100) treeEl.textContent = '🌳';
+        else if (totalPrayers >= 50) treeEl.textContent = '🌿';
+        else if (totalPrayers >= 10) treeEl.textContent = '🌱';
+        else treeEl.textContent = '🌰';
+      }
+
+      // Progress bar (towards next tree)
+      const progressBar = document.getElementById('gardenWidgetProgressBar');
+      if (progressBar) {
+        progressBar.style.width = `${seedsInProgress}%`;
+      }
+
+      // Title with prayer count
+      const label = document.getElementById('gardenWidgetLabel');
+      if (label) {
+        if (totalPrayers > 0) {
+          label.textContent = `${totalPrayers} ${t('trackerStatTotal', 'tracker') || 'prières'}`;
+        } else {
+          label.textContent = t('gardenTitle', 'tracker') || 'Jardin de Hassanat';
+        }
+      }
+
+      // Streak
+      const streakEl = document.getElementById('widgetStreak');
+      if (streakEl) {
+        streakEl.textContent = `🔥 ${currentStreak}`;
+        if (currentStreak === 0) streakEl.style.opacity = '0.4';
+      }
+
+      // Level
+      const levelEl = document.getElementById('widgetLevel');
+      if (levelEl) {
+        const levels = [
+          { name: 'beginner', emoji: '🌱', min: 0 },
+          { name: 'regular', emoji: '🌿', min: 500 },
+          { name: 'perseverant', emoji: '🌳', min: 1500 },
+          { name: 'assiduous', emoji: '⭐', min: 5000 },
+          { name: 'exemplary', emoji: '🏆', min: 10000 }
+        ];
+        let currentLevel = levels[0];
+        for (const l of levels) {
+          if (totalPoints >= l.min) currentLevel = l;
+        }
+        const levelName = t('level_' + currentLevel.name, 'tracker') || currentLevel.name;
+        levelEl.textContent = `${currentLevel.emoji} ${levelName}`;
+      }
+
+      // Points
+      const pointsEl = document.getElementById('widgetPoints');
+      if (pointsEl) {
+        pointsEl.textContent = `${totalPoints} pts`;
+      }
+    }
+  } catch (e) {
+    console.log('Tracker widget: no data yet');
+  }
 }
 
 // ==================== START THE APP ====================
