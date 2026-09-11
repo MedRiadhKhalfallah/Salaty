@@ -171,6 +171,84 @@ ipcMain.on('close-themed-popup', (event) => {
   if (win && !win.isDestroyed()) win.destroy();
 });
 
+/* ── Athkar periodic alert scheduler ──────────────────────────────────────
+ * Lives entirely in the main process so the interval survives page
+ * navigation/reloads in the renderer (previously it was (re)started from
+ * renderer.js on every page load, which reset the countdown to zero every
+ * time the user navigated between pages — making alerts appear far less
+ * often than the configured interval, and effectively "random").
+ */
+const ATHKAR_GITHUB_URL = 'https://raw.githubusercontent.com/yassindaboussi/Salaty/main/src/renderer/data/adkar.json';
+
+let athkarFullList = [];
+let athkarQueue = [];
+let athkarAlertIntervalId = null;
+
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildAthkarList(data) {
+  athkarFullList = Object.values(data).flat();
+  athkarQueue    = shuffleArray(athkarFullList);
+}
+
+function loadAthkarData() {
+  // Build immediately from the bundled local copy (instant, always available) …
+  try {
+    const localPath = path.join(__dirname, '../renderer/data/adkar.json');
+    buildAthkarList(JSON.parse(fs.readFileSync(localPath, 'utf8')));
+  } catch (error) {
+    console.error('Error loading local adkar.json:', error);
+  }
+
+  // … then refresh from GitHub in the background (may contain newer content).
+  fetch(ATHKAR_GITHUB_URL)
+    .then(res => (res.ok ? res.json() : Promise.reject(new Error(`Status ${res.status}`))))
+    .then(data => buildAthkarList(data))
+    .catch(err => console.warn('Failed to fetch adkar.json from GitHub, keeping local fallback.', err));
+}
+
+function triggerAthkarAlert() {
+  if (athkarFullList.length === 0) return;
+
+  // Refill the queue once all entries have been shown (full coverage before repeating)
+  if (athkarQueue.length === 0) {
+    athkarQueue = shuffleArray(athkarFullList);
+  }
+
+  const next = athkarQueue.pop();
+  showThemedPopup({
+    icon:    'fa-moon',
+    theme:   settingsData.theme || 'navy',
+    content: next.content,
+    title:   next.category ? `Salaty · ${next.category}` : 'Salaty Time · أذكار'
+  }, 'athkar');
+}
+
+/**
+ * (Re)starts the periodic Athkar alert timer based on the current settings.
+ * Must be called once at startup and again every time settings are saved,
+ * so enabling/disabling alerts or changing the interval takes effect
+ * immediately — no need to navigate/reload a renderer page.
+ */
+function restartAthkarAlertTimer() {
+  if (athkarAlertIntervalId) {
+    clearInterval(athkarAlertIntervalId);
+    athkarAlertIntervalId = null;
+  }
+
+  if (!settingsData.athkarAlertEnabled) return;
+
+  const minutes = settingsData.athkarAlertInterval || 30;
+  athkarAlertIntervalId = setInterval(triggerAthkarAlert, minutes * 60 * 1000);
+}
+
 let settingsData = {
   city: 'Tunis',
   country: 'Tunisia',
@@ -178,7 +256,13 @@ let settingsData = {
   language: 'en',
   position: { x: 100, y: 100 },
   bigScreen: true,
-  locations: []
+  locations: [],
+  // Prayer Tracker (Salaty tracking during Adhan + Prayer Tracker page) — enabled by default
+  prayerTrackingEnabled: true,
+  // Athkar "read" counter — total number of athkar popups marked as read by the user
+  athkarReadCount: 0,
+  // Whether the counter widget is shown on the home page (configurable in Settings)
+  showAthkarReadCounter: true
 };
 
 function getSettingsPath() {
@@ -209,6 +293,10 @@ function loadSettings() {
   } catch (error) {
     console.error('Error loading settings:', error);
   }
+
+  // Athkar alerts depend on settingsData being loaded — (re)start once here.
+  loadAthkarData();
+  restartAthkarAlertTimer();
 }
 
 /**
@@ -305,9 +393,18 @@ function setupHandlers(mainWindow) {
 
   ipcMain.handle('save-settings', (event, newSettings) => {
     const oldTheme = settingsData.theme;
+    const oldAthkarEnabled  = settingsData.athkarAlertEnabled;
+    const oldAthkarInterval = settingsData.athkarAlertInterval;
     settingsData = { ...settingsData, ...newSettings };
     syncActiveLocation();
     saveSettings();
+
+    // Apply the new Athkar alert schedule immediately (enable/disable or
+    // interval change) instead of waiting for a page navigation/reload.
+    if (settingsData.athkarAlertEnabled !== oldAthkarEnabled ||
+        settingsData.athkarAlertInterval !== oldAthkarInterval) {
+      restartAthkarAlertTimer();
+    }
 
     // If theme changed, notify ALL windows to update their theme
     if (newSettings.theme && newSettings.theme !== oldTheme) {
@@ -332,6 +429,19 @@ function setupHandlers(mainWindow) {
     }
 
     return settingsData;
+  });
+
+  // Athkar "read" counter — incremented when the user checks "I've read it"
+  // in the athkar popup. Persisted in settings and broadcast to the home page.
+  ipcMain.handle('increment-athkar-read-count', () => {
+    settingsData.athkarReadCount = (settingsData.athkarReadCount || 0) + 1;
+    saveSettings();
+
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('athkar-read-count-updated', settingsData.athkarReadCount);
+    }
+
+    return settingsData.athkarReadCount;
   });
 
   // Location management handlers

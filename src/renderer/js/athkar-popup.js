@@ -2,15 +2,28 @@
 // Renderer script for the themed notification popup window (athkar & adhan).
 
 const { ipcRenderer } = require('electron');
+// NOTE: this script is loaded via a plain <script src> tag (not a module),
+// so require() resolves relative paths against the HTML page's location
+// (src/renderer/pages/), not against this file's own directory.
+const { t, setLanguage } = require('../js/translations');
 
 const CLOSE_DELAY_MS = 10000; // 10 seconds auto-close
 
-const app        = document.getElementById('app');
-const athkarText = document.getElementById('athkarText');
-const closeBtn   = document.getElementById('closeBtn');
-const titleEl    = document.getElementById('popupTitle');
-const iconEl     = document.querySelector('.popup-icon i');
-const openAppBtn = document.getElementById('openAppBtn');
+const app               = document.getElementById('app');
+const athkarText        = document.getElementById('athkarText');
+const closeBtn          = document.getElementById('closeBtn');
+const titleEl           = document.getElementById('popupTitle');
+const iconEl            = document.querySelector('.popup-icon i');
+const openAppBtn        = document.getElementById('openAppBtn');
+const readCheckContainer = document.getElementById('readCheckContainer');
+const readCheckbox      = document.getElementById('readCheckbox');
+const readCheckLabel    = document.getElementById('readCheckLabel');
+
+// Sync language with the rest of the app so the "read" checkbox label is translated
+ipcRenderer.invoke('get-settings').then(settings => {
+    setLanguage(settings?.language || 'en');
+    if (readCheckLabel) readCheckLabel.textContent = t('athkarReadCheckbox');
+}).catch(() => {});
 
 /* All supported theme classes (must match themes.css) */
 const THEME_CLASSES = [
@@ -59,6 +72,16 @@ ipcRenderer.once('init-themed-popup', (_event, data) => {
         openAppBtn.addEventListener('click', () => {
             ipcRenderer.send('show-main-window'); // focus + affiche la fenêtre principale
             closePopup();
+        });
+    }
+
+    // Show the "I've read this dhikr" checkbox only for athkar popups
+    if (type !== 'adhan' && readCheckContainer && readCheckbox) {
+        readCheckContainer.classList.remove('hidden');
+        readCheckbox.addEventListener('change', () => {
+            if (!readCheckbox.checked) return;
+            readCheckbox.disabled = true; // prevent double counting on repeated clicks
+            ipcRenderer.invoke('increment-athkar-read-count').catch(err => console.error(err));
         });
     }
 

@@ -3,6 +3,7 @@ const { ipcRenderer } = require('electron');
 const { t } = require('./translations');
 const screenSizeManager = require('./screenSize');
 const analytics = require('./utils/analytics');
+const { state } = require('./globalStore');
 
 // Helper for tracker-specific translations
 function tt(key) {
@@ -721,6 +722,13 @@ function updateUITexts() {
 // ===== INIT =====
 async function initPrayerTrackerPage() {
   console.log('Initializing Prayer Tracker page...');
+
+  // Defense-in-depth: if the user disabled Prayer Tracking from Settings,
+  // bounce back to the Features page instead of showing this feature.
+  if (state.settings.prayerTrackingEnabled === false) {
+    ipcRenderer.invoke('navigate-to', 'features');
+    return;
+  }
 
   // Back button
   const backBtn = document.getElementById('backBtn');

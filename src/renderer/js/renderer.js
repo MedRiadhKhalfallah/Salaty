@@ -13,7 +13,6 @@ const { initQiblaPage } = require('../js/qibla');
 const { initAsmaPage } = require('../js/asmaUI');
 const { initHijriCalendar } = require('../js/hijriCalendar');
 const { applyTheme } = require('../js/theme');
-const { initAthkarAlertsSystem } = require('../js/athkarAlerts');
 const screenSizeManager = require('../js/screenSize');
 const { initLocationSwitcher } = require('../js/locationSwitcher');
 const { setupMiniPlayer } = require('../js/mini-player');
@@ -108,7 +107,9 @@ async function initializeApp() {
       applyTheme(state.settings.theme || 'navy');
       applyLanguageDirection();
       await screenSizeManager.applyScreenSize();
-      initAthkarAlertsSystem();
+      // NOTE: Athkar periodic alerts are now scheduled entirely in the main
+      // process (src/main/ipc-handlers.js) so the timer survives page
+      // navigation/reloads instead of restarting every time a page loads.
     }
 
     // ── Detect current page and init the right module ─────────────────────────
@@ -357,6 +358,31 @@ function initMainPage() {
 
   // Garden Widget Preview
   initGardenWidget();
+
+  // Athkar Read Counter widget
+  initAthkarCounterWidget();
+}
+
+// ==================== ATHKAR READ COUNTER WIDGET ON HOME PAGE ====================
+function initAthkarCounterWidget() {
+  const widget = document.getElementById('athkarCounterWidget');
+  const labelEl = document.getElementById('athkarCounterLabel');
+  const valueEl = document.getElementById('athkarCounterValue');
+  if (!widget) return;
+
+  const render = () => {
+    if (labelEl) labelEl.textContent = t('athkarReadCounterHome');
+    if (valueEl) valueEl.textContent = state.settings.athkarReadCount || 0;
+    widget.style.display = state.settings.showAthkarReadCounter !== false ? 'flex' : 'none';
+  };
+
+  render();
+
+  // Live update when a popup is marked as read (broadcast from main process)
+  ipcRenderer.on('athkar-read-count-updated', (_event, count) => {
+    state.settings.athkarReadCount = count;
+    render();
+  });
 }
 
 // ==================== PRAYER TRACKER WIDGET ON HOME PAGE ====================

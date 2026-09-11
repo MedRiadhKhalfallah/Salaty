@@ -45,6 +45,8 @@ function setPrayGoText() {
 
 // ==================== PRAYER TIMER ====================
 function startPrayerTimer() {
+    if (!isPrayerTrackingEnabled()) return;
+
     // Stop the adhan
     stopAdhan();
 
@@ -155,6 +157,8 @@ function onUserReturn() {
 }
 
 async function validatePrayerFromTimer() {
+    if (!isPrayerTrackingEnabled()) return;
+
     try {
         const data = await ipcRenderer.invoke('get-prayer-tracker-data');
         if (!data) return;
@@ -208,6 +212,14 @@ function closePrayerTimer() {
     currentPrayerName = null;
 }
 
+// ==================== PRAYER TRACKER SETTING ====================
+// The whole "Salaty tracking" flow (Prayer Tracker page + the "Going to
+// pray" timer/auto-validation shown after each Adhan) can be disabled by
+// the user from Settings. Enabled by default.
+function isPrayerTrackingEnabled() {
+    return state.settings.prayerTrackingEnabled !== false;
+}
+
 // ==================== ADHAN CORE ====================
 function notifyPrayer(prayer, mode = true) {
     const prayerName = t(prayer.key, 'prayerNames');
@@ -222,7 +234,7 @@ function notifyPrayer(prayer, mode = true) {
 
     // Si mode silencieux, on s'arrête là (pas de son)
     if (mode === 'silent') {
-        showPrayGoBtn(true); // Still show the pray button
+        if (isPrayerTrackingEnabled()) showPrayGoBtn(true); // Still show the pray button
         return;
     }
 
@@ -241,7 +253,7 @@ function notifyPrayer(prayer, mode = true) {
 
     adhanAudio.play().then(() => {
         showAdhanStopBtn(true);
-        showPrayGoBtn(true);
+        if (isPrayerTrackingEnabled()) showPrayGoBtn(true);
 
         // Effet de fade-in sur 60 secondes
         const step = 0.0015;

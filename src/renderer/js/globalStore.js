@@ -17,7 +17,8 @@ const state = {
         athkarAlertEnabled: false,
         athkarAlertInterval: 30,
         preAdhanMinutes: 5,
-        preAdhanNotificationEnabled: true
+        preAdhanNotificationEnabled: true,
+        prayerTrackingEnabled: true
     }
 };
 

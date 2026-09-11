@@ -39,6 +39,8 @@ function initSettingsPage() {
     initAthkarAlerts();
     initPreAdhanNotification();
     initScreenSizeSetting();
+    initPrayerTracking();
+    initAthkarReadCounterSetting();
     initTestPopupButtons();
 }
 
@@ -75,6 +77,14 @@ function updateAllText() {
         'enablePreAdhanNotificationLabel': 'enablePreAdhanNotification',
         'preAdhanMinutesLabel': 'minutesBeforeAdhan',
         'minutesLabel2': 'minutes',
+
+        // Prayer Tracker toggle
+        'prayerTrackingLabel': 'prayerTrackingLabel',
+        'enablePrayerTrackingLabel': 'enablePrayerTrackingLabel',
+
+        // Athkar Read Counter toggle
+        'athkarReadCounterLabel': 'athkarReadCounterLabel',
+        'showAthkarReadCounterLabel': 'showAthkarReadCounterLabel',
 
         'saveBtn': 'save',
 
@@ -291,6 +301,31 @@ function initPreAdhanNotification() {
 }
 
 /**
+ * Initialize Prayer Tracker toggle.
+ * Controls the whole Salaty prayer-tracking system: the "Prayer Tracker"
+ * feature page AND the "Going to pray" timer / auto-validation shown after
+ * each Adhan. Enabled by default; the user can opt out at any time.
+ */
+function initPrayerTracking() {
+    const toggle = document.getElementById('prayerTrackingToggle');
+    if (!toggle) return;
+
+    // Default to true (opt-out model) when not explicitly disabled
+    toggle.checked = state.settings.prayerTrackingEnabled !== false;
+}
+
+/**
+ * Initialize the Athkar Read Counter toggle (home page widget visibility).
+ * Enabled by default; the user can hide it at any time.
+ */
+function initAthkarReadCounterSetting() {
+    const toggle = document.getElementById('athkarReadCounterToggle');
+    if (!toggle) return;
+
+    toggle.checked = state.settings.showAthkarReadCounter !== false;
+}
+
+/**
  * Initialize test popup buttons (Athkar & Adhan preview) – dev mode only
  */
 async function initTestPopupButtons() {
@@ -336,6 +371,8 @@ async function saveSettings() {
   const athkarInput   = document.getElementById('athkarIntervalInput');
   const preAdhanToggle = document.getElementById('preAdhanNotificationToggle');
   const preAdhanInput = document.getElementById('preAdhanMinutesInput');
+  const prayerTrackingToggle = document.getElementById('prayerTrackingToggle');
+  const athkarReadCounterToggle = document.getElementById('athkarReadCounterToggle');
   const selectedSizeCard = document.querySelector('.size-card.selected');
   const selectedSize  = selectedSizeCard ? selectedSizeCard.dataset.size : 'small';
 
@@ -363,6 +400,8 @@ async function saveSettings() {
       let v = parseInt(preAdhanInput.value);
       state.settings.preAdhanMinutes = isNaN(v) || v < 1 ? 5 : v;
     }
+    if (prayerTrackingToggle) state.settings.prayerTrackingEnabled = prayerTrackingToggle.checked;
+    if (athkarReadCounterToggle) state.settings.showAthkarReadCounter = athkarReadCounterToggle.checked;
 
     await ipcRenderer.invoke('save-settings', state.settings);
 

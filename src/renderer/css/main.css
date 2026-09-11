@@ -657,3 +657,46 @@ a,
   color: var(--accent-color, rgba(255, 255, 255, 0.8));
   transform: translateX(2px);
 }
+
+/* ========== Athkar Read Counter Widget (home page) ========== */
+.athkar-counter-widget {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 16px 14px;
+  padding: 10px 14px;
+  background: var(--bg-surface, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  -webkit-app-region: no-drag;
+}
+
+.athkar-counter-icon {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(var(--accent-rgb, 74, 144, 226), 0.12);
+  color: var(--accent-color, #4a90e2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.athkar-counter-label {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.athkar-counter-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent-color, #4a90e2);
+  flex-shrink: 0;
+}

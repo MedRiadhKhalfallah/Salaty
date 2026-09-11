@@ -3,6 +3,7 @@ const { ipcRenderer } = require('electron');
 const { t } = require('./translations');
 const screenSizeManager = require('./screenSize');
 const analytics = require('./utils/analytics');
+const { state } = require('./globalStore');
 
 // ==================== FEATURES PAGE FUNCTIONS ====================
 function initFeaturesPage() {
@@ -165,7 +166,12 @@ function setupFeatureCards() {
   // Prayer Tracker card
   const trackerCard = document.querySelector('[data-feature="prayer-tracker"]');
   if (trackerCard) {
-    trackerCard.addEventListener('click', openPrayerTracker);
+    // Hide the whole card when the user disabled Prayer Tracking from Settings
+    if (state.settings.prayerTrackingEnabled === false) {
+      trackerCard.style.display = 'none';
+    } else {
+      trackerCard.addEventListener('click', openPrayerTracker);
+    }
   }
 }
 
